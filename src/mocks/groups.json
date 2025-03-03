@@ -1,0 +1,46 @@
+[
+    {
+        "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5e1"},
+        "name": "Adventure Enthusiasts",
+        "members": [
+            "Alice Johnson",
+            "Bob Smith",
+            "Charlie Brown"
+        ]
+    },
+    {
+        "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5e5"},
+        "name": "Tech Innovators",
+        "members": [
+            "David Lee",
+            "Eva Martinez"
+        ]
+    },
+    {
+        "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5e8"},
+        "name": "Book Club",
+        "members": [
+            "Fiona Green",
+            "George Harris",
+            "Hannah Taylor",
+            "Ian Clark"
+        ]
+    },
+    {
+        "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5ed"},
+        "name": "Fitness Freaks",
+        "members": [
+            "Jack White",
+            "Karen Adams"
+        ]
+    },
+    {
+        "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5f0"},
+        "name": "Food Lovers",
+        "members": [
+            "Laura Wilson",
+            "Michael Brown",
+            "Nina Garcia"
+        ]
+    }
+]
