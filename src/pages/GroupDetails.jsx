@@ -1,5 +1,9 @@
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { getGroupById } from '../services/groupService'
+import PageContainer from '../components/layout/PageContainer'
+import PageHeader from '../components/layout/PageHeader'
+import MemberList from '../components/groups/MemberList'
+import NotFound from '../components/common/NotFound'
 
 const GroupDetails = () => {
     const { id } = useParams()
@@ -7,59 +11,25 @@ const GroupDetails = () => {
 
     if (!group) {
         return (
-            <div className="max-w-2xl mx-auto bg-white shadow-sm min-h-screen p-4">
-                <div className="flex items-center mb-4">
-                    <Link to="/" className="text-blue-500 hover:text-blue-700 mr-2">
-                        &larr; Back
-                    </Link>
-                </div>
-                <div className="text-center py-10">
-                    <h2 className="text-xl font-semibold text-gray-800">Group not found</h2>
-                </div>
-            </div>
+            <PageContainer>
+                <PageHeader backLink="/" />
+                <NotFound type="Group" />
+            </PageContainer>
         )
     }
 
     return (
-        <div className="max-w-2xl mx-auto bg-white shadow-sm min-h-screen">
-            <div className="border-b border-gray-200 p-4">
-                <div className="flex items-center mb-2">
-                    <Link to="/" className="text-blue-500 hover:text-blue-700 mr-2">
-                        &larr; Back
-                    </Link>
-                </div>
-                <h1 className="text-xl font-semibold text-gray-800">
-                    {group.name}
-                </h1>
-                <p className="text-sm text-gray-500">
-                    {group.members.length} members
-                </p>
-            </div>
+        <PageContainer>
+            <PageHeader 
+                title={group.name}
+                subtitle={`${group.members.length} members`}
+                backLink="/"
+            />
 
             <div className="p-4">
-                <h2 className="text-lg font-medium text-gray-700 mb-3">Members</h2>
-                <ul className="divide-y divide-gray-100">
-                    {group.members.map((member) => (
-                        <li key={member.id} className="py-3 flex items-center">
-                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                                <span className="text-blue-500 text-sm">
-                                    {member.name.charAt(0)}
-                                </span>
-                            </div>
-                            <div className="flex-1">
-                                <Link 
-                                    to={`/user/${member.id}`} 
-                                    className="text-gray-800 hover:text-blue-600 block"
-                                >
-                                    {member.name}
-                                </Link>
-                                <span className="text-xs text-gray-500">{member.email}</span>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
+                <MemberList members={group.members} />
             </div>
-        </div>
+        </PageContainer>
     )
 }
 
