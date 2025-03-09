@@ -15,7 +15,7 @@ export class SocketService {
   private connected: boolean = false;
   private serverUrl: string;
 
-  constructor(serverUrl: string = 'http://localhost:3001') {
+  constructor(serverUrl: string) {
     this.serverUrl = serverUrl;
   }
 
@@ -157,5 +157,5 @@ export class SocketService {
 }
 
 // Create a singleton instance
-const socketService = new SocketService();
+const socketService = new SocketService(import.meta.env.VITE_SOCKET_SERVER_URL || 'http://localhost:3001');
 export default socketService; 
