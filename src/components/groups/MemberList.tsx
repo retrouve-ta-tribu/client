@@ -1,9 +1,8 @@
 import { FC, useEffect, useState } from 'react';
 import Spinner from '../common/Spinner';
-import { UserPosition } from '../../services/geolocationService';
 import MemberCard from './MemberCard';
 import HighlightedMemberCard from './HighlightedMemberCard';
-import {Member} from './types';
+import {Member, UserPosition} from '../../services/types.ts';
 
 
 export interface MemberListProps {

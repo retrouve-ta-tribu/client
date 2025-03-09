@@ -7,7 +7,7 @@ import MemberList from '../components/groups/MemberList'
 import NotFound from '../components/common/NotFound'
 import Spinner from '../components/common/Spinner'
 import locationSharingService from '../services/locationSharingService'
-import {UserPosition} from "../services/geolocationService.ts";
+import {UserPosition} from "../services/types.ts";
 
 const GroupDetails: FC = () => {
     const params = useParams();

@@ -1,19 +1,5 @@
 import groups from '../mocks/groups.json'
-
-// Define types for our data structure
-interface Member {
-  id: string;
-  name: string;
-  email: string;
-}
-
-interface Group {
-  _id: {
-    $oid: string;
-  };
-  name: string;
-  members: Member[];
-}
+import {Group} from "./types.ts";
 
 export const getGroups = () => {
   return groups as Group[]

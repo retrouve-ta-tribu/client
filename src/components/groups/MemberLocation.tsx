@@ -1,5 +1,5 @@
 import React from 'react';
-import { UserPosition } from '../../services/geolocationService';
+import {UserPosition} from "../../services/types.ts";
 
 interface MemberLocationProps {
   position: UserPosition;

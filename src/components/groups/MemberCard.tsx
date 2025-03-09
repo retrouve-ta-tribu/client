@@ -2,8 +2,7 @@ import React from 'react';
 import MemberLocation from './MemberLocation';
 import MemberAvatar from './MemberAvatar';
 import OnlineStatus from './OnlineStatus';
-import {Member} from "./types.ts";
-import {UserPosition} from "../../services/geolocationService.ts";
+import {Member, UserPosition} from "../../services/types.ts";
 
 interface MemberCardProps {
   member: Member;

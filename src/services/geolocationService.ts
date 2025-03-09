@@ -1,14 +1,8 @@
+import {UserPosition} from "./types.ts";
+
 /**
  * Service for handling geolocation functionality
  */
-
-export interface UserPosition {
-  latitude: number;
-  longitude: number;
-  userId: string;
-  timestamp: number;
-}
-
 class GeolocationService {
   private watchId: number | null = null;
   private lastPosition: UserPosition | null = null;

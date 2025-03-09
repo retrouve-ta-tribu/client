@@ -1,5 +1,6 @@
 import socketService, { RoomEvents } from './socketService';
-import geolocationService, {UserPosition} from './geolocationService';
+import geolocationService from './geolocationService';
+import {UserPosition} from "./types.ts";
 
 export enum LocationEvents {
   LocationUpdate = 'LocationUpdate'

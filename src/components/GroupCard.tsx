@@ -1,19 +1,6 @@
 import { FC } from 'react'
 import { Link } from 'react-router-dom'
-
-interface Member {
-    id: string;
-    name: string;
-    email: string;
-}
-
-interface Group {
-    _id: {
-        $oid: string;
-    };
-    name: string;
-    members: Member[];
-}
+import {Group} from "../services/types.ts";
 
 interface GroupCardProps {
     group: Group;

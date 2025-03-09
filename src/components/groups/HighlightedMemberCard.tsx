@@ -3,8 +3,7 @@ import MemberLocation from './MemberLocation';
 import LocationUnavailable from './LocationUnavailable';
 import MemberAvatar from './MemberAvatar';
 import OnlineStatus from './OnlineStatus';
-import {Member} from "./types.ts";
-import {UserPosition} from "../../services/geolocationService.ts";
+import {Member, UserPosition} from "../../services/types.ts";
 
 interface HighlightedMemberCardProps {
   member: Member;
