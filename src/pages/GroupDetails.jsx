@@ -71,7 +71,22 @@ const GroupDetails = () => {
             />
 
             <div className="p-4">
-                <MemberList members={group.members} />
+                {error && (
+                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+                        {error}
+                    </div>
+                )}
+                
+                {isSharing && (
+                    <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
+                        Sharing your location with the group
+                    </div>
+                )}
+                
+                <MemberList 
+                    members={group.members} 
+                    userPositions={userPositions}
+                />
             </div>
         </PageContainer>
     )
