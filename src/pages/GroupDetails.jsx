@@ -16,14 +16,26 @@ const GroupDetails = () => {
     const [error, setError] = useState(null)
     const [isConnectingSocket, setIsConnectingSocket] = useState(false)
     const [isGettingLocation, setIsGettingLocation] = useState(false)
+    const [selectedUserId, setSelectedUserId] = useState('')
 
-    // Start location sharing when component mounts
+    // Set the first user as default when group data loads
     useEffect(() => {
-        if (!group) return
+        if (group && group.members.length > 0 && !selectedUserId) {
+            setSelectedUserId(group.members[0].id)
+        }
+    }, [group, selectedUserId])
 
-        // Get current user info (in a real app, this would come from auth)
-        // For demo purposes, we'll use a hardcoded user ID (first member in the group)
-        const currentUser = group.members[0]
+    // Start location sharing when component mounts or selected user changes
+    useEffect(() => {
+        if (!group || !selectedUserId) return
+
+        // Find the selected user from the group members
+        const currentUser = group.members.find(member => member.id === selectedUserId)
+        if (!currentUser) return
+
+        // Stop any existing location sharing
+        locationSharingService.stopSharing()
+        setIsSharing(false)
         
         const startLocationSharing = async () => {
             try {
@@ -56,16 +68,21 @@ const GroupDetails = () => {
         
         startLocationSharing()
         
-        // Clean up when component unmounts
+        // Clean up when component unmounts or selected user changes
         return () => {
             locationSharingService.stopSharing()
             locationSharingService.removeLocationUpdateListener(handleLocationUpdates)
         }
-    }, [id, group])
+    }, [id, group, selectedUserId])
     
     // Handle location updates from other users
     const handleLocationUpdates = (positions) => {
         setUserPositions(positions)
+    }
+
+    // Handle user selection change
+    const handleUserChange = (e) => {
+        setSelectedUserId(e.target.value)
     }
 
     if (!group) {
@@ -86,6 +103,25 @@ const GroupDetails = () => {
             />
 
             <div className="p-4">
+                {/* User selection dropdown */}
+                <div className="mb-4">
+                    <label htmlFor="userSelect" className="block text-sm font-medium text-gray-700 mb-1">
+                        Debug: Select User to Simulate
+                    </label>
+                    <select
+                        id="userSelect"
+                        value={selectedUserId}
+                        onChange={handleUserChange}
+                        className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                        {group.members.map(member => (
+                            <option key={member.id} value={member.id}>
+                                {member.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
                 {error && (
                     <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
                         {error}
@@ -108,7 +144,7 @@ const GroupDetails = () => {
                 
                 {isSharing && !isConnectingSocket && !isGettingLocation && (
                     <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
-                        Sharing your location with the group
+                        Sharing location as: <strong>{group.members.find(m => m.id === selectedUserId)?.name}</strong>
                     </div>
                 )}
                 
