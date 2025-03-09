@@ -46,12 +46,15 @@ const GroupDetails = () => {
                                     {member.name.charAt(0)}
                                 </span>
                             </div>
-                            <Link 
-                                to={`/user/${member.id}`} 
-                                className="text-gray-800 hover:text-blue-600 flex-1"
-                            >
-                                {member.name}
-                            </Link>
+                            <div className="flex-1">
+                                <Link 
+                                    to={`/user/${member.id}`} 
+                                    className="text-gray-800 hover:text-blue-600 block"
+                                >
+                                    {member.name}
+                                </Link>
+                                <span className="text-xs text-gray-500">{member.email}</span>
+                            </div>
                         </li>
                     ))}
                 </ul>

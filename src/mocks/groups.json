@@ -6,17 +6,17 @@
             {
                 "id": "user1",
                 "name": "Alice Johnson",
-                "bio": "Avid hiker and mountain climber with 5 years of experience."
+                "email": "alice.johnson@example.com"
             },
             {
                 "id": "user2",
                 "name": "Bob Smith",
-                "bio": "Kayaking enthusiast and wilderness photographer."
+                "email": "bob.smith@example.com"
             },
             {
                 "id": "user3",
                 "name": "Charlie Brown",
-                "bio": "Former tour guide who loves camping and stargazing."
+                "email": "charlie.brown@example.com"
             }
         ]
     },
@@ -27,12 +27,12 @@
             {
                 "id": "user4",
                 "name": "David Lee",
-                "bio": "Full-stack developer with a passion for AI and machine learning."
+                "email": "david.lee@example.com"
             },
             {
                 "id": "user5",
                 "name": "Eva Martinez",
-                "bio": "UX designer and accessibility advocate with 7+ years experience."
+                "email": "eva.martinez@example.com"
             }
         ]
     },
@@ -43,22 +43,22 @@
             {
                 "id": "user6",
                 "name": "Fiona Green",
-                "bio": "Literature professor specializing in 19th century novels."
+                "email": "fiona.green@example.com"
             },
             {
                 "id": "user7",
                 "name": "George Harris",
-                "bio": "Mystery and thriller enthusiast who reads 50+ books per year."
+                "email": "george.harris@example.com"
             },
             {
                 "id": "user8",
                 "name": "Hannah Taylor",
-                "bio": "Aspiring author currently working on her first fantasy novel."
+                "email": "hannah.taylor@example.com"
             },
             {
                 "id": "user9",
                 "name": "Ian Clark",
-                "bio": "Bookstore owner and rare book collector for over 15 years."
+                "email": "ian.clark@example.com"
             }
         ]
     },
@@ -69,12 +69,12 @@
             {
                 "id": "user10",
                 "name": "Jack White",
-                "bio": "Personal trainer specialized in HIIT and functional training."
+                "email": "jack.white@example.com"
             },
             {
                 "id": "user11",
                 "name": "Karen Adams",
-                "bio": "Marathon runner and nutrition coach with a focus on plant-based diets."
+                "email": "karen.adams@example.com"
             }
         ]
     },
@@ -85,17 +85,17 @@
             {
                 "id": "user12",
                 "name": "Laura Wilson",
-                "bio": "Pastry chef who specializes in French desserts and bread making."
+                "email": "laura.wilson@example.com"
             },
             {
                 "id": "user13",
                 "name": "Michael Brown",
-                "bio": "Home cook experimenting with fusion cuisine and fermentation."
+                "email": "michael.brown@example.com"
             },
             {
                 "id": "user14",
                 "name": "Nina Garcia",
-                "bio": "Food blogger and photographer with a focus on international cuisines."
+                "email": "nina.garcia@example.com"
             }
         ]
     }

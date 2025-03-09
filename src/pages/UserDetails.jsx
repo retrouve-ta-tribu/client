@@ -44,8 +44,10 @@ const UserDetails = () => {
                 </div>
 
                 <div className="bg-gray-50 p-4 rounded-lg mb-6">
-                    <h2 className="text-lg font-medium text-gray-700 mb-2">Bio</h2>
-                    <p className="text-gray-600">{user.bio}</p>
+                    <h2 className="text-lg font-medium text-gray-700 mb-2">Contact</h2>
+                    <p className="text-gray-600">
+                        <span className="font-medium">Email:</span> {user.email}
+                    </p>
                 </div>
             </div>
         </div>
