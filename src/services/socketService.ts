@@ -72,9 +72,9 @@ export class SocketService {
    */
   joinRoom(roomName: string): void {
     if (!this.socket || !this.connected) {
-      throw new Error('Socket not connected');
+      console.log("Socket not connected");
     }
-    this.socket.emit(RoomEvents.Join, roomName);
+    this.socket!.emit(RoomEvents.Join, roomName);
   }
 
   /**
@@ -83,9 +83,9 @@ export class SocketService {
    */
   leaveRoom(roomName: string): void {
     if (!this.socket || !this.connected) {
-      throw new Error('Socket not connected');
+      console.log("Socket not connected");
     }
-    this.socket.emit(RoomEvents.Leave, roomName);
+    this.socket!.emit(RoomEvents.Leave, roomName);
   }
 
   /**
@@ -95,9 +95,9 @@ export class SocketService {
    */
   broadcast<T>(roomName: string, content: T): void {
     if (!this.socket || !this.connected) {
-      throw new Error('Socket not connected');
+      console.log("Socket not connected");
     }
-    this.socket.emit(RoomEvents.Broadcast, {
+    this.socket!.emit(RoomEvents.Broadcast, {
       room: roomName,
       content
     });
