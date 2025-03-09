@@ -7,13 +7,13 @@ import MemberList from '../components/groups/MemberList'
 import NotFound from '../components/common/NotFound'
 import Spinner from '../components/common/Spinner'
 import locationSharingService from '../services/locationSharingService'
-import { UserPosition } from '../services/geolocationService'
+import {Position} from "../services/geolocationService.ts";
 
 const GroupDetails: FC = () => {
     const params = useParams();
     const id = params.id || '';
     const group = getGroupById(id)
-    const [userPositions, setUserPositions] = useState<UserPosition[]>([])
+    const [userPositions, setUserPositions] = useState<Position[]>([])
     const [isSharing, setIsSharing] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const [isConnectingSocket, setIsConnectingSocket] = useState<boolean>(false)
@@ -52,8 +52,7 @@ const GroupDetails: FC = () => {
                 setIsGettingLocation(true)
                 await locationSharingService.startSharing(
                     id,
-                    currentUser.id,
-                    currentUser.name
+                    currentUser.id
                 )
                 setIsGettingLocation(false)
                 setIsSharing(true)
@@ -79,7 +78,7 @@ const GroupDetails: FC = () => {
     }, [id, group, selectedUserId])
     
     // Handle location updates from other users
-    const handleLocationUpdates = (positions: UserPosition[]) => {
+    const handleLocationUpdates = (positions: Position[]) => {
         setUserPositions(positions)
     }
 

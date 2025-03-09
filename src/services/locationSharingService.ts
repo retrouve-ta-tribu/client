@@ -25,7 +25,6 @@ interface BroadcastData {
 class LocationSharingService {
   private groupId: string | null = null;
   private userId: string | null = null;
-  private userName: string | null = null;
   private intervalId: number | null = null;
   private positions: Map<string, UserPosition> = new Map();
   private locationUpdateListeners: Set<(positions: UserPosition[]) => void> = new Set();
@@ -50,15 +49,13 @@ class LocationSharingService {
    * Start sharing location in a group
    * @param groupId The ID of the group to share location in
    * @param userId The ID of the user sharing their location
-   * @param userName The name of the user sharing their location
    */
-  async startSharing(groupId: string, userId: string, userName: string): Promise<void> {
+  async startSharing(groupId: string, userId: string): Promise<void> {
     // Stop any existing sharing
     this.stopSharing();
     
     this.groupId = groupId;
     this.userId = userId;
-    this.userName = userName;
     
     // Connect to socket if not already connected
     if (!socketService.isConnected()) {
@@ -103,7 +100,6 @@ class LocationSharingService {
     }
     
     this.userId = null;
-    this.userName = null;
     this.positions.clear();
     this.notifyListeners();
   }
@@ -118,10 +114,12 @@ class LocationSharingService {
       const message = data.content as LocationMessage;
       const position = message.position;
       
-      // Skip our own updates
-      if (position.userId === this.userId) {
-        return;
-      }
+      console.log('Received location update:', {
+        userId: position.userId,
+        myUserId: this.userId,
+        hasUserName: !!data.content.userName,
+        position
+      });
       
       // Store the position
       if (data.content.userName) {
@@ -130,10 +128,13 @@ class LocationSharingService {
           userName: data.content.userName
         });
         
+        console.log('Updated positions map:', Array.from(this.positions.entries()));
+        
         // Clean up old positions (older than 10 seconds)
         const now = Date.now();
         for (const [userId, pos] of this.positions.entries()) {
           if (now - pos.timestamp > 10000) {
+            console.log('Removing old position for user:', userId);
             this.positions.delete(userId);
           }
         }
@@ -152,11 +153,10 @@ class LocationSharingService {
     if (!this.groupId || !this.userId) {
       return;
     }
-    
-    const message: LocationMessage & { userName: string } = {
+
+    const message: LocationMessage = {
       type: LocationEvents.LocationUpdate,
       position,
-      userName: this.userName || 'Unknown'
     };
     
     socketService.broadcast(this.groupId, message);

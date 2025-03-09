@@ -9,10 +9,6 @@ export interface Position {
   timestamp: number;
 }
 
-export interface UserPosition extends Position {
-  userName: string;
-}
-
 class GeolocationService {
   private watchId: number | null = null;
   private lastPosition: Position | null = null;
