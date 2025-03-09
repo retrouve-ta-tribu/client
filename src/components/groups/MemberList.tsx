@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import MemberLocation from './MemberLocation';
 import Spinner from '../common/Spinner';
 import { UserPosition } from '../../services/geolocationService';
@@ -13,23 +12,17 @@ interface Member {
 interface MemberListProps {
   members: Member[];
   userPositions: UserPosition[];
+  selectedMemberId?: string;
+  onMemberSelect?: (memberId: string) => void;
 }
 
-const MemberList: FC<MemberListProps> = ({ members, userPositions = [] }) => {
+const MemberList: FC<MemberListProps> = ({ members, userPositions = []  }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  
-  // Set loading to false after positions are received or after a timeout
+  const [selectedUserId, setSelectedUserId] = useState<string>('')
+
   useEffect(() => {
     if (userPositions.length > 0) {
       setIsLoading(false);
-    } else {
-      // Set a timeout to stop showing loading state after 10 seconds
-      // even if no positions are received
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 10000);
-      
-      return () => clearTimeout(timer);
     }
   }, [userPositions]);
 
@@ -38,6 +31,12 @@ const MemberList: FC<MemberListProps> = ({ members, userPositions = [] }) => {
     map[position.userId] = position;
     return map;
   }, {} as Record<string, UserPosition>);
+
+  // Get the selected user (either from props or from local state)
+  const highlightedMember = selectedUserId ?
+    members.find(m => m.id === selectedUserId) : null;
+  const highlightedPosition = selectedUserId ?
+    positionMap[selectedUserId] : null;
 
   return (
     <div>
@@ -51,26 +50,68 @@ const MemberList: FC<MemberListProps> = ({ members, userPositions = [] }) => {
         )}
       </div>
       
+      {/* Highlighted Member Card */}
+      {highlightedMember && (
+        <div className="mb-6 p-4 bg-blue-50 rounded-lg shadow-sm border border-blue-100">
+          <div className="flex items-center">
+            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+              <span className="text-blue-500 text-lg font-medium">
+                {highlightedMember.name.charAt(0)}
+              </span>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-medium text-gray-800">{highlightedMember.name}</h3>
+              <p className="text-sm text-gray-600">{highlightedMember.email}</p>
+              {highlightedPosition ? (
+                <div className="mt-2">
+                  <MemberLocation position={highlightedPosition} large={true} />
+                </div>
+              ) : (
+                <div className="mt-2 text-sm text-gray-500">
+                  <span className="inline-flex items-center">
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      className="h-4 w-4 mr-1 text-gray-400" 
+                      viewBox="0 0 20 20" 
+                      fill="currentColor"
+                    >
+                      <path 
+                        fillRule="evenodd" 
+                        d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" 
+                        clipRule="evenodd" 
+                      />
+                    </svg>
+                    Location not available
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      
       <ul className="divide-y divide-gray-100">
         {members.map((member) => {
           const position = positionMap[member.id];
           const isOnline = !!position;
+          const isHighlighted = member.id === selectedUserId;
           
           return (
-            <li key={member.id} className="py-3 flex items-center">
-              <div className={`w-8 h-8 rounded-full ${isOnline ? 'bg-green-100' : 'bg-blue-100'} flex items-center justify-center mr-3`}>
-                <span className={`${isOnline ? 'text-green-500' : 'text-blue-500'} text-sm`}>
+            <li 
+              key={member.id} 
+              className={`py-3 flex items-center ${isHighlighted ? 'bg-blue-50' : ''} cursor-pointer hover:bg-gray-50`}
+              onClick={() => setSelectedUserId(member.id)}
+            >
+              <div className={`w-8 h-8 rounded-full ${isOnline ? 'bg-green-100' : 'bg-gray-100'} flex items-center justify-center mr-3`}>
+                <span className={`${isOnline ? 'text-green-500' : 'text-gray-500'} text-sm`}>
                   {member.name.charAt(0)}
                 </span>
               </div>
               <div className="flex-1">
                 <div className="flex items-center">
-                  <Link 
-                    to={`/user/${member.id}`} 
-                    className="text-gray-800 hover:text-blue-600 block"
-                  >
+                  <span className="text-gray-800 block">
                     {member.name}
-                  </Link>
+                  </span>
                   {isOnline && (
                     <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                       Online

@@ -18,21 +18,21 @@ const GroupDetails: FC = () => {
     const [error, setError] = useState<string | null>(null)
     const [isConnectingSocket, setIsConnectingSocket] = useState<boolean>(false)
     const [isGettingLocation, setIsGettingLocation] = useState<boolean>(false)
-    const [selectedUserId, setSelectedUserId] = useState<string>('')
+    const [debugUserId, setDebugUserId] = useState<string>('')
 
-    // Set the first user as default when group data loads
+    // DEBUG : Set the first user as default when group data loads
     useEffect(() => {
-        if (group && group.members.length > 0 && !selectedUserId) {
-            setSelectedUserId(group.members[0].id)
+        if (group && group.members.length > 0 && !debugUserId) {
+            setDebugUserId(group.members[0].id)
         }
-    }, [group, selectedUserId])
+    }, [group, debugUserId])
 
     // Start location sharing when component mounts or selected user changes
     useEffect(() => {
-        if (!group || !selectedUserId) return
+        if (!group || !debugUserId) return
 
-        // Find the selected user from the group members
-        const currentUser = group.members.find(member => member.id === selectedUserId)
+        // DEBUG :  Find the selected user from the group members
+        const currentUser = group.members.find(member => member.id === debugUserId)
         if (!currentUser) return
 
         // Stop any existing location sharing
@@ -75,16 +75,17 @@ const GroupDetails: FC = () => {
             locationSharingService.stopSharing()
             locationSharingService.removeLocationUpdateListener(handleLocationUpdates)
         }
-    }, [id, group, selectedUserId])
-    
+    }, [id, group, debugUserId])
+
+
+    // DEBUG : Handle user selection change
+    const handleUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setDebugUserId(e.target.value)
+    }
+
     // Handle location updates from other users
     const handleLocationUpdates = (positions: UserPosition[]) => {
         setUserPositions(positions)
-    }
-
-    // Handle user selection change
-    const handleUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedUserId(e.target.value)
     }
 
     if (!group) {
@@ -112,7 +113,7 @@ const GroupDetails: FC = () => {
                     </label>
                     <select
                         id="userSelect"
-                        value={selectedUserId}
+                        value={debugUserId}
                         onChange={handleUserChange}
                         className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     >
@@ -146,7 +147,7 @@ const GroupDetails: FC = () => {
                 
                 {isSharing && !isConnectingSocket && !isGettingLocation && (
                     <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
-                        Sharing location as: <strong>{group.members.find(m => m.id === selectedUserId)?.name}</strong>
+                        Sharing location as: <strong>{group.members.find(m => m.id === debugUserId)?.name}</strong>
                     </div>
                 )}
                 
