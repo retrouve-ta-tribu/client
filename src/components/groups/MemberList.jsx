@@ -1,7 +1,26 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import MemberLocation from './MemberLocation';
+import Spinner from '../common/Spinner';
 
 const MemberList = ({ members, userPositions = [] }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Set loading to false after positions are received or after a timeout
+  useEffect(() => {
+    if (userPositions.length > 0) {
+      setIsLoading(false);
+    } else {
+      // Set a timeout to stop showing loading state after 10 seconds
+      // even if no positions are received
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 10000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [userPositions]);
+
   // Create a map of user positions by userId for quick lookup
   const positionMap = userPositions.reduce((map, position) => {
     map[position.userId] = position;
@@ -10,7 +29,16 @@ const MemberList = ({ members, userPositions = [] }) => {
 
   return (
     <div>
-      <h2 className="text-lg font-medium text-gray-700 mb-3">Members</h2>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-lg font-medium text-gray-700">Members</h2>
+        {isLoading && (
+          <div className="flex items-center">
+            <Spinner size="sm" color="blue" className="mr-2" />
+            <span className="text-sm text-gray-500">Waiting for locations...</span>
+          </div>
+        )}
+      </div>
+      
       <ul className="divide-y divide-gray-100">
         {members.map((member) => {
           const position = positionMap[member.id];

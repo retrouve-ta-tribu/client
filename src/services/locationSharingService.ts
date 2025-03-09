@@ -31,6 +31,22 @@ class LocationSharingService {
   private locationUpdateListeners: Set<(positions: UserPosition[]) => void> = new Set();
   
   /**
+   * Check if socket is connected
+   * @returns True if socket is connected, false otherwise
+   */
+  isSocketConnected(): boolean {
+    return socketService.isConnected();
+  }
+  
+  /**
+   * Connect to socket server
+   * @returns Promise that resolves when connected
+   */
+  async connectSocket(): Promise<void> {
+    return socketService.connect();
+  }
+  
+  /**
    * Start sharing location in a group
    * @param groupId The ID of the group to share location in
    * @param userId The ID of the user sharing their location

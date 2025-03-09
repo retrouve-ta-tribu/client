@@ -5,6 +5,7 @@ import PageContainer from '../components/layout/PageContainer'
 import PageHeader from '../components/layout/PageHeader'
 import MemberList from '../components/groups/MemberList'
 import NotFound from '../components/common/NotFound'
+import Spinner from '../components/common/Spinner'
 import locationSharingService from '../services/locationSharingService'
 
 const GroupDetails = () => {
@@ -13,6 +14,8 @@ const GroupDetails = () => {
     const [userPositions, setUserPositions] = useState([])
     const [isSharing, setIsSharing] = useState(false)
     const [error, setError] = useState(null)
+    const [isConnectingSocket, setIsConnectingSocket] = useState(false)
+    const [isGettingLocation, setIsGettingLocation] = useState(false)
 
     // Start location sharing when component mounts
     useEffect(() => {
@@ -24,18 +27,30 @@ const GroupDetails = () => {
         
         const startLocationSharing = async () => {
             try {
+                // First, connect to socket
+                setIsConnectingSocket(true)
+                if (!locationSharingService.isSocketConnected()) {
+                    await locationSharingService.connectSocket()
+                }
+                setIsConnectingSocket(false)
+                
+                // Then, get geolocation
+                setIsGettingLocation(true)
                 await locationSharingService.startSharing(
                     id,
                     currentUser.id,
                     currentUser.name
                 )
+                setIsGettingLocation(false)
                 setIsSharing(true)
                 
                 // Add listener for location updates
                 locationSharingService.addLocationUpdateListener(handleLocationUpdates)
             } catch (err) {
+                setIsConnectingSocket(false)
+                setIsGettingLocation(false)
                 console.error('Failed to start location sharing:', err)
-                setError('Failed to start location sharing. Please check your browser permissions.')
+                setError(`Failed to start location sharing: ${err.message}`)
             }
         }
         
@@ -77,7 +92,21 @@ const GroupDetails = () => {
                     </div>
                 )}
                 
-                {isSharing && (
+                {isConnectingSocket && (
+                    <div className="mb-4 p-3 bg-blue-50 text-blue-700 rounded-md flex items-center">
+                        <Spinner size="sm" color="blue" />
+                        <span className="ml-2">Connecting to server...</span>
+                    </div>
+                )}
+                
+                {isGettingLocation && (
+                    <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-md flex items-center">
+                        <Spinner size="sm" color="green" />
+                        <span className="ml-2">Getting your location...</span>
+                    </div>
+                )}
+                
+                {isSharing && !isConnectingSocket && !isGettingLocation && (
                     <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
                         Sharing your location with the group
                     </div>
