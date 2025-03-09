@@ -1,22 +1,13 @@
 import socketService, { RoomEvents } from './socketService';
-import geolocationService, { Position, UserPosition } from './geolocationService';
+import geolocationService, {UserPosition} from './geolocationService';
 
 export enum LocationEvents {
   LocationUpdate = 'LocationUpdate'
 }
 
-export interface LocationMessage {
+interface IncomingPositionBroadcastData {
   type: LocationEvents;
-  position: Position;
-}
-
-interface BroadcastData {
-  room: string;
-  content: {
-    type: LocationEvents;
-    position: Position;
-    userName?: string;
-  };
+  position: UserPosition;
 }
 
 /**
@@ -66,7 +57,7 @@ class LocationSharingService {
     socketService.joinRoom(groupId);
     
     // Set up listener for location updates from other users
-    socketService.addListener<BroadcastData>(RoomEvents.Broadcast, this.handleLocationUpdate);
+    socketService.addListener<IncomingPositionBroadcastData>(RoomEvents.Broadcast, this.handleLocationUpdate);
     
     // Start tracking location and broadcasting updates
     await geolocationService.startTracking(userId, (position) => {
@@ -108,40 +99,22 @@ class LocationSharingService {
    * Handle location update from another user
    * @param data The location message
    */
-  private handleLocationUpdate = (data: BroadcastData): void => {
+  private handleLocationUpdate = (data: IncomingPositionBroadcastData): void => {
     // Check if this is a location update message
-    if (data && data.content && data.content.type === LocationEvents.LocationUpdate) {
-      const message = data.content as LocationMessage;
-      const position = message.position;
-      
-      console.log('Received location update:', {
-        userId: position.userId,
-        myUserId: this.userId,
-        hasUserName: !!data.content.userName,
-        position
-      });
-      
-      // Store the position
-      if (data.content.userName) {
-        this.positions.set(position.userId, {
-          ...position,
-          userName: data.content.userName
-        });
-        
-        console.log('Updated positions map:', Array.from(this.positions.entries()));
-        
-        // Clean up old positions (older than 10 seconds)
-        const now = Date.now();
-        for (const [userId, pos] of this.positions.entries()) {
-          if (now - pos.timestamp > 10000) {
-            console.log('Removing old position for user:', userId);
-            this.positions.delete(userId);
-          }
+    if (data && data.type === LocationEvents.LocationUpdate) {
+      const position = data.position;
+      this.positions.set(position.userId, position);
+
+      // Clean up old positions (older than 60 seconds)
+      const now = Date.now();
+      for (const [userId, pos] of this.positions.entries()) {
+        if (now - pos.timestamp > 60000) {
+          this.positions.delete(userId);
         }
-        
-        // Notify listeners
-        this.notifyListeners();
       }
+
+      // Notify listeners
+      this.notifyListeners();
     }
   };
   
@@ -149,12 +122,12 @@ class LocationSharingService {
    * Broadcast location to the group
    * @param position The position to broadcast
    */
-  private broadcastLocation(position: Position): void {
+  private broadcastLocation(position: UserPosition): void {
     if (!this.groupId || !this.userId) {
       return;
     }
 
-    const message: LocationMessage = {
+    const message = {
       type: LocationEvents.LocationUpdate,
       position,
     };

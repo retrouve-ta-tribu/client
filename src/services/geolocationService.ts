@@ -2,7 +2,7 @@
  * Service for handling geolocation functionality
  */
 
-export interface Position {
+export interface UserPosition {
   latitude: number;
   longitude: number;
   userId: string;
@@ -11,7 +11,7 @@ export interface Position {
 
 class GeolocationService {
   private watchId: number | null = null;
-  private lastPosition: Position | null = null;
+  private lastPosition: UserPosition | null = null;
   
   /**
    * Start tracking the user's location
@@ -19,7 +19,7 @@ class GeolocationService {
    * @param onPositionUpdate Callback function to call when position is updated
    * @returns Promise that resolves when tracking starts
    */
-  startTracking(userId: string, onPositionUpdate: (position: Position) => void): Promise<void> {
+  startTracking(userId: string, onPositionUpdate: (position: UserPosition) => void): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
         reject(new Error('Geolocation is not supported by this browser'));
@@ -31,7 +31,7 @@ class GeolocationService {
       
       this.watchId = navigator.geolocation.watchPosition(
         (position) => {
-          const newPosition: Position = {
+          const newPosition: UserPosition = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             userId,
@@ -69,7 +69,7 @@ class GeolocationService {
    * Get the last known position
    * @returns The last known position or null if not available
    */
-  getLastPosition(): Position | null {
+  getLastPosition(): UserPosition | null {
     return this.lastPosition;
   }
   
@@ -78,7 +78,7 @@ class GeolocationService {
    * @param userId The ID of the user
    * @returns Promise that resolves with the current position
    */
-  getCurrentPosition(userId: string): Promise<Position> {
+  getCurrentPosition(userId: string): Promise<UserPosition> {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
         reject(new Error('Geolocation is not supported by this browser'));
@@ -87,7 +87,7 @@ class GeolocationService {
       
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const newPosition: Position = {
+          const newPosition: UserPosition = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             userId,
