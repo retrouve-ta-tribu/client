@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom'
+import { FC } from 'react'
 import { getUserById } from '../services/groupService'
 import PageContainer from '../components/layout/PageContainer'
 import PageHeader from '../components/layout/PageHeader'
@@ -6,9 +7,18 @@ import UserProfile from '../components/users/UserProfile'
 import ContactInfo from '../components/users/ContactInfo'
 import NotFound from '../components/common/NotFound'
 
-const UserDetails = () => {
-    const { id } = useParams()
-    const user = getUserById(id)
+interface ExtendedUser {
+    id: string;
+    name: string;
+    email: string;
+    groupId: string;
+    groupName: string;
+}
+
+const UserDetails: FC = () => {
+    const params = useParams();
+    const id = params.id || '';
+    const user = getUserById(id) as ExtendedUser | null
 
     if (!user) {
         return (

@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, FC } from 'react'
 import { getGroupById } from '../services/groupService'
 import PageContainer from '../components/layout/PageContainer'
 import PageHeader from '../components/layout/PageHeader'
@@ -7,16 +7,18 @@ import MemberList from '../components/groups/MemberList'
 import NotFound from '../components/common/NotFound'
 import Spinner from '../components/common/Spinner'
 import locationSharingService from '../services/locationSharingService'
+import { UserPosition } from '../services/geolocationService'
 
-const GroupDetails = () => {
-    const { id } = useParams()
+const GroupDetails: FC = () => {
+    const params = useParams();
+    const id = params.id || '';
     const group = getGroupById(id)
-    const [userPositions, setUserPositions] = useState([])
-    const [isSharing, setIsSharing] = useState(false)
-    const [error, setError] = useState(null)
-    const [isConnectingSocket, setIsConnectingSocket] = useState(false)
-    const [isGettingLocation, setIsGettingLocation] = useState(false)
-    const [selectedUserId, setSelectedUserId] = useState('')
+    const [userPositions, setUserPositions] = useState<UserPosition[]>([])
+    const [isSharing, setIsSharing] = useState<boolean>(false)
+    const [error, setError] = useState<string | null>(null)
+    const [isConnectingSocket, setIsConnectingSocket] = useState<boolean>(false)
+    const [isGettingLocation, setIsGettingLocation] = useState<boolean>(false)
+    const [selectedUserId, setSelectedUserId] = useState<string>('')
 
     // Set the first user as default when group data loads
     useEffect(() => {
@@ -58,11 +60,12 @@ const GroupDetails = () => {
                 
                 // Add listener for location updates
                 locationSharingService.addLocationUpdateListener(handleLocationUpdates)
-            } catch (err) {
+            } catch (err: unknown) {
                 setIsConnectingSocket(false)
                 setIsGettingLocation(false)
                 console.error('Failed to start location sharing:', err)
-                setError(`Failed to start location sharing: ${err.message}`)
+                const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+                setError(`Failed to start location sharing: ${errorMessage}`)
             }
         }
         
@@ -76,12 +79,12 @@ const GroupDetails = () => {
     }, [id, group, selectedUserId])
     
     // Handle location updates from other users
-    const handleLocationUpdates = (positions) => {
+    const handleLocationUpdates = (positions: UserPosition[]) => {
         setUserPositions(positions)
     }
 
     // Handle user selection change
-    const handleUserChange = (e) => {
+    const handleUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedUserId(e.target.value)
     }
 

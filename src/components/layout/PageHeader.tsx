@@ -1,6 +1,14 @@
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 
-const PageHeader = ({ title, subtitle, backLink, backText }) => {
+interface PageHeaderProps {
+  title?: string;
+  subtitle?: string;
+  backLink?: string;
+  backText?: string;
+}
+
+const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, backLink, backText }) => {
   return (
     <div className="border-b border-gray-200 p-4">
       {backLink && (

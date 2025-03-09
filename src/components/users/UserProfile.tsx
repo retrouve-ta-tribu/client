@@ -1,4 +1,16 @@
-const UserProfile = ({ user }) => {
+import { FC } from 'react'
+
+interface User {
+  id: string;
+  name: string;
+  groupName: string;
+}
+
+interface UserProfileProps {
+  user: User;
+}
+
+const UserProfile: FC<UserProfileProps> = ({ user }) => {
   return (
     <div className="flex items-center mb-6">
       <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mr-4">

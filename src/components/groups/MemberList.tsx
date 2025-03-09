@@ -1,10 +1,22 @@
+import { FC, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import MemberLocation from './MemberLocation';
 import Spinner from '../common/Spinner';
+import { UserPosition } from '../../services/geolocationService';
 
-const MemberList = ({ members, userPositions = [] }) => {
-  const [isLoading, setIsLoading] = useState(true);
+interface Member {
+  id: string;
+  name: string;
+  email: string;
+}
+
+interface MemberListProps {
+  members: Member[];
+  userPositions: UserPosition[];
+}
+
+const MemberList: FC<MemberListProps> = ({ members, userPositions = [] }) => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   
   // Set loading to false after positions are received or after a timeout
   useEffect(() => {
@@ -22,10 +34,10 @@ const MemberList = ({ members, userPositions = [] }) => {
   }, [userPositions]);
 
   // Create a map of user positions by userId for quick lookup
-  const positionMap = userPositions.reduce((map, position) => {
+  const positionMap: Record<string, UserPosition> = userPositions.reduce((map, position) => {
     map[position.userId] = position;
     return map;
-  }, {});
+  }, {} as Record<string, UserPosition>);
 
   return (
     <div>

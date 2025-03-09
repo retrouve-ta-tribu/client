@@ -1,16 +1,17 @@
-import React from 'react';
+import { FC } from 'react';
 
 /**
  * A reusable spinner component for loading states
- * @param {Object} props Component props
- * @param {string} props.size Size of the spinner ('sm', 'md', 'lg')
- * @param {string} props.color Color of the spinner ('blue', 'green', 'red', etc.)
- * @param {string} props.className Additional CSS classes
- * @returns {JSX.Element} Spinner component
  */
-const Spinner = ({ size = 'md', color = 'blue', className = '' }) => {
+interface SpinnerProps {
+  size?: 'sm' | 'md' | 'lg';
+  color?: string;
+  className?: string;
+}
+
+const Spinner: FC<SpinnerProps> = ({ size = 'md', color = 'blue', className = '' }) => {
   // Map size to width and height classes
-  const sizeMap = {
+  const sizeMap: Record<string, string> = {
     sm: 'w-4 h-4 border-2',
     md: 'w-8 h-8 border-3',
     lg: 'w-12 h-12 border-4'

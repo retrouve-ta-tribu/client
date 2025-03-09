@@ -1,6 +1,12 @@
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 
-const NotFound = ({ type = 'Item', backLink = '/' }) => {
+interface NotFoundProps {
+  type?: string;
+  backLink?: string;
+}
+
+const NotFound: FC<NotFoundProps> = ({ type = 'Item', backLink = '/' }) => {
   return (
     <div className="text-center py-10">
       <h2 className="text-xl font-semibold text-gray-800">{type} not found</h2>
