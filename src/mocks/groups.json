@@ -3,44 +3,100 @@
         "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5e1"},
         "name": "Adventure Enthusiasts",
         "members": [
-            "Alice Johnson",
-            "Bob Smith",
-            "Charlie Brown"
+            {
+                "id": "user1",
+                "name": "Alice Johnson",
+                "bio": "Avid hiker and mountain climber with 5 years of experience."
+            },
+            {
+                "id": "user2",
+                "name": "Bob Smith",
+                "bio": "Kayaking enthusiast and wilderness photographer."
+            },
+            {
+                "id": "user3",
+                "name": "Charlie Brown",
+                "bio": "Former tour guide who loves camping and stargazing."
+            }
         ]
     },
     {
         "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5e5"},
         "name": "Tech Innovators",
         "members": [
-            "David Lee",
-            "Eva Martinez"
+            {
+                "id": "user4",
+                "name": "David Lee",
+                "bio": "Full-stack developer with a passion for AI and machine learning."
+            },
+            {
+                "id": "user5",
+                "name": "Eva Martinez",
+                "bio": "UX designer and accessibility advocate with 7+ years experience."
+            }
         ]
     },
     {
         "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5e8"},
         "name": "Book Club",
         "members": [
-            "Fiona Green",
-            "George Harris",
-            "Hannah Taylor",
-            "Ian Clark"
+            {
+                "id": "user6",
+                "name": "Fiona Green",
+                "bio": "Literature professor specializing in 19th century novels."
+            },
+            {
+                "id": "user7",
+                "name": "George Harris",
+                "bio": "Mystery and thriller enthusiast who reads 50+ books per year."
+            },
+            {
+                "id": "user8",
+                "name": "Hannah Taylor",
+                "bio": "Aspiring author currently working on her first fantasy novel."
+            },
+            {
+                "id": "user9",
+                "name": "Ian Clark",
+                "bio": "Bookstore owner and rare book collector for over 15 years."
+            }
         ]
     },
     {
         "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5ed"},
         "name": "Fitness Freaks",
         "members": [
-            "Jack White",
-            "Karen Adams"
+            {
+                "id": "user10",
+                "name": "Jack White",
+                "bio": "Personal trainer specialized in HIIT and functional training."
+            },
+            {
+                "id": "user11",
+                "name": "Karen Adams",
+                "bio": "Marathon runner and nutrition coach with a focus on plant-based diets."
+            }
         ]
     },
     {
         "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5f0"},
         "name": "Food Lovers",
         "members": [
-            "Laura Wilson",
-            "Michael Brown",
-            "Nina Garcia"
+            {
+                "id": "user12",
+                "name": "Laura Wilson",
+                "bio": "Pastry chef who specializes in French desserts and bread making."
+            },
+            {
+                "id": "user13",
+                "name": "Michael Brown",
+                "bio": "Home cook experimenting with fusion cuisine and fermentation."
+            },
+            {
+                "id": "user14",
+                "name": "Nina Garcia",
+                "bio": "Food blogger and photographer with a focus on international cuisines."
+            }
         ]
     }
 ]

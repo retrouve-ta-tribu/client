@@ -39,14 +39,19 @@ const GroupDetails = () => {
             <div className="p-4">
                 <h2 className="text-lg font-medium text-gray-700 mb-3">Members</h2>
                 <ul className="divide-y divide-gray-100">
-                    {group.members.map((member, index) => (
-                        <li key={index} className="py-3 flex items-center">
+                    {group.members.map((member) => (
+                        <li key={member.id} className="py-3 flex items-center">
                             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                                 <span className="text-blue-500 text-sm">
-                                    {member.charAt(0)}
+                                    {member.name.charAt(0)}
                                 </span>
                             </div>
-                            <span className="text-gray-800">{member}</span>
+                            <Link 
+                                to={`/user/${member.id}`} 
+                                className="text-gray-800 hover:text-blue-600 flex-1"
+                            >
+                                {member.name}
+                            </Link>
                         </li>
                     ))}
                 </ul>

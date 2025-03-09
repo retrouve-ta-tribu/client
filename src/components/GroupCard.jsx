@@ -17,6 +17,12 @@ const GroupCard = ({ group }) => {
                     <p className="text-sm text-gray-500">
                         {group.members.length} members
                     </p>
+                    {group.members.length > 0 && (
+                        <p className="text-xs text-gray-400 mt-1">
+                            Including {group.members[0].name}
+                            {group.members.length > 1 ? ' and others' : ''}
+                        </p>
+                    )}
                 </div>
             </div>
         </Link>
