@@ -3,44 +3,100 @@
         "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5e1"},
         "name": "Adventure Enthusiasts",
         "members": [
-            "Alice Johnson",
-            "Bob Smith",
-            "Charlie Brown"
+            {
+                "id": "user1",
+                "name": "Alice Johnson",
+                "email": "alice.johnson@example.com"
+            },
+            {
+                "id": "user2",
+                "name": "Bob Smith",
+                "email": "bob.smith@example.com"
+            },
+            {
+                "id": "user3",
+                "name": "Charlie Brown",
+                "email": "charlie.brown@example.com"
+            }
         ]
     },
     {
         "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5e5"},
         "name": "Tech Innovators",
         "members": [
-            "David Lee",
-            "Eva Martinez"
+            {
+                "id": "user4",
+                "name": "David Lee",
+                "email": "david.lee@example.com"
+            },
+            {
+                "id": "user5",
+                "name": "Eva Martinez",
+                "email": "eva.martinez@example.com"
+            }
         ]
     },
     {
         "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5e8"},
         "name": "Book Club",
         "members": [
-            "Fiona Green",
-            "George Harris",
-            "Hannah Taylor",
-            "Ian Clark"
+            {
+                "id": "user6",
+                "name": "Fiona Green",
+                "email": "fiona.green@example.com"
+            },
+            {
+                "id": "user7",
+                "name": "George Harris",
+                "email": "george.harris@example.com"
+            },
+            {
+                "id": "user8",
+                "name": "Hannah Taylor",
+                "email": "hannah.taylor@example.com"
+            },
+            {
+                "id": "user9",
+                "name": "Ian Clark",
+                "email": "ian.clark@example.com"
+            }
         ]
     },
     {
         "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5ed"},
         "name": "Fitness Freaks",
         "members": [
-            "Jack White",
-            "Karen Adams"
+            {
+                "id": "user10",
+                "name": "Jack White",
+                "email": "jack.white@example.com"
+            },
+            {
+                "id": "user11",
+                "name": "Karen Adams",
+                "email": "karen.adams@example.com"
+            }
         ]
     },
     {
         "_id": {"$oid": "64b8f8a7e4b0a1a2b3c4d5f0"},
         "name": "Food Lovers",
         "members": [
-            "Laura Wilson",
-            "Michael Brown",
-            "Nina Garcia"
+            {
+                "id": "user12",
+                "name": "Laura Wilson",
+                "email": "laura.wilson@example.com"
+            },
+            {
+                "id": "user13",
+                "name": "Michael Brown",
+                "email": "michael.brown@example.com"
+            },
+            {
+                "id": "user14",
+                "name": "Nina Garcia",
+                "email": "nina.garcia@example.com"
+            }
         ]
     }
 ]
