@@ -4,7 +4,7 @@ import PageHeader from '../components/layout/PageHeader';
 import { useAuth } from '../hooks/useAuth';
 
 const Login: FC = () => {
-    const { profile, error, login, logOut } = useAuth();
+    const { error, login, isLoading } = useAuth();
 
     return (
         <PageContainer>
@@ -16,35 +16,16 @@ const Login: FC = () => {
                     </div>
                 )}
                 
-                {profile ? (
-                    <div className="text-center">
-                        <img 
-                            src={profile.picture} 
-                            alt={profile.name}
-                            className="w-20 h-20 rounded-full mx-auto mb-4" 
-                        />
-                        <h3 className="text-xl font-semibold mb-2">
-                            {profile.name}
-                        </h3>
-                        <p className="text-gray-600 mb-4">
-                            {profile.email}
-                        </p>
-                        <button 
-                            onClick={logOut}
-                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                        >
-                            Log out
-                        </button>
-                    </div>
-                ) : (
-                    <button 
-                        onClick={() => login()}
-                        className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 flex items-center gap-2"
-                    >
-                        <span>Sign in with Google</span> 
-                        <span role="img" aria-label="rocket">🚀</span>
-                    </button>
-                )}
+                <button 
+                    onClick={() => login()}
+                    disabled={isLoading}
+                    className={`bg-blue-500 text-white px-6 py-3 rounded-lg flex items-center gap-2 ${
+                        isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
+                    }`}
+                >
+                    <span>{isLoading ? 'Loading...' : 'Sign in with Google'}</span> 
+                    {!isLoading && <span role="img" aria-label="rocket">🚀</span>}
+                </button>
             </div>
         </PageContainer>
     );

@@ -7,21 +7,51 @@ export const useAuth = () => {
     const [profile, setProfile] = useState(null);
     const [error, setError] = useState<Error | null>(null);
 
+    // Check for existing token on mount
+    useEffect(() => {
+        const storedUser = localStorage.getItem('google_user');
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+        }
+    }, []);
+
     const login = useGoogleLogin({
-        onSuccess: (codeResponse) => setUser(codeResponse),
-        onError: (error) => setError(error)
+        onSuccess: (codeResponse) => {
+            console.log('Google login success:', codeResponse);
+            localStorage.setItem('google_user', JSON.stringify(codeResponse));
+            setUser(codeResponse);
+        },
+        onError: (error) => {
+            console.error('Google login error:', error);
+            setError(error);
+        }
     });
 
     useEffect(() => {
         if (user) {
+            console.log('Fetching user profile...');
             fetchGoogleUserProfile(user)
-                .then(setProfile)
-                .catch(setError);
+                .then((data) => {
+                    console.log('Profile fetched:', data);
+                    setProfile(data);
+                })
+                .catch((err) => {
+                    console.error('Profile fetch error:', err);
+                    // If we get an auth error, clear the stored token
+                    if (err.message.includes('401') || err.message.includes('403')) {
+                        localStorage.removeItem('google_user');
+                        setUser(null);
+                    }
+                    setError(err);
+                });
         }
     }, [user]);
 
     const logOut = () => {
+        console.log('Logging out...');
         googleLogout();
+        localStorage.removeItem('google_user');
         setUser(null);
         setProfile(null);
         setError(null);
@@ -32,6 +62,7 @@ export const useAuth = () => {
         profile,
         error,
         login,
-        logOut
+        logOut,
+        isLoading: !!user && !profile
     };
 }; 
