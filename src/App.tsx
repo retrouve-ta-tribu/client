@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home.jsx'
 import GroupDetails from './pages/GroupDetails.jsx'
-import Login from './pages/Login.jsx'
+import Login from './pages/Login.tsx'
 
 function App() {
   return (
