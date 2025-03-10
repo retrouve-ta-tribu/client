@@ -1,60 +1,51 @@
-import { FC, useState, useEffect } from 'react';
-import { googleLogout, useGoogleLogin } from '@react-oauth/google';
+import { FC } from 'react';
 import PageContainer from '../components/layout/PageContainer';
 import PageHeader from '../components/layout/PageHeader';
+import { useAuth } from '../hooks/useAuth';
 
 const Login: FC = () => {
-    const [user, setUser] = useState(null);
-    const [profile, setProfile] = useState(null);
-
-    const login = useGoogleLogin({
-        onSuccess: (codeResponse) => setUser(codeResponse),
-        onError: (error) => console.log('Login Failed:', error)
-    });
-
-    useEffect(() => {
-        if (user) {
-            fetch(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
-                headers: {
-                    Authorization: `Bearer ${user.access_token}`,
-                    Accept: 'application/json'
-                }
-            })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then((data) => {
-                setProfile(data);
-            })
-            .catch((err) => console.log(err));
-        }
-    }, [user]);
-
-    // Log out function to log the user out of Google and set the profile to null
-    const logOut = () => {
-        googleLogout();
-        setProfile(null);
-    };
+    const { profile, error, login, logOut } = useAuth();
 
     return (
         <PageContainer>
             <PageHeader title="Login" />
-            {profile ? (
-                <div>
-                    <img src={profile.picture} alt="user" />
-                    <h3>User Logged in</h3>
-                    <p>Name: {profile.name}</p>
-                    <p>Email Address: {profile.email}</p>
-                    <br />
-                    <br />
-                    <button onClick={logOut}>Log out</button>
-                </div>
-            ) : (
-                <button onClick={() => login()}>Sign in with Google 🚀</button>
-            )}
+            <div className="flex flex-col items-center justify-center p-8">
+                {error && (
+                    <div className="text-red-500 mb-4">
+                        {error.message}
+                    </div>
+                )}
+                
+                {profile ? (
+                    <div className="text-center">
+                        <img 
+                            src={profile.picture} 
+                            alt={profile.name}
+                            className="w-20 h-20 rounded-full mx-auto mb-4" 
+                        />
+                        <h3 className="text-xl font-semibold mb-2">
+                            {profile.name}
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                            {profile.email}
+                        </p>
+                        <button 
+                            onClick={logOut}
+                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                        >
+                            Log out
+                        </button>
+                    </div>
+                ) : (
+                    <button 
+                        onClick={() => login()}
+                        className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 flex items-center gap-2"
+                    >
+                        <span>Sign in with Google</span> 
+                        <span role="img" aria-label="rocket">🚀</span>
+                    </button>
+                )}
+            </div>
         </PageContainer>
     );
 };
