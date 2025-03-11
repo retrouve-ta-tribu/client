@@ -24,6 +24,8 @@ class AuthService {
     private constructor() {
         // Check for stored user on initialization
         this.checkStoredUser();
+        // Bind methods to preserve this context
+        this.logOut = this.logOut.bind(this);
     }
 
     public static getInstance(): AuthService {
@@ -75,7 +77,8 @@ class AuthService {
         }
     }
 
-    public logOut(): void {
+    // Using arrow function to preserve this context
+    public logOut = (): void => {
         console.log('Logging out...');
         googleLogout();
         localStorage.removeItem('google_user');
