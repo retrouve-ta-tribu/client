@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import authService from '../../services/authService';
 
 interface PageHeaderProps {
   title?: string;
@@ -10,8 +10,6 @@ interface PageHeaderProps {
 }
 
 const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, backLink, backText }) => {
-  const { profile, logOut } = useAuth();
-
   return (
     <header className="border-b border-gray-200 p-4 flex justify-between items-center">
       {backLink && (
@@ -24,20 +22,20 @@ const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, backLink, backText }
       {title && <h1 className="text-xl font-semibold text-gray-800">{title}</h1>}
       {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
       
-      {profile && (
+      {authService.profile && (
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <img 
-              src={profile.picture} 
-              alt={profile.name}
+              src={authService.profile.picture} 
+              alt={authService.profile.name}
               className="w-8 h-8 rounded-full" 
             />
             <span className="text-sm text-gray-600">
-              {profile.name}
+              {authService.profile.name}
             </span>
           </div>
           <button
-            onClick={logOut}
+            onClick={authService.logOut}
             className="text-sm text-red-600 hover:text-red-800"
           >
             Déconnexion

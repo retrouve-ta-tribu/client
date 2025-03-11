@@ -2,20 +2,19 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import Home from './pages/Home.jsx'
 import GroupDetails from './pages/GroupDetails.jsx'
 import Login from './pages/Login.tsx'
-import { useAuth } from './hooks/useAuth'
+import authService from './services/authService'
 import { useEffect } from 'react'
 
 function App() {
-  const { profile, isLoading } = useAuth()
   const location = useLocation()
 
   useEffect(() => {
-    if (profile) {
-      console.log('User logged in:', profile.name)
+    if (authService.profile) {
+      console.log('User logged in:', authService.profile.name)
     } else {
       console.log('User logged out')
     }
-  }, [profile])
+  }, [authService.profile])
 
   return (
     <>
@@ -24,14 +23,14 @@ function App() {
         <Route
           path="/group/:id"
           element={
-            isLoading ? <div>Loading...</div> :
-            profile ? <GroupDetails /> : <Navigate to="/login" replace />
+            authService.isLoading ? <div>Loading...</div> :
+            authService.profile ? <GroupDetails /> : <Navigate to="/login" replace />
           }
         />
 
         <Route
             path="/"
-            element={profile == null ? <Navigate to="/login"/> : <Home/>}
+            element={authService.profile == null ? <Navigate to="/login"/> : <Home/>}
         />
       </Routes>
     </>

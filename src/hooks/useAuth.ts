@@ -1,65 +1,107 @@
 import { useState, useEffect } from 'react';
 import { useGoogleLogin, googleLogout } from '@react-oauth/google';
-import { fetchGoogleUserProfile } from '../services/authService';
+import authService from '../services/authService';
 
-export const useAuth = () => {
-    const [user, setUser] = useState(null);
-    const [profile, setProfile] = useState(null);
-    const [error, setError] = useState<Error | null>(null);
+interface AuthUser {
+    access_token: string;
+    // Add other user properties
+}
 
-    // Check for existing token on mount
-    useEffect(() => {
-        const storedUser = localStorage.getItem('google_user');
-        if (storedUser) {
-            const parsedUser = JSON.parse(storedUser);
-            setUser(parsedUser);
-        }
-    }, []);
+interface AuthProfile {
+    picture: string;
+    name: string;
+    email: string;
+    // Add other profile properties
+}
 
-    const login = useGoogleLogin({
+class Auth {
+    private setUser: (user: AuthUser | null) => void;
+    private setProfile: (profile: AuthProfile | null) => void;
+    private setError: (error: Error | null) => void;
+
+    constructor(
+        setUser: (user: AuthUser | null) => void,
+        setProfile: (profile: AuthProfile | null) => void,
+        setError: (error: Error | null) => void
+    ) {
+        this.setUser = setUser;
+        this.setProfile = setProfile;
+        this.setError = setError;
+    }
+
+    public login = useGoogleLogin({
         onSuccess: (codeResponse) => {
             console.log('Google login success:', codeResponse);
             localStorage.setItem('google_user', JSON.stringify(codeResponse));
-            setUser(codeResponse);
+            this.setUser(codeResponse);
         },
         onError: (error) => {
             console.error('Google login error:', error);
-            setError(error);
+            this.setError(error);
         }
     });
 
-    useEffect(() => {
-        if (user) {
-            console.log('Fetching user profile...');
-            fetchGoogleUserProfile(user)
-                .then((data) => {
-                    console.log('Profile fetched:', data);
-                    setProfile(data);
-                })
-                .catch((err) => {
-                    // If we get an auth error, clear the stored token
-                    localStorage.removeItem('google_user');
-                    setUser(null);
-                    setError(err);
-                });
-        }
-    }, [user]);
-
-    const logOut = () => {
+    public logOut = () => {
         console.log('Logging out...');
         googleLogout();
         localStorage.removeItem('google_user');
-        setUser(null);
-        setProfile(null);
-        setError(null);
+        this.setUser(null);
+        this.setProfile(null);
+        this.setError(null);
     };
+
+    public async checkStoredUser() {
+        const storedUser = localStorage.getItem('google_user');
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            this.setUser(parsedUser);
+        }
+    }
+
+    public async fetchProfile(user: AuthUser) {
+        if (!user) return;
+
+        try {
+            console.log('Fetching user profile...');
+            const data = await authService.login(user);
+            console.log('Profile fetched:', data);
+            this.setProfile(data);
+        } catch (err) {
+            console.error('Profile fetch error:', err);
+            localStorage.removeItem('google_user');
+            this.setUser(null);
+            this.setError(err);
+        }
+    }
+}
+
+export const useAuth = () => {
+    const [user, setUser] = useState<AuthUser | null>(null);
+    const [profile, setProfile] = useState<AuthProfile | null>(null);
+    const [error, setError] = useState<Error | null>(null);
+
+    const auth = new Auth(setUser, setProfile, setError);
+
+    // Check for existing token on mount
+    useEffect(() => {
+        auth.checkStoredUser();
+    }, []);
+
+    // Fetch profile when user changes
+    useEffect(() => {
+        if (user) {
+            auth.fetchProfile(user);
+        }
+    }, [user]);
 
     return {
         user,
         profile,
         error,
-        login,
-        logOut,
+        login: auth.login,
+        logOut: auth.logOut,
         isLoading: !!user && !profile
     };
-}; 
+};
+
+export type { AuthUser, AuthProfile }; 
