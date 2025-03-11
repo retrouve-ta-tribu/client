@@ -17,28 +17,21 @@ function App() {
     }
   }, [profile])
 
-  // If user is logged in and tries to access /login, redirect to home
-  if (profile && location.pathname === '/login') {
-    return <Navigate to="/" replace />
-  }
-
-  return (  
+  return (
     <>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route 
-          path="/group/:id" 
+        <Route
+          path="/group/:id"
           element={
             isLoading ? <div>Loading...</div> :
             profile ? <GroupDetails /> : <Navigate to="/login" replace />
-          } 
-        />
-        <Route 
-          path="/" 
-          element={
-            isLoading ? <div>Loading...</div> :
-            profile ? <Home /> : <Navigate to="/login" replace />
           }
+        />
+
+        <Route
+            path="/"
+            element={profile == null ? <Navigate to="/login"/> : <Home/>}
         />
       </Routes>
     </>
