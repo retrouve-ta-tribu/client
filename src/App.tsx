@@ -1,39 +1,39 @@
-import {BrowserRouter as Router, Routes, Route, Navigate, useLocation} from 'react-router-dom'
+import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom'
 import Home from './pages/Home.jsx'
 import GroupDetails from './pages/GroupDetails.jsx'
 import Login from './pages/Login.tsx'
-import authService from './services/authService'
-import {useEffect} from 'react'
+import { useAuthState } from './hooks/useAuthState'
+import { useEffect } from 'react'
 
 function App() {
-    const location = useLocation()
+    const { profile, isLoading } = useAuthState();
 
     useEffect(() => {
-        if (authService.profile) {
-            console.log('User logged in:', authService.profile.name)
+        if (profile) {
+            console.log('User logged in:', profile.name)
         } else {
             console.log('User logged out')
         }
-    }, [authService.profile])
+    }, [profile])
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <>
             <Routes>
                 <Route
                     path="/login"
-                    element={authService.profile == null ? <Login/> : <Navigate to="/"/>}
+                    element={profile ? <Navigate to="/" /> : <Login />}
                 />
                 <Route
                     path="/group/:id"
-                    element={
-                        authService.isLoading ? <div>Loading...</div> :
-                            authService.profile ? <GroupDetails/> : <Navigate to="/login" replace/>
-                    }
+                    element={profile ? <GroupDetails /> : <Navigate to="/login" replace />}
                 />
-
                 <Route
                     path="/"
-                    element={authService.profile == null ? <Navigate to="/login"/> : <Home/>}
+                    element={profile ? <Home /> : <Navigate to="/login" />}
                 />
             </Routes>
         </>
