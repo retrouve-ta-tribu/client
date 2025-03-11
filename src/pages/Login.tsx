@@ -26,12 +26,12 @@ const Login: FC = () => {
                 <button 
                     onClick={() => login()}
                     disabled={authService.isLoading}
-                    className={`bg-blue-500 text-white px-6 py-3 rounded-lg flex items-center gap-2 ${
+                    className={`bg-blue-500 text-white px-6 py-3 rounded-lg cursor-pointer flex items-center gap-2 ${
                         authService.isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
                     }`}
                 >
                     <span>{authService.isLoading ? 'Loading...' : 'Sign in with Google'}</span> 
-                    {!authService.isLoading && <span role="img" aria-label="rocket">🚀</span>}
+                    {!authService.isLoading}
                 </button>
             </div>
         </PageContainer>
