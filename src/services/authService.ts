@@ -1,4 +1,5 @@
 import { googleLogout, useGoogleLogin } from '@react-oauth/google';
+import userService from './userService';
 
 export interface AuthUser {
     access_token: string;
@@ -20,6 +21,11 @@ export interface AuthState {
 }
 
 type Listener = () => void;
+
+interface GoogleProfile extends AuthProfile {
+    id: string;  // Add Google ID
+    email: string;  // Add email
+}
 
 class AuthService {
     private static instance: AuthService;
@@ -169,9 +175,29 @@ class AuthService {
                 throw new Error('Failed to fetch user profile');
             }
 
-            const profile = await response.json();
-            this.setState({ profile });
-            console.log('Profile fetched:', profile);
+            const googleProfile = await response.json() as GoogleProfile;
+            
+            // Check if user exists in our backend
+            try {
+                const existingUser = await userService.getUserByGoogleId(googleProfile.id);
+                
+                if (!existingUser) {
+                    // Only create if user doesn't exist
+                    await userService.createUser({
+                        googleId: googleProfile.id,
+                        email: googleProfile.email,
+                        displayName: googleProfile.name,
+                        picture: googleProfile.picture,
+                        friends: []
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to check/create user in backend:', error);
+                // Continue anyway as the Google auth was successful
+            }
+
+            this.setState({ profile: googleProfile });
+            console.log('Profile fetched:', googleProfile);
         } catch (err) {
             console.error('Profile fetch error:', err);
             localStorage.removeItem('google_user');
@@ -180,7 +206,7 @@ class AuthService {
                 profile: null,
                 error: err as Error
             });
-            throw err; // Re-throw to handle in calling functions
+            throw err;
         } finally {
             this.setState({ isLoading: false });
         }
