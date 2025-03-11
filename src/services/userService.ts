@@ -13,9 +13,15 @@ interface User extends CreateUserDto {
 
 class UserService {
     private static instance: UserService;
-    private baseUrl: string = 'http://localhost:8000/api';
+    private baseUrl: string;
 
-    private constructor() {}
+    private constructor() {
+        const apiUrl = import.meta.env.VITE_API_URL;
+        if (!apiUrl) {
+            throw new Error('VITE_API_URL environment variable is not defined');
+        }
+        this.baseUrl = `${apiUrl}/api`;
+    }
 
     public static getInstance(): UserService {
         if (!UserService.instance) {
