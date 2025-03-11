@@ -37,12 +37,9 @@ export const useAuth = () => {
                     setProfile(data);
                 })
                 .catch((err) => {
-                    console.error('Profile fetch error:', err);
                     // If we get an auth error, clear the stored token
-                    if (err.message.includes('401') || err.message.includes('403')) {
-                        localStorage.removeItem('google_user');
-                        setUser(null);
-                    }
+                    localStorage.removeItem('google_user');
+                    setUser(null);
                     setError(err);
                 });
         }

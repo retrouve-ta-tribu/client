@@ -24,11 +24,6 @@ function App() {
 
   return (  
     <>
-      {/* Status indicator */}
-      <div className="fixed top-0 right-0 m-4 p-2 text-sm rounded bg-gray-800 text-white">
-        Status: {isLoading ? 'Loading...' : profile ? 'Logged in' : 'Logged out'}
-      </div>
-
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route 
