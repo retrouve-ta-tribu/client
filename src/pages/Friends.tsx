@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import NavBar from '../components/layout/NavBar';
 import FriendCard from '../components/FriendCard';
+import Button from '../components/ui/Button';
 import friendService, { Friend } from '../services/friendService';
 
 const Friends: FC = () => {
@@ -75,15 +76,15 @@ const Friends: FC = () => {
               className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
-            <button
+            <Button
               type="submit"
-              disabled={isSubmitting}
-              className={`px-4 py-2 cursor-pointer bg-blue-500 text-white rounded-md ${
-                isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
-              }`}
+              variant="primary"
+              isLoading={isSubmitting}
+              loadingText="Envoi..."
+              disabled={!email.trim()}
             >
-              {isSubmitting ? 'Envoi...' : 'Ajouter un ami'}
-            </button>
+              Ajouter un ami
+            </Button>
           </form>
           
           {error && (

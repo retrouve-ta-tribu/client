@@ -2,6 +2,7 @@ import { FC, useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import NavBar from '../components/layout/NavBar';
+import Button from '../components/ui/Button';
 import friendService, { Friend } from '../services/friendService';
 import { createGroup } from '../services/groupService';
 
@@ -227,25 +228,23 @@ const CreateGroup: FC = () => {
               </div>
             )}
             
-            <div className="flex justify-end">
-              <button
+            <div className="flex justify-end gap-2">
+              <Button 
                 type="button"
+                variant="secondary"
                 onClick={() => navigate('/')}
-                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md mr-2 hover:bg-gray-300"
               >
                 Annuler
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                disabled={isSubmitting || groupName.trim() === ''}
-                className={`px-4 py-2 text-white bg-blue-500 rounded-md ${
-                  isSubmitting || groupName.trim() === '' 
-                    ? 'opacity-50 cursor-not-allowed' 
-                    : 'hover:bg-blue-600'
-                }`}
+                variant="primary"
+                disabled={groupName.trim() === ''}
+                isLoading={isSubmitting}
+                loadingText="Création..."
               >
-                {isSubmitting ? 'Création...' : 'Créer le groupe'}
-              </button>
+                Créer le groupe
+              </Button>
             </div>
           </form>
         </div>
