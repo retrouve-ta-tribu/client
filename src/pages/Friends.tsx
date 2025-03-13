@@ -11,10 +11,21 @@ const Friends: FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const loadFriends = async () => {
+    setIsLoading(true);
+    try {
+      const friendsList = await friendService.getFriends();
+      setFriends(friendsList);
+    } catch (err) {
+      console.error('Failed to load friends:', err);
+      setError('Failed to load friends. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Load friends
-    setFriends(friendService.getFriends());
-    setIsLoading(false);
+    loadFriends();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,7 +37,7 @@ const Friends: FC = () => {
       await friendService.addFriend(email);
       setEmail('');
       // Refresh friends list
-      setFriends(friendService.getFriends());
+      await loadFriends();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
     } finally {
@@ -36,7 +47,7 @@ const Friends: FC = () => {
 
   const handleFriendRemoved = () => {
     // Refresh friends list
-    setFriends(friendService.getFriends());
+    loadFriends();
   };
 
   return (

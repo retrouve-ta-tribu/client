@@ -1,20 +1,22 @@
 import authService from './authService';
 
-// Mock data for friends
-const mockFriends = [
-  { id: '1', firstName: 'Marie', lastName: 'Dupont', email: 'marie.dupont@example.com', picture: 'https://randomuser.me/api/portraits/women/1.jpg' },
-  { id: '2', firstName: 'Jean', lastName: 'Martin', email: 'jean.martin@example.com', picture: 'https://randomuser.me/api/portraits/men/1.jpg' },
-  { id: '3', firstName: 'Sophie', lastName: 'Bernard', email: 'sophie.bernard@example.com', picture: 'https://randomuser.me/api/portraits/women/2.jpg' },
-  { id: '4', firstName: 'Thomas', lastName: 'Petit', email: 'thomas.petit@example.com', picture: 'https://randomuser.me/api/portraits/men/2.jpg' },
-  { id: '5', firstName: 'Camille', lastName: 'Dubois', email: 'camille.dubois@example.com', picture: 'https://randomuser.me/api/portraits/women/3.jpg' },
-];
-
 export interface Friend {
   id: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
   email: string;
   picture: string;
+  googleId?: string;
+}
+
+interface UserResponse {
+  id: string;
+  googleId: string;
+  email: string;
+  displayName: string;
+  picture: string;
+  friends: string[]; // Array of friend IDs
 }
 
 class FriendService {
@@ -36,12 +38,63 @@ class FriendService {
     return FriendService.instance;
   }
 
-  public getFriends(): Friend[] {
-    return mockFriends;
+  public async getUserById(googleId: string): Promise<UserResponse | null> {
+    try {
+      const response = await fetch(`${this.baseUrl}/users/${googleId}`);
+      
+      if (response.status === 404) {
+        return null;
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch user: ${response.statusText}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      throw error;
+    }
   }
 
-  public getFriendById(id: string): Friend | undefined {
-    return mockFriends.find(friend => friend.id === id);
+  public async getFriends(): Promise<Friend[]> {
+    // Get the current user's Google ID from the auth service
+    const googleId = authService.state.profile?.id;
+
+    try {
+      // Get the current user with their friends list
+      const currentUser = await this.getUserById(googleId);
+      
+      if (!currentUser || !currentUser.friends || currentUser.friends.length === 0) {
+        return [];
+      }
+
+      // Fetch details for each friend
+      const friendsPromises = currentUser.friends.map(async (friendId) => {
+        try {
+          const friendData = await this.getUserById(friendId);
+          if (!friendData) return null;
+          
+          return {
+            id: friendData.id,
+            googleId: friendData.googleId,
+            displayName: friendData.displayName,
+            email: friendData.email,
+            picture: friendData.picture || 'https://via.placeholder.com/150',
+          };
+        } catch (error) {
+          console.error(`Error fetching friend ${friendId}:`, error);
+          return null;
+        }
+      });
+
+      const friendsResults = await Promise.all(friendsPromises);
+      // Filter out any null results (failed fetches)
+      return friendsResults.filter(friend => friend !== null) as Friend[];
+      
+    } catch (error) {
+      console.error('Error fetching friends:', error);
+    }
   }
 
   public async addFriend(email: string): Promise<void> {
