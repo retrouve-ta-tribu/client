@@ -134,9 +134,7 @@ class FriendService {
       throw new Error('User not authenticated');
     }
 
-    try {
-      console.log(`Removing friend with ID: ${friendId}`);
-      
+    try {      
       const response = await fetch(`${this.baseUrl}/users/${googleId}/friends`, {
         method: 'DELETE',
         headers: {

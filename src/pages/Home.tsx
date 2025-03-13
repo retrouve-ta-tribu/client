@@ -18,7 +18,6 @@ const Home: FC = () => {
         setIsLoading(true)
         try {
             const groupsList = await groupService.getGroups()
-            console.log(groupsList);
             setGroups(groupsList)
         } catch (err) {
             console.error('Failed to load groups:', err)
