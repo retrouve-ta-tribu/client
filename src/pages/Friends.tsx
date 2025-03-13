@@ -76,7 +76,7 @@ const Friends: FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`px-4 py-2 bg-blue-500 text-white rounded-md ${
+            className={`px-4 py-2 cursor-pointer bg-blue-500 text-white rounded-md ${
               isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
             }`}
           >
