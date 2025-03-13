@@ -147,7 +147,7 @@ const CreateGroup: FC = () => {
                   ) : (
                     filteredFriends.map(friend => (
                       <PersonCard
-                        key={friend.id}
+                        key={friend.email}
                         person={friend}
                         onClick={() => handleAddFriend(friend)}
                         showRemoveButton={false}
@@ -171,7 +171,7 @@ const CreateGroup: FC = () => {
                   <div className="space-y-2">
                     {selectedFriends.map(friend => (
                       <PersonCard
-                        key={friend.id}
+                        key={friend.email}
                         person={friend}
                         onRemove={() => handleRemoveFriend(friend.id)}
                         compact={true}
