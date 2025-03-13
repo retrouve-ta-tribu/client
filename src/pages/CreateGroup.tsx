@@ -43,24 +43,22 @@ const CreateGroup: FC = () => {
 
   const filteredFriends = useMemo(() => {
     if (!searchTerm.trim()) return [];
-    
+
     const lowerSearchTerm = searchTerm.toLowerCase();
     return friends.filter(friend => {
-      // Don't show friends that are already selected
-      if (selectedFriends.some(selected => selected.id === friend.id)) {
+      if (selectedFriends.some(selected => selected.googleId === friend.googleId)) {
         return false;
       }
-      
-      // Search by display name, first name, last name, or email
+
       const displayName = friend.displayName?.toLowerCase() || '';
       const firstName = friend.firstName?.toLowerCase() || '';
       const lastName = friend.lastName?.toLowerCase() || '';
       const email = friend.email.toLowerCase();
-      
-      return displayName.includes(lowerSearchTerm) || 
-             firstName.includes(lowerSearchTerm) || 
-             lastName.includes(lowerSearchTerm) || 
-             email.includes(lowerSearchTerm);
+
+      return displayName.includes(lowerSearchTerm) ||
+        firstName.includes(lowerSearchTerm) ||
+        lastName.includes(lowerSearchTerm) ||
+        email.includes(lowerSearchTerm);
     });
   }, [searchTerm, friends, selectedFriends]);
 
@@ -69,35 +67,30 @@ const CreateGroup: FC = () => {
     setSearchTerm('');
   };
 
-  const handleRemoveFriend = (friendId: string) => {
-    setSelectedFriends(selectedFriends.filter(friend => friend.id !== friendId));
+  const handleRemoveFriend = (friendGoogleId: string | undefined) => {
+    if (!friendGoogleId) return;
+    setSelectedFriends(selectedFriends.filter(friend => friend.googleId !== friendGoogleId));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-    
+
     try {
-      // Get the current user's ID
       const currentUserId = authService.state.profile?.id;
-      
+
       if (!currentUserId) {
         throw new Error('You must be logged in to create a group');
       }
-      
-      // Try googleId first, then fall back to id
-      const friendIds = selectedFriends.map(friend => {
-        return friend.googleId || friend.id;
-      });
-      
-      const memberIds = [currentUserId, ...friendIds];
-      
+
+      const memberIds = [currentUserId, ...selectedFriends.map(friend => friend.googleId).filter((id): id is string => id !== undefined)];
+
       await groupService.createGroup({
         name: groupName.trim(),
         members: memberIds
       });
-      
+
       navigate('/');
     } catch (err) {
       console.error('Failed to create group:', err);
@@ -111,10 +104,8 @@ const CreateGroup: FC = () => {
     <PageContainer>
       <div className="flex flex-col h-full max-h-screen">
         <NavBar activeTab={activeTab} onTabChange={handleTabChange} />
-        
         <div className="p-4 border-b border-gray-200 flex-shrink-0">
           <h1 className="text-xl font-semibold text-gray-800 mb-4">Créer un nouveau groupe</h1>
-          
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label htmlFor="groupName" className="block text-sm font-medium text-gray-700 mb-1">
@@ -130,7 +121,7 @@ const CreateGroup: FC = () => {
                 required
               />
             </div>
-            
+
             <div className="mb-4">
               <label htmlFor="searchFriends" className="block text-sm font-medium text-gray-700 mb-1">
                 Ajouter des amis
@@ -143,7 +134,6 @@ const CreateGroup: FC = () => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Rechercher des amis par nom ou email"
               />
-              
               {searchTerm.trim() !== '' && (
                 <div className="mt-2 border border-gray-200 rounded-md max-h-40 overflow-y-auto">
                   {filteredFriends.length === 0 ? (
@@ -162,12 +152,11 @@ const CreateGroup: FC = () => {
                 </div>
               )}
             </div>
-            
+
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Membres du groupe ({selectedFriends.length})
               </label>
-              
               <div className="border border-gray-200 rounded-md p-2 min-h-[100px] max-h-[200px] overflow-y-auto">
                 {selectedFriends.length === 0 ? (
                   <div className="text-sm text-gray-500">Aucun membre sélectionné</div>
@@ -177,7 +166,7 @@ const CreateGroup: FC = () => {
                       <PersonCard
                         key={friend.email}
                         person={friend}
-                        onRemove={() => handleRemoveFriend(friend.id)}
+                        onRemove={() => handleRemoveFriend(friend.googleId)}
                         compact={true}
                       />
                     ))}
@@ -185,15 +174,15 @@ const CreateGroup: FC = () => {
                 )}
               </div>
             </div>
-            
+
             {error && (
               <div className="mb-4 text-sm text-red-600">
                 {error}
               </div>
             )}
-            
+
             <div className="flex justify-end gap-2">
-              <Button 
+              <Button
                 type="button"
                 variant="secondary"
                 onClick={() => navigate('/')}
@@ -203,7 +192,7 @@ const CreateGroup: FC = () => {
               <Button
                 type="submit"
                 variant="primary"
-                disabled={groupName.trim() === ''}
+                disabled={groupName.trim() === '' || selectedFriends.length === 0}
                 isLoading={isSubmitting}
                 loadingText="Création..."
               >
