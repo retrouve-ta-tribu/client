@@ -7,7 +7,7 @@ interface FriendCardProps {
 
 const FriendCard: FC<FriendCardProps> = ({ friend }) => {
   return (
-    <div className="flex items-center p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
+    <div className="flex items-center p-4 hover:bg-gray-50 border-b border-gray-100">
       <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
         <img 
           src={friend.picture} 
