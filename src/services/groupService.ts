@@ -109,6 +109,25 @@ class GroupService {
       throw error;
     }
   }
+
+  public async leaveGroup(groupId: string, userId: string): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseUrl}/groups/${groupId}/members/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || `Failed to leave group: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error(`Error leaving group ${groupId}:`, error);
+      throw error;
+    }
+  }
 }
 
 export default GroupService.getInstance(); 

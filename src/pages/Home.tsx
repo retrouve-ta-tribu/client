@@ -5,6 +5,7 @@ import PageContainer from '../components/layout/PageContainer'
 import NavBar from '../components/layout/NavBar'
 import Button from '../components/ui/Button'
 import groupService, { Group } from '../services/groupService'
+import authService from '../services/authService'
 
 const Home: FC = () => {
     const [groups, setGroups] = useState<Group[]>([])
@@ -42,6 +43,33 @@ const Home: FC = () => {
         navigate('/create-group')
     }
 
+    const handleLeaveGroup = async (groupId: string) => {
+        const currentUserId = authService.state.profile?.id;
+        if (!currentUserId) {
+            throw new Error('You must be logged in to leave a group');
+        }
+        
+        const apiUrl = import.meta.env.VITE_API_URL;
+        if (!apiUrl) {
+            throw new Error('API URL is not defined');
+        }
+        
+        const response = await fetch(`${apiUrl}/api/groups/${groupId}/members/${currentUserId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+            throw new Error(errorData.message || `Failed to leave group: ${response.statusText}`);
+        }
+        
+        // Refresh the groups list
+        await loadGroups();
+    };
+
     return (
         <PageContainer>
             <div className="flex flex-col h-full max-h-screen">
@@ -68,8 +96,9 @@ const Home: FC = () => {
                         <div className="divide-y divide-gray-100">
                             {groups.map((group, index) => (
                                 <GroupCard 
-                                    key={`${group._id.$oid}-${index}`} 
+                                    key={`${group._id}-${index}`} 
                                     group={group} 
+                                    onLeave={handleLeaveGroup}
                                 />
                             ))}
                         </div>
