@@ -5,7 +5,7 @@ import NavBar from '../components/layout/NavBar';
 import Button from '../components/ui/Button';
 import PersonCard from '../components/PersonCard';
 import friendService, { Friend } from '../services/friendService';
-import { createGroup } from '../services/groupService';
+import groupService from '../services/groupService';
 
 const CreateGroup: FC = () => {
   const navigate = useNavigate();
@@ -78,26 +78,24 @@ const CreateGroup: FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!groupName.trim()) {
-      setError('Please enter a group name');
-      return;
-    }
-    
     setIsSubmitting(true);
     setError(null);
     
     try {
-      const memberIds = selectedFriends.map(friend => friend.googleId || friend.id);
-      await createGroup({
+      // Get the IDs of selected friends
+      const memberIds = selectedFriends.map(friend => friend.id);
+      
+      // Call the createGroup method from the service
+      await groupService.createGroup({
         name: groupName.trim(),
         members: memberIds
       });
       
+      // Navigate back to the home page on success
       navigate('/');
     } catch (err) {
       console.error('Failed to create group:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create group. Please try again.');
+      setError(err instanceof Error ? err.message : 'Failed to create group. Please try again later.');
     } finally {
       setIsSubmitting(false);
     }

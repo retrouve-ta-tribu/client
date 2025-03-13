@@ -1,66 +1,114 @@
-import groups from '../mocks/groups.json'
-import {Group} from "./types.ts";
-import authService from '../services/authService';
+import authService from './authService';
 
-export const getGroups = () => {
-  return groups as Group[]
-} 
-
-export const getGroupById = (id: string) => {
-  return (groups as Group[]).find(group => group._id.$oid === id)
-} 
-
-export const getUserById = (userId: string) => {
-  for (const group of groups as Group[]) {
-    const user = group.members.find(member => member.id === userId)
-    if (user) {
-      return {
-        ...user,
-        groupId: group._id.$oid,
-        groupName: group.name
-      }
-    }
-  }
-  return null
-} 
+export interface Group {
+  _id: {
+    $oid: string;
+  };
+  name: string;
+  description?: string;
+  members: string[];
+  createdBy: string;
+  createdAt: {
+    $date: string;
+  };
+}
 
 interface CreateGroupRequest {
   name: string;
   members: string[];
 }
 
-export const createGroup = async (groupData: CreateGroupRequest): Promise<any> => {
-  const apiUrl = import.meta.env.VITE_API_URL;
-  if (!apiUrl) {
-    throw new Error('VITE_API_URL environment variable is not defined');
+class GroupService {
+  private static instance: GroupService;
+  private baseUrl: string;
+
+  private constructor() {
+    const apiUrl = import.meta.env.VITE_API_URL;
+    if (!apiUrl) {
+      throw new Error('VITE_API_URL environment variable is not defined');
+    }
+    this.baseUrl = `${apiUrl}/api`;
   }
-  
-  const googleId = authService.state.profile?.id;
-  if (!googleId) {
-    throw new Error('User not authenticated');
+
+  public static getInstance(): GroupService {
+    if (!GroupService.instance) {
+      GroupService.instance = new GroupService();
+    }
+    return GroupService.instance;
   }
-  
-  try {
-    const response = await fetch(`${apiUrl}/api/groups`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: groupData.name,
-        members: groupData.members,
-        createdBy: googleId
-      }),
-    });
+
+  public async getGroups(): Promise<Group[]> {
+    // Get the current user's Google ID from the auth service
+    const googleId = authService.state.profile?.id;
     
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-      throw new Error(errorData.message || `Failed to create group: ${response.statusText}`);
+    if (!googleId) {
+      console.warn('User not authenticated, returning empty groups array');
+      return [];
+    }
+
+    try {
+      const response = await fetch(`${this.baseUrl}/users/${googleId}/groups`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch groups: ${response.statusText}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching groups:', error);
+      return [];
+    }
+  }
+
+  public async getGroupById(groupId: string): Promise<Group | null> {
+    try {
+      const response = await fetch(`${this.baseUrl}/groups/${groupId}`);
+      
+      if (response.status === 404) {
+        return null;
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch group: ${response.statusText}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error(`Error fetching group ${groupId}:`, error);
+      return null;
+    }
+  }
+
+  public async createGroup(groupData: CreateGroupRequest): Promise<any> {
+    const googleId = authService.state.profile?.id;
+    if (!googleId) {
+      throw new Error('User not authenticated');
     }
     
-    return response.json();
-  } catch (error) {
-    console.error('Error creating group:', error);
-    throw error;
+    try {
+      const response = await fetch(`${this.baseUrl}/groups`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: groupData.name,
+          members: groupData.members,
+          createdBy: googleId
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || `Failed to create group: ${response.statusText}`);
+      }
+      
+      return response.json();
+    } catch (error) {
+      console.error('Error creating group:', error);
+      throw error;
+    }
   }
-} 
+}
+
+export default GroupService.getInstance(); 
