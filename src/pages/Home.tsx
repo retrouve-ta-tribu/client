@@ -18,7 +18,13 @@ const Home: FC = () => {
         setIsLoading(true)
         try {
             const groupsList = await groupService.getGroups()
-            setGroups(groupsList)
+            // Sort groups by creation date (newest first)
+            const sortedGroups = [...groupsList].sort((a, b) => {
+                const dateA = new Date(a.createdAt).getTime()
+                const dateB = new Date(b.createdAt).getTime()
+                return dateB - dateA
+            })
+            setGroups(sortedGroups)
         } catch (err) {
             console.error('Failed to load groups:', err)
             setError('Failed to load groups. Please try again later.')
