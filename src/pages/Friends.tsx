@@ -1,14 +1,21 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import PageContainer from '../components/layout/PageContainer';
 import PageHeader from '../components/layout/PageHeader';
 import FriendCard from '../components/FriendCard';
-import friendService from '../services/friendService';
+import friendService, { Friend } from '../services/friendService';
 
 const Friends: FC = () => {
-  const friends = friendService.getFriends();
+  const [friends, setFriends] = useState<Friend[]>([]);
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Load friends
+    setFriends(friendService.getFriends());
+    setIsLoading(false);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,11 +25,18 @@ const Friends: FC = () => {
     try {
       await friendService.addFriend(email);
       setEmail('');
+      // Refresh friends list
+      setFriends(friendService.getFriends());
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleFriendRemoved = () => {
+    // Refresh friends list
+    setFriends(friendService.getFriends());
   };
 
   return (
@@ -61,14 +75,21 @@ const Friends: FC = () => {
         )}
       </div>
       
-      <div className="divide-y divide-gray-100">
-        {friends.map((friend) => (
-          <FriendCard 
-            key={friend.id} 
-            friend={friend} 
-          />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="p-4 text-center text-gray-500">Chargement...</div>
+      ) : friends.length === 0 ? (
+        <div className="p-4 text-center text-gray-500">Vous n'avez pas encore d'amis</div>
+      ) : (
+        <div className="divide-y divide-gray-100">
+          {friends.map((friend) => (
+            <FriendCard 
+              key={friend.id} 
+              friend={friend}
+              onRemove={handleFriendRemoved}
+            />
+          ))}
+        </div>
+      )}
     </PageContainer>
   );
 };
