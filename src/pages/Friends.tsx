@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import NavBar from '../components/layout/NavBar';
-import FriendCard from '../components/FriendCard';
+import PersonCard from '../components/PersonCard';
 import Button from '../components/ui/Button';
 import friendService, { Friend } from '../services/friendService';
 
@@ -56,9 +56,16 @@ const Friends: FC = () => {
     }
   };
 
-  const handleFriendRemoved = () => {
-    // Refresh friends list
-    loadFriends();
+  const handleFriendRemoved = (friendId: string) => {
+    // Call the API to remove the friend
+    friendService.removeFriend(friendId)
+      .then(() => {
+        // Refresh friends list
+        loadFriends();
+      })
+      .catch(err => {
+        console.error('Failed to remove friend:', err);
+      });
   };
 
   return (
@@ -102,10 +109,10 @@ const Friends: FC = () => {
           ) : (
             <div className="divide-y divide-gray-100">
               {friends.map((friend, index) => (
-                <FriendCard 
+                <PersonCard 
                   key={`${friend.email}-${index}`} 
-                  friend={friend}
-                  onRemove={handleFriendRemoved}
+                  person={friend}
+                  onRemove={() => handleFriendRemoved(friend.googleId || friend.id)}
                 />
               ))}
             </div>

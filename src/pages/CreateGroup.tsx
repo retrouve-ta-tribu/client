@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import NavBar from '../components/layout/NavBar';
 import Button from '../components/ui/Button';
+import PersonCard from '../components/PersonCard';
 import friendService, { Friend } from '../services/friendService';
 import { createGroup } from '../services/groupService';
 
@@ -144,30 +145,15 @@ const CreateGroup: FC = () => {
                   {filteredFriends.length === 0 ? (
                     <div className="p-2 text-sm text-gray-500">Aucun ami trouvé</div>
                   ) : (
-                    filteredFriends.map(friend => {
-                      const displayName = friend.displayName || 
-                        (friend.firstName && friend.lastName 
-                          ? `${friend.firstName} ${friend.lastName}` 
-                          : friend.email.split('@')[0]);
-                      
-                      return (
-                        <div 
-                          key={friend.id} 
-                          className="p-2 hover:bg-gray-100 cursor-pointer flex items-center"
-                          onClick={() => handleAddFriend(friend)}
-                        >
-                          <img 
-                            src={friend.picture} 
-                            alt={displayName}
-                            className="w-8 h-8 rounded-full mr-2" 
-                          />
-                          <div>
-                            <div className="font-medium">{displayName}</div>
-                            <div className="text-xs text-gray-500">{friend.email}</div>
-                          </div>
-                        </div>
-                      );
-                    })
+                    filteredFriends.map(friend => (
+                      <PersonCard
+                        key={friend.id}
+                        person={friend}
+                        onClick={() => handleAddFriend(friend)}
+                        showRemoveButton={false}
+                        compact={true}
+                      />
+                    ))
                   )}
                 </div>
               )}
@@ -183,40 +169,14 @@ const CreateGroup: FC = () => {
                   <div className="text-sm text-gray-500">Aucun membre sélectionné</div>
                 ) : (
                   <div className="space-y-2">
-                    {selectedFriends.map(friend => {
-                      const displayName = friend.displayName || 
-                        (friend.firstName && friend.lastName 
-                          ? `${friend.firstName} ${friend.lastName}` 
-                          : friend.email.split('@')[0]);
-                      
-                      return (
-                        <div 
-                          key={friend.id} 
-                          className="flex items-center justify-between bg-gray-50 p-2 rounded"
-                        >
-                          <div className="flex items-center">
-                            <img 
-                              src={friend.picture} 
-                              alt={displayName}
-                              className="w-8 h-8 rounded-full mr-2" 
-                            />
-                            <div>
-                              <div className="font-medium">{displayName}</div>
-                              <div className="text-xs text-gray-500">{friend.email}</div>
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveFriend(friend.id)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
-                          </button>
-                        </div>
-                      );
-                    })}
+                    {selectedFriends.map(friend => (
+                      <PersonCard
+                        key={friend.id}
+                        person={friend}
+                        onRemove={() => handleRemoveFriend(friend.id)}
+                        compact={true}
+                      />
+                    ))}
                   </div>
                 )}
               </div>
