@@ -24,7 +24,7 @@ const GroupCard: FC<GroupCardProps> = ({ group }) => {
     const memberCount = group.members?.length || 0;
 
     return (
-        <Link to={`/group/${group._id.$oid}`} className="block hover:bg-gray-50">
+        <Link to={`/group/${group._id}`} className="block hover:bg-gray-50">
             <div className="p-4">
                 <h3 className="font-semibold text-gray-800">{group.name}</h3>
                 
