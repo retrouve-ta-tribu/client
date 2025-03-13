@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import Friends from './pages/Friends'
 import { useAuthState } from './hooks/useAuthState'
 import { useEffect } from 'react'
+import CreateGroup from './pages/CreateGroup'
 
 function App() {
     const { profile, isLoading } = useAuthState();
@@ -40,6 +41,7 @@ function App() {
                     path="/"
                     element={profile ? <Home /> : <Navigate to="/login" />}
                 />
+                <Route path="/create-group" element={<CreateGroup />} />
             </Routes>
         </>
     )
