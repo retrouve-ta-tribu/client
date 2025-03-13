@@ -15,7 +15,6 @@ const CreateGroup: FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [friends, setFriends] = useState<Friend[]>([]);
   const [selectedFriends, setSelectedFriends] = useState<Friend[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,15 +29,12 @@ const CreateGroup: FC = () => {
 
   useEffect(() => {
     const loadFriends = async () => {
-      setIsLoading(true);
       try {
         const friendsList = await friendService.getFriends();
         setFriends(friendsList);
       } catch (err) {
         console.error('Failed to load friends:', err);
         setError('Failed to load friends. Please try again later.');
-      } finally {
-        setIsLoading(false);
       }
     };
 

@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthState } from '../../hooks/useAuthState';
 import authService from '../../services/authService';
 
