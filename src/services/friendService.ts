@@ -135,6 +135,8 @@ class FriendService {
     }
 
     try {
+      console.log(`Removing friend with ID: ${friendId}`);
+      
       const response = await fetch(`${this.baseUrl}/users/${googleId}/friends`, {
         method: 'DELETE',
         headers: {
@@ -144,11 +146,9 @@ class FriendService {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to remove friend');
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || `Failed to remove friend: ${response.statusText}`);
       }
-
-      return response.json();
     } catch (error) {
       console.error('Error removing friend:', error);
       throw error;

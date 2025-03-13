@@ -15,9 +15,14 @@ const FriendCard: FC<FriendCardProps> = ({ friend, onRemove }) => {
     e.stopPropagation();
     setIsRemoving(true);
     setError(null);
-
+    
+    // Use googleId if available, otherwise fall back to id
+    const idToRemove = friend.googleId || friend.id;
+    console.log('Removing friend:', friend);
+    console.log('Using ID for removal:', idToRemove);
+    
     try {
-      await friendService.removeFriend(friend.id);
+      await friendService.removeFriend(idToRemove);
       if (onRemove) {
         onRemove();
       }
@@ -60,7 +65,7 @@ const FriendCard: FC<FriendCardProps> = ({ friend, onRemove }) => {
       <button
         onClick={handleRemove}
         disabled={isRemoving}
-        className={`p-2 text-red-500 hover:text-red-700 focus:outline-none ${
+        className={`p-2 text-red-500 hover:text-red-700 focus:outline-none cursor-pointer ${
           isRemoving ? 'opacity-50 cursor-not-allowed' : ''
         }`}
         title="Supprimer cet ami"

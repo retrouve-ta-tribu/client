@@ -94,7 +94,7 @@ const Friends: FC = () => {
         <div className="divide-y divide-gray-100">
           {friends.map((friend) => (
             <FriendCard 
-              key={friend.id} 
+              key={friend.email} 
               friend={friend}
               onRemove={handleFriendRemoved}
             />
