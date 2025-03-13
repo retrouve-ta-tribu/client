@@ -10,20 +10,19 @@ const Friends: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
     
-    // Simulate API call
-    setTimeout(() => {
-      if (email.includes('@')) {
-        setEmail('');
-      } else {
-        setError('Veuillez entrer une adresse email valide');
-      }
+    try {
+      await friendService.addFriend(email);
+      setEmail('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   return (

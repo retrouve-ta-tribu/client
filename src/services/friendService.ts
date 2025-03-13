@@ -1,3 +1,5 @@
+import authService from './authService';
+
 // Mock data for friends
 const mockFriends = [
   { id: '1', firstName: 'Marie', lastName: 'Dupont', email: 'marie.dupont@example.com', picture: 'https://randomuser.me/api/portraits/women/1.jpg' },
@@ -17,8 +19,15 @@ export interface Friend {
 
 class FriendService {
   private static instance: FriendService;
+  private baseUrl: string;
 
-  private constructor() {}
+  private constructor() {
+    const apiUrl = import.meta.env.VITE_API_URL;
+    if (!apiUrl) {
+      throw new Error('VITE_API_URL environment variable is not defined');
+    }
+    this.baseUrl = `${apiUrl}/api`;
+  }
 
   public static getInstance(): FriendService {
     if (!FriendService.instance) {
@@ -33,6 +42,35 @@ class FriendService {
 
   public getFriendById(id: string): Friend | undefined {
     return mockFriends.find(friend => friend.id === id);
+  }
+
+  public async addFriend(email: string): Promise<void> {
+    // Get the current user's Google ID from the auth service
+    const googleId = authService.state.profile?.id;
+    
+    if (!googleId) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      const response = await fetch(`${this.baseUrl}/users/${googleId}/friends`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to add friend');
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Error adding friend:', error);
+      throw error;
+    }
   }
 }
 
