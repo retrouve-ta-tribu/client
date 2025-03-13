@@ -52,60 +52,64 @@ const Friends: FC = () => {
 
   return (
     <PageContainer>
-      <div className="border-b border-gray-200 p-4">
-        <div className="flex items-center">
-          <Link to="/" className="mr-3 text-blue-500 hover:text-blue-700">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </Link>
-          <h1 className="text-xl font-semibold text-gray-800">Mes amis</h1>
-        </div>
-      </div>
-      
-      <div className="p-4 bg-gray-50 border-b border-gray-200">
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={`px-4 py-2 cursor-pointer bg-blue-500 text-white rounded-md ${
-              isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
-            }`}
-          >
-            {isSubmitting ? 'Envoi...' : 'Ajouter un ami'}
-          </button>
-        </form>
-        
-        {error && (
-          <div className="mt-2 text-sm text-red-600">
-            {error}
+      <div className="flex flex-col h-full max-h-screen">
+        <div className="border-b border-gray-200 p-4 flex-shrink-0">
+          <div className="flex items-center">
+            <Link to="/" className="mr-3 text-blue-500 hover:text-blue-700">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </Link>
+            <h1 className="text-xl font-semibold text-gray-800">Mes amis</h1>
           </div>
-        )}
-      </div>
-      
-      {isLoading ? (
-        <div className="p-4 text-center text-gray-500">Chargement...</div>
-      ) : friends.length === 0 ? (
-        <div className="p-4 text-center text-gray-500">Vous n'avez pas encore d'amis</div>
-      ) : (
-        <div className="divide-y divide-gray-100">
-          {friends.map((friend) => (
-            <FriendCard 
-              key={friend.email} 
-              friend={friend}
-              onRemove={handleFriendRemoved}
-            />
-          ))}
         </div>
-      )}
+        
+        <div className="p-4 bg-gray-50 border-b border-gray-200 flex-shrink-0">
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`px-4 py-2 cursor-pointer bg-blue-500 text-white rounded-md ${
+                isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
+              }`}
+            >
+              {isSubmitting ? 'Envoi...' : 'Ajouter un ami'}
+            </button>
+          </form>
+          
+          {error && (
+            <div className="mt-2 text-sm text-red-600">
+              {error}
+            </div>
+          )}
+        </div>
+        
+        <div className="flex-grow overflow-y-auto">
+          {isLoading ? (
+            <div className="p-4 text-center text-gray-500">Chargement...</div>
+          ) : friends.length === 0 ? (
+            <div className="p-4 text-center text-gray-500">Vous n'avez pas encore d'amis</div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {friends.map((friend, index) => (
+                <FriendCard 
+                  key={`${friend.email}-${index}`} 
+                  friend={friend}
+                  onRemove={handleFriendRemoved}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </PageContainer>
   );
 };
