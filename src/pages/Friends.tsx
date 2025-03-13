@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
-import PageHeader from '../components/layout/PageHeader';
 import FriendCard from '../components/FriendCard';
 import friendService, { Friend } from '../services/friendService';
 
@@ -52,11 +52,16 @@ const Friends: FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader 
-        title="Mes amis" 
-        backLink="/"
-        backText="Retour aux groupes"
-      />
+      <div className="border-b border-gray-200 p-4">
+        <div className="flex items-center">
+          <Link to="/" className="mr-3 text-blue-500 hover:text-blue-700">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </Link>
+          <h1 className="text-xl font-semibold text-gray-800">Mes amis</h1>
+        </div>
+      </div>
       
       <div className="p-4 bg-gray-50 border-b border-gray-200">
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
