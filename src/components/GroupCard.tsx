@@ -7,17 +7,21 @@ interface GroupCardProps {
 }
 
 const GroupCard: FC<GroupCardProps> = ({ group }) => {
-    // Format the date
-    const formattedDate = group.createdAt?.$date 
-        ? new Date(group.createdAt.$date).toLocaleDateString('fr-FR', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        })
-        : 'Date inconnue'
 
-    // Get member count
-    const memberCount = group.members?.length || 0
+    const formatDate = (dateValue: any): string => {
+        try {
+            const dateString = typeof dateValue === 'string' ? dateValue : 
+                              (dateValue?.$date || '');
+            const date = new Date(dateString);
+            return isNaN(date.getTime()) ? 'Date invalide' : 
+                   date.toLocaleDateString('fr-FR', {year: 'numeric', month: 'long', day: 'numeric'});
+        } catch {
+            return 'Date inconnue';
+        }
+    };
+
+    const formattedDate = formatDate(group.createdAt);
+    const memberCount = group.members?.length || 0;
 
     return (
         <Link to={`/group/${group._id.$oid}`} className="block hover:bg-gray-50">

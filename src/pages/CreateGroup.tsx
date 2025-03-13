@@ -6,6 +6,7 @@ import Button from '../components/ui/Button';
 import PersonCard from '../components/PersonCard';
 import friendService, { Friend } from '../services/friendService';
 import groupService from '../services/groupService';
+import authService from '../services/authService';
 
 const CreateGroup: FC = () => {
   const navigate = useNavigate();
@@ -82,16 +83,25 @@ const CreateGroup: FC = () => {
     setError(null);
     
     try {
-      // Get the IDs of selected friends
-      const memberIds = selectedFriends.map(friend => friend.id);
+      // Get the current user's ID
+      const currentUserId = authService.state.profile?.id;
       
-      // Call the createGroup method from the service
+      if (!currentUserId) {
+        throw new Error('You must be logged in to create a group');
+      }
+      
+      // Try googleId first, then fall back to id
+      const friendIds = selectedFriends.map(friend => {
+        return friend.googleId || friend.id;
+      });
+      
+      const memberIds = [currentUserId, ...friendIds];
+      
       await groupService.createGroup({
         name: groupName.trim(),
         members: memberIds
       });
       
-      // Navigate back to the home page on success
       navigate('/');
     } catch (err) {
       console.error('Failed to create group:', err);
