@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { Friend } from '../services/friendService';
+import { Friend } from '../../services/friendService';
 
 interface PersonCardProps {
   person: Friend;

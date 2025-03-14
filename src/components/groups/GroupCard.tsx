@@ -1,8 +1,8 @@
 import { FC, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Group } from '../services/groupService'
-import authService from '../services/authService'
-import ExitIcon from './icons/ExitIcon'
+import { Group } from '../../services/groupService'
+import authService from '../../services/authService'
+import ExitIcon from '../icons/ExitIcon'
 
 interface GroupCardProps {
     group: Group;
