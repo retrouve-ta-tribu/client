@@ -22,7 +22,7 @@ const LocationUnavailable: React.FC<LocationUnavailableProps> = ({
             clipRule="evenodd" 
           />
         </svg>
-        Location not available
+        Localisation non disponible
       </span>
     </div>
   );
