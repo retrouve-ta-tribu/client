@@ -181,14 +181,6 @@ const GroupDetails: FC = () => {
                     </div>
                 )}
                 
-                {isSharing && !isConnectingSocket && !isGettingLocation && (
-                    <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
-                        Sharing location as: <strong>
-                            {group.members.find(m => m.googleId === debugUserId)?.displayName || debugUserId}
-                        </strong>
-                    </div>
-                )}
-                
                 {/* Adapt MemberList to work with the new data structure */}                
                 <MemberList 
                     members={memberObjects}
