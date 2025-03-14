@@ -48,7 +48,7 @@ const Conversation: FC<ConversationProps> = () => {
     return (
         <>
             <div className="flex flex-col h-full">
-                <div className="flex-1 overflow-auto no-scrollbar">
+                <div className="flex-1 flex overflow-auto no-scrollbar justify-end items-end">
                     <div className="flex px-4 flex-col gap-4 w-full">
                         <Message isSent={true} message={{sender: "Vous", content: "Hello", time: "12:00"}}/>
 
