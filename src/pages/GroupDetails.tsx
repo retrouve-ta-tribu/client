@@ -121,18 +121,7 @@ const GroupDetails: FC = () => {
             if (!group) return;
             
             try {
-                // Assuming groupService has a method to get members by their IDs
-                const members = await Promise.all(
-                    group.members.map(async (memberId) => {
-                        const member = await FriendService.getUserById(memberId);
-                        return {
-                            id: memberId,
-                            email: member.email,
-                            name: member.displayName,
-                            picture: member.picture
-                        };
-                    })
-                );
+                const members = await groupService.getGroupMembers(id);
                 setMemberObjects(members);
             } catch (err) {
                 console.error('Failed to load group members:', err);
@@ -141,7 +130,7 @@ const GroupDetails: FC = () => {
         };
 
         loadGroupMembers();
-    }, [group]);
+    }, [group, id]);
 
     if (isLoading) {
         return (

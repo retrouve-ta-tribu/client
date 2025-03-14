@@ -128,6 +128,22 @@ class GroupService {
       throw error;
     }
   }
+
+  public async getGroupMembers(groupId: string): Promise<Member[]> {
+    const response = await fetch(`${this.baseUrl}/groups/${groupId}/members`);
+    
+    if (!response.ok) {
+        throw new Error('Failed to fetch group members');
+    }
+    
+    const members = await response.json();
+    return members.map((member: any) => ({
+        id: member.googleId,
+        email: member.email,
+        name: member.displayName,
+        picture: member.picture
+    }));
+  }
 }
 
 export default GroupService.getInstance(); 
