@@ -4,18 +4,10 @@ import GroupDetails from './pages/GroupDetails'
 import Login from './pages/Login'
 import Friends from './pages/Friends'
 import { useAuthState } from './hooks/useAuthState'
-import { useEffect } from 'react'
+import CreateGroup from './pages/CreateGroup'
 
 function App() {
     const { profile, isLoading } = useAuthState();
-
-    useEffect(() => {
-        if (profile) {
-            console.log('User logged in:', profile.name)
-        } else {
-            console.log('User logged out')
-        }
-    }, [profile])
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -40,6 +32,7 @@ function App() {
                     path="/"
                     element={profile ? <Home /> : <Navigate to="/login" />}
                 />
+                <Route path="/create-group" element={<CreateGroup />} />
             </Routes>
         </>
     )

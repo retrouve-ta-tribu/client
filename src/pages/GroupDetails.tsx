@@ -1,18 +1,19 @@
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState, FC } from 'react'
-import { getGroupById } from '../services/groupService'
+import groupService, { Group } from '../services/groupService'
 import PageContainer from '../components/layout/PageContainer'
 import PageHeader from '../components/layout/PageHeader'
-import MemberList from '../components/groups/MemberList'
 import NotFound from '../components/common/NotFound'
 import Spinner from '../components/common/Spinner'
 import locationSharingService from '../services/locationSharingService'
-import {UserPosition} from "../services/types.ts";
+import { UserPosition } from "../services/types.ts"
 
 const GroupDetails: FC = () => {
     const params = useParams();
+    const navigate = useNavigate();
     const id = params.id || '';
-    const group = getGroupById(id)
+    const [group, setGroup] = useState<Group | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
     const [userPositions, setUserPositions] = useState<UserPosition[]>([])
     const [isSharing, setIsSharing] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
@@ -20,72 +21,102 @@ const GroupDetails: FC = () => {
     const [isGettingLocation, setIsGettingLocation] = useState<boolean>(false)
     const [debugUserId, setDebugUserId] = useState<string>('')
 
+    // Load group data
+    useEffect(() => {
+        const loadGroup = async () => {
+            if (!id) return;
+            
+            setIsLoading(true);
+            try {
+                const groupData = await groupService.getGroupById(id);
+                setGroup(groupData);
+                if (!groupData) {
+                    setError('Group not found');
+                }
+            } catch (err) {
+                console.error('Failed to load group:', err);
+                setError('Failed to load group details');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        
+        loadGroup();
+    }, [id]);
+
     // DEBUG : Set the first user as default when group data loads
     useEffect(() => {
-        if (group && group.members.length > 0 && !debugUserId) {
-            setDebugUserId(group.members[0].id)
+        if (group && group.members && group.members.length > 0 && !debugUserId) {
+            // Assuming members is an array of strings (user IDs)
+            setDebugUserId(group.members[0]);
         }
-    }, [group, debugUserId])
+    }, [group, debugUserId]);
 
     // Start location sharing when component mounts or selected user changes
     useEffect(() => {
-        if (!group || !debugUserId) return
-
-        // DEBUG :  Find the selected user from the group members
-        const currentUser = group.members.find(member => member.id === debugUserId)
-        if (!currentUser) return
+        if (!group || !debugUserId) return;
 
         // Stop any existing location sharing
-        locationSharingService.stopSharing()
-        setIsSharing(false)
+        locationSharingService.stopSharing();
+        setIsSharing(false);
         
         const startLocationSharing = async () => {
             try {
                 // First, connect to socket
-                setIsConnectingSocket(true)
+                setIsConnectingSocket(true);
                 if (!locationSharingService.isSocketConnected()) {
-                    await locationSharingService.connectSocket()
+                    await locationSharingService.connectSocket();
                 }
-                setIsConnectingSocket(false)
+                setIsConnectingSocket(false);
                 
                 // Then, get geolocation
-                setIsGettingLocation(true)
+                setIsGettingLocation(true);
                 await locationSharingService.startSharing(
                     id,
-                    currentUser.id
-                )
-                setIsGettingLocation(false)
-                setIsSharing(true)
+                    debugUserId
+                );
+                setIsGettingLocation(false);
+                setIsSharing(true);
                 
                 // Add listener for location updates
-                locationSharingService.addLocationUpdateListener(handleLocationUpdates)
+                locationSharingService.addLocationUpdateListener(handleLocationUpdates);
             } catch (err: unknown) {
-                setIsConnectingSocket(false)
-                setIsGettingLocation(false)
-                console.error('Failed to start location sharing:', err)
+                setIsConnectingSocket(false);
+                setIsGettingLocation(false);
+                console.error('Failed to start location sharing:', err);
                 const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-                setError(`Failed to start location sharing: ${errorMessage}`)
+                setError(`Failed to start location sharing: ${errorMessage}`);
             }
-        }
+        };
         
-        startLocationSharing()
+        startLocationSharing();
         
         // Clean up when component unmounts or selected user changes
         return () => {
-            locationSharingService.stopSharing()
-            locationSharingService.removeLocationUpdateListener(handleLocationUpdates)
-        }
-    }, [id, group, debugUserId])
-
+            locationSharingService.stopSharing();
+            locationSharingService.removeLocationUpdateListener(handleLocationUpdates);
+        };
+    }, [id, group, debugUserId]);
 
     // DEBUG : Handle user selection change
     const handleUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setDebugUserId(e.target.value)
-    }
+        setDebugUserId(e.target.value);
+    };
 
     // Handle location updates from other users
     const handleLocationUpdates = (positions: UserPosition[]) => {
-        setUserPositions(positions)
+        setUserPositions(positions);
+    };
+
+    if (isLoading) {
+        return (
+            <PageContainer>
+                <PageHeader backLink="/" />
+                <div className="flex justify-center items-center h-64">
+                    <Spinner size="lg" color="blue" />
+                </div>
+            </PageContainer>
+        );
     }
 
     if (!group) {
@@ -94,8 +125,15 @@ const GroupDetails: FC = () => {
                 <PageHeader backLink="/" />
                 <NotFound type="Group" />
             </PageContainer>
-        )
+        );
     }
+
+    // Get member names from user service or API
+    // This is a placeholder - you'll need to implement this
+    const getMemberName = (memberId: string) => {
+        // Placeholder - replace with actual implementation
+        return `User ${memberId.substring(0, 5)}`;
+    };
 
     return (
         <PageContainer>
@@ -117,9 +155,9 @@ const GroupDetails: FC = () => {
                         onChange={handleUserChange}
                         className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     >
-                        {group.members.map(member => (
-                            <option key={member.id} value={member.id}>
-                                {member.name}
+                        {group.members.map(memberId => (
+                            <option key={memberId} value={memberId}>
+                                {getMemberName(memberId)}
                             </option>
                         ))}
                     </select>
@@ -147,17 +185,36 @@ const GroupDetails: FC = () => {
                 
                 {isSharing && !isConnectingSocket && !isGettingLocation && (
                     <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
-                        Sharing location as: <strong>{group.members.find(m => m.id === debugUserId)?.name}</strong>
+                        Sharing location as: <strong>{getMemberName(debugUserId)}</strong>
                     </div>
                 )}
                 
-                <MemberList 
-                    members={group.members} 
-                    userPositions={userPositions}
-                />
+                {/* Adapt MemberList to work with the new data structure */}
+                <div className="mt-6">
+                    <h2 className="text-lg font-semibold mb-3">Group Members</h2>
+                    <div className="space-y-2">
+                        {group.members.map(memberId => (
+                            <div key={memberId} className="p-3 bg-white rounded-md shadow-sm border border-gray-200">
+                                <div className="flex items-center">
+                                    <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                                        <span className="text-gray-500">{getMemberName(memberId).charAt(0)}</span>
+                                    </div>
+                                    <div>
+                                        <div className="font-medium">{getMemberName(memberId)}</div>
+                                        <div className="text-sm text-gray-500">
+                                            {userPositions.find(p => p.userId === memberId) 
+                                                ? 'Online' 
+                                                : 'Offline'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </PageContainer>
-    )
-}
+    );
+};
 
-export default GroupDetails 
+export default GroupDetails; 

@@ -127,7 +127,6 @@ class AuthService {
     public async login(googleResponse: any): Promise<void> {
         try {
             this.setState({ isLoading: true });
-            console.log('Google login success:', googleResponse);
             
             localStorage.setItem('google_user', JSON.stringify(googleResponse));
             this.setState({ user: googleResponse });
@@ -146,7 +145,6 @@ class AuthService {
     }
 
     public logOut = (): void => {
-        console.log('Logging out...');
         googleLogout();
         localStorage.removeItem('google_user');
         this.setState({
@@ -197,7 +195,6 @@ class AuthService {
             }
 
             this.setState({ profile: googleProfile });
-            console.log('Profile fetched:', googleProfile);
         } catch (err) {
             console.error('Profile fetch error:', err);
             localStorage.removeItem('google_user');
