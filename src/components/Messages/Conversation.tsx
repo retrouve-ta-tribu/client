@@ -6,7 +6,7 @@ const mockedMessages = [
     {sender: "John Doe", content: "Hello", time: "12:00"},
     {sender: "Will", content: "Hello my friend", time: "12:01"},
     {sender: "Patrick", content: "I can't see you!", time: "12:02"},
-    {sender: "Le laitier", content: "Did you install spunk ?", time: "12:03"},
+    {sender: "Le laitier", content: "Did you install sprunk ?", time: "12:03"},
     {sender: "Will", content: "OF COURSE !!!!!", time: "12:04"},
 ]
 
