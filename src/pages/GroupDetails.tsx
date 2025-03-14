@@ -8,8 +8,6 @@ import Spinner from '../components/common/Spinner'
 import locationSharingService from '../services/locationSharingService'
 import { UserPosition, Member } from "../services/types.ts"
 import MemberList from '../components/groups/MemberList'
-import authService from '../services/authService'
-import FriendService from '../services/friendService'
 
 const GroupDetails: FC = () => {
     const params = useParams();
@@ -27,9 +25,6 @@ const GroupDetails: FC = () => {
 
     // Load group data
     useEffect(() => {
-        // console log the current user
-        console.log(authService.state.profile)
-
         const loadGroup = async () => {
             if (!id) return;
             
@@ -104,11 +99,6 @@ const GroupDetails: FC = () => {
             locationSharingService.removeLocationUpdateListener(handleLocationUpdates);
         };
     }, [id, group, debugUserId]);
-
-    // DEBUG : Handle user selection change
-    const handleUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setDebugUserId(e.target.value);
-    };
 
     // Handle location updates from other users
     const handleLocationUpdates = (positions: UserPosition[]) => {

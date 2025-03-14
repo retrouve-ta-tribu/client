@@ -14,7 +14,6 @@ const BigMemberCard: React.FC<BigMemberCardProps> = ({
   position 
 }) => {
   const isOnline = !!position;
-  console.log(member.picture);
   
   return (
     <div className={`p-4 ${isOnline ? 'bg-green-50 border-green-200' : 'bg-gray-100 border-gray-200'} rounded-lg shadow-sm border`}>
