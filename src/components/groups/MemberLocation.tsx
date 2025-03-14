@@ -3,10 +3,9 @@ import {UserPosition} from "../../services/types.ts";
 
 interface MemberLocationProps {
   position: UserPosition;
-  large?: boolean;
 }
 
-const MemberLocation: React.FC<MemberLocationProps> = ({ position, large = false }) => {
+const MemberLocation: React.FC<MemberLocationProps> = ({ position }) => {
   // Format the coordinates to be more readable
   const formatCoordinate = (coord: number): string => {
     return coord.toFixed(6);
@@ -28,10 +27,10 @@ const MemberLocation: React.FC<MemberLocationProps> = ({ position, large = false
   };
 
   return (
-    <div className={`mt-1 flex items-center ${large ? 'text-sm' : 'text-xs'} text-gray-500`}>
+    <div className={`mt-1 flex items-center text-xs text-gray-500`}>
       <svg 
         xmlns="http://www.w3.org/2000/svg" 
-        className={`${large ? 'h-4 w-4' : 'h-3 w-3'} mr-1 text-green-500`} 
+        className={`h-3 w-3 mr-1 text-green-500`} 
         viewBox="0 0 20 20" 
         fill="currentColor"
       >
@@ -42,17 +41,7 @@ const MemberLocation: React.FC<MemberLocationProps> = ({ position, large = false
         />
       </svg>
       <span>
-        {large ? (
-          <>
-            <strong>Location:</strong> {formatCoordinate(position.latitude)}, {formatCoordinate(position.longitude)}
-            <br />
-            <span className="ml-5">Updated {getTimeSinceUpdate()}</span>
-          </>
-        ) : (
-          <>
             {formatCoordinate(position.latitude)}, {formatCoordinate(position.longitude)} • {getTimeSinceUpdate()}
-          </>
-        )}
       </span>
     </div>
   );

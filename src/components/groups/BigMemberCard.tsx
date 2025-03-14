@@ -30,7 +30,7 @@ const BigMemberCard: React.FC<BigMemberCardProps> = ({
           <p className="text-sm text-gray-600">{member.email}</p>
           {position ? (
             <div className="mt-2">
-              <MemberLocation position={position} large={true} />
+              <MemberLocation position={position} />
             </div>
           ) : (
             <div className="mt-2">
