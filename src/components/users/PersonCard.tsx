@@ -1,6 +1,14 @@
 import { FC, useState } from 'react';
-import { Friend } from '../services/friendService';
+import { Friend } from '../../services/friendService';
 
+/**
+ * Props for the PersonCard component that displays person information with actions
+ * @property person - The person object containing information about the person
+ * @property onRemove - The function to call when the remove button is clicked
+ * @property onClick - The function to call when the card is clicked
+ * @property showRemoveButton - Whether to show the remove button
+ * @property compact - Whether to show the compact version of the card
+ */
 interface PersonCardProps {
   person: Friend;
   onRemove?: () => void;

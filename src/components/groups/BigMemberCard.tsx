@@ -1,26 +1,30 @@
 import React from 'react';
-import MemberLocation from './MemberLocation';
-import LocationUnavailable from './LocationUnavailable';
-import MemberAvatar from './MemberAvatar';
-import OnlineStatus from './OnlineStatus';
+import MemberLocation from './MemberLocation.tsx';
+import LocationUnavailable from './LocationUnavailable.tsx';
+import OnlineStatus from './OnlineStatus.tsx';
 import {Member, UserPosition} from "../../services/types.ts";
 
-interface HighlightedMemberCardProps {
+/**
+ * Props for the BigMemberCard component that displays detailed member information
+ * @property member - The member object containing information about the member
+ * @property position - The user's position data including coordinates and timestamp
+ */
+interface BigMemberCardProps {
   member: Member;
   position?: UserPosition;
 }
 
-const HighlightedMemberCard: React.FC<HighlightedMemberCardProps> = ({ 
+const BigMemberCard: React.FC<BigMemberCardProps> = ({ 
   member, 
   position 
 }) => {
   const isOnline = !!position;
   
   return (
-    <div className="mb-6 p-4 bg-blue-50 rounded-lg shadow-sm border border-blue-100">
+    <div className={`p-4 ${isOnline ? 'bg-green-50 border-green-200' : 'bg-gray-100 border-gray-200'} rounded-lg shadow-sm border`}>
       <div className="flex items-center">
         <div className="mr-4">
-          <MemberAvatar name={member.name} isOnline={isOnline} size="lg" />
+          <img src={member.picture} alt={member.name} className="w-12 h-12 rounded-full" />
         </div>
         <div className="flex-1">
           <div className="flex items-center">
@@ -30,7 +34,7 @@ const HighlightedMemberCard: React.FC<HighlightedMemberCardProps> = ({
           <p className="text-sm text-gray-600">{member.email}</p>
           {position ? (
             <div className="mt-2">
-              <MemberLocation position={position} large={true} />
+              <MemberLocation position={position} />
             </div>
           ) : (
             <div className="mt-2">
@@ -43,4 +47,4 @@ const HighlightedMemberCard: React.FC<HighlightedMemberCardProps> = ({
   );
 };
 
-export default HighlightedMemberCard; 
+export default BigMemberCard; 

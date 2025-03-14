@@ -1,5 +1,9 @@
 import { FC } from 'react';
 
+/**
+ * Props for the ContactInfo component that displays contact information
+ * @property email - The email address of the contact
+ */
 interface ContactInfoProps {
   email: string;
 }

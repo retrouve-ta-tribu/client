@@ -1,9 +1,9 @@
 import { FC, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import GroupCard from '../components/GroupCard'
+import GroupCard from '../components/groups/GroupCard'
 import PageContainer from '../components/layout/PageContainer'
 import NavBar from '../components/layout/NavBar'
-import Button from '../components/ui/Button'
+import Button from '../components/common/Button'
 import groupService, { Group } from '../services/groupService'
 import authService from '../services/authService'
 

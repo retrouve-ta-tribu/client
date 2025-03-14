@@ -1,9 +1,14 @@
 import { FC, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Group } from '../services/groupService'
-import authService from '../services/authService'
-import ExitIcon from './icons/ExitIcon'
+import { Group } from '../../services/groupService'
+import authService from '../../services/authService'
+import ExitIcon from '../icons/ExitIcon'
 
+/**
+ * Props for the GroupCard component that displays group information
+ * @property group - The group object containing information about the group
+ * @property onLeave - The function to call when the leave button is clicked
+ */
 interface GroupCardProps {
     group: Group;
     onLeave?: (groupId: string) => Promise<void>;

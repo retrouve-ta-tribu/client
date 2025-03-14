@@ -1,5 +1,11 @@
 import { FC, ButtonHTMLAttributes } from 'react';
 
+/**
+ * Props for the Button component with styling and loading state options
+ * @property variant - The variant of the button
+ * @property isLoading - Whether the button is in a loading state
+ * @property loadingText - The text to display while the button is loading
+ */
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'bordered';
   isLoading?: boolean;

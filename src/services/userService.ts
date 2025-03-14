@@ -1,3 +1,11 @@
+/**
+ * Data required to create a new user
+ * @property googleId - Google account unique identifier
+ * @property email - User's email address
+ * @property displayName - User's display name
+ * @property picture - URL to user's profile picture
+ * @property friends - Array of friend IDs
+ */
 interface CreateUserDto {
     googleId: string;
     email: string;
@@ -6,6 +14,11 @@ interface CreateUserDto {
     friends: string[];
 }
 
+/**
+ * Represents a user's complete information in the system
+ * @property id - Unique identifier in our system
+ * @extends CreateUserDto - Includes all properties from CreateUserDto
+ */
 interface User extends CreateUserDto {
     id: string;
     // Add any other fields returned by the API
