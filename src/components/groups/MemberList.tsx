@@ -12,7 +12,7 @@ export interface MemberListProps {
   onMemberSelect?: (memberId: string) => void;
 }
 const MemberList: FC<MemberListProps> = ({
-  members,
+  members = [],
   userPositions = [],
   selectedMemberId,
   onMemberSelect
@@ -73,6 +73,7 @@ const MemberList: FC<MemberListProps> = ({
       
       <ul className="divide-y divide-gray-100">
         {members.map((member) => {
+          console.log(member)
           const position = positionMap[member.id];
           const isHighlighted = member.id === selectedUserId;
           

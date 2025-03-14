@@ -16,6 +16,8 @@ const MemberAvatar: React.FC<MemberAvatarProps> = ({
     sm: 'w-8 h-8 text-sm',
     lg: 'w-12 h-12 text-lg font-medium'
   };
+
+  console.log(name)
   
   // Color classes based on online status
   const colorClasses = isOnline 

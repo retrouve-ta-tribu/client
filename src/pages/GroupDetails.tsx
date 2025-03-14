@@ -6,7 +6,10 @@ import PageHeader from '../components/layout/PageHeader'
 import NotFound from '../components/common/NotFound'
 import Spinner from '../components/common/Spinner'
 import locationSharingService from '../services/locationSharingService'
-import { UserPosition } from "../services/types.ts"
+import { UserPosition, Member } from "../services/types.ts"
+import MemberList from '../components/groups/MemberList'
+import MemberCard from '../components/groups/MemberCard'
+import HighlightedMemberCard from '../components/groups/HighlightedMemberCard'
 
 const GroupDetails: FC = () => {
     const params = useParams();
@@ -20,6 +23,24 @@ const GroupDetails: FC = () => {
     const [isConnectingSocket, setIsConnectingSocket] = useState<boolean>(false)
     const [isGettingLocation, setIsGettingLocation] = useState<boolean>(false)
     const [debugUserId, setDebugUserId] = useState<string>('')
+    const [selectedUserId, setSelectedUserId] = useState<string>('');
+    const [memberObjects, setMemberObjects] = useState<Member[]>([]);
+
+    // Create position map
+    const positionMap: Record<string, UserPosition> = userPositions.reduce((map, position) => {
+        map[position.userId] = position;
+        return map;
+    }, {} as Record<string, UserPosition>);
+
+    // Get highlighted member
+    const highlightedMember = selectedUserId && group ? 
+        group.members.find(m => m.id === selectedUserId) : null;
+    const highlightedPosition = selectedUserId ? 
+        positionMap[selectedUserId] : undefined;
+
+    const handleMemberSelect = (memberId: string) => {
+        setSelectedUserId(memberId);
+    };
 
     // Load group data
     useEffect(() => {
@@ -108,6 +129,21 @@ const GroupDetails: FC = () => {
         setUserPositions(positions);
     };
 
+    // Transform member IDs into Member objects when group loads
+    useEffect(() => {
+        if (!group) return;
+        
+        const members: Member[] = group.members.map(memberId => ({
+            id: memberId,
+            // googleId: memberId,
+            email: getMemberName(memberId), // Temporary, replace with actual email
+            name: getMemberName(memberId),
+            // picture: '', // Add default avatar URL if needed
+        }));
+        
+        setMemberObjects(members);
+    }, [group]);
+
     if (isLoading) {
         return (
             <PageContainer>
@@ -189,29 +225,13 @@ const GroupDetails: FC = () => {
                     </div>
                 )}
                 
-                {/* Adapt MemberList to work with the new data structure */}
-                <div className="mt-6">
-                    <h2 className="text-lg font-semibold mb-3">Group Members</h2>
-                    <div className="space-y-2">
-                        {group.members.map(memberId => (
-                            <div key={memberId} className="p-3 bg-white rounded-md shadow-sm border border-gray-200">
-                                <div className="flex items-center">
-                                    <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
-                                        <span className="text-gray-500">{getMemberName(memberId).charAt(0)}</span>
-                                    </div>
-                                    <div>
-                                        <div className="font-medium">{getMemberName(memberId)}</div>
-                                        <div className="text-sm text-gray-500">
-                                            {userPositions.find(p => p.userId === memberId) 
-                                                ? 'Online' 
-                                                : 'Offline'}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                {/* Adapt MemberList to work with the new data structure */}                
+                <MemberList 
+                    members={memberObjects}
+                    userPositions={userPositions}
+                    selectedMemberId={selectedUserId}
+                    onMemberSelect={handleMemberSelect}
+                />
             </div>
         </PageContainer>
     );
