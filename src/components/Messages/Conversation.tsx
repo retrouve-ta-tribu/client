@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useRef, useEffect } from 'react';
 import Message from './Message';
 import SendIcon from '../icons/SendIcon';
 
@@ -28,29 +28,46 @@ interface ConversationProps {
 
 const Conversation: FC<ConversationProps> = () => {
     const [newMessage, setNewMessage] = useState("");
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [newMessage, mockedMessages]);
+
+    const resetInputHeight = () => {
+        const input = document.querySelector("textarea");
+        if (input) {
+            input.style.height = "40px";
+        }
+    }
 
     const handleWriteMessage = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setNewMessage(e.target.value);
-        e.target.style.height = "40px";
+        resetInputHeight();
         e.target.style.height = `${e.target.scrollHeight}px`;
     }
 
     const handleSendMessage = () => {
         console.log(newMessage);
         setNewMessage("");
+        resetInputHeight();
     }
-
 
     return (
         <>
             <div className="flex flex-col h-full">
                 <div className="flex-1 overflow-auto no-scrollbar">
-                    <div className="flex px-4 flex-col gap-4 w-full pb-4">
+                    <div className="flex px-4 flex-col gap-4 w-full">
                         <Message isSent={true} message={{sender: "Vous", content: "Hello"}}/>
 
                         {mockedMessages.map((message, index) => (
                             <Message key={index} message={message}/>
                         ))}
+                        <div ref={messagesEndRef} /> {/* Scroll anchor */}
                     </div>
                 </div>
                 
@@ -62,7 +79,10 @@ const Conversation: FC<ConversationProps> = () => {
                         onChange={(e) => handleWriteMessage(e)}
                     />
 
-                    <button className="bg-indigo-500 text-white p-2 w-10 h-10 rounded-md hover:bg-indigo-600 cursor-pointer">
+                    <button 
+                        onClick={handleSendMessage}
+                        className="bg-indigo-500 text-white p-2 w-10 h-10 rounded-md hover:bg-indigo-600 cursor-pointer"
+                    >
                         <SendIcon />
                     </button>
                 </div>
