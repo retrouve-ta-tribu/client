@@ -9,6 +9,7 @@ import locationSharingService from '../services/locationSharingService'
 import { UserPosition, Member } from "../services/types.ts"
 import MemberList from '../components/groups/MemberList'
 import authService from '../services/authService'
+import FriendService from '../services/friendService'
 
 const GroupDetails: FC = () => {
     const params = useParams();
@@ -123,7 +124,7 @@ const GroupDetails: FC = () => {
                 // Assuming groupService has a method to get members by their IDs
                 const members = await Promise.all(
                     group.members.map(async (memberId) => {
-                        const member = await groupService.getMemberById(memberId);
+                        const member = await FriendService.getUserById(memberId);
                         return {
                             id: memberId,
                             email: member.email,
