@@ -10,6 +10,10 @@ const mockedMessages = [
     {sender: "Will", content: "OF COURSE !!!!!", time: "12:04"},
 ]
 
+/**
+ * Props for the Conversation component that displays a chat interface
+ * @property children - React child elements to be rendered within the conversation
+ */
 interface ConversationProps {
     children: React.ReactNode;
 }

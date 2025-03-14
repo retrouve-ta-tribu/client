@@ -3,6 +3,11 @@ import MemberLocation from './MemberLocation';
 import OnlineStatus from './OnlineStatus';
 import {Member, UserPosition} from "../../services/types.ts";
 
+/**
+ * Props for the MemberCard component that displays member information
+ * @property member - The member object containing information about the member
+ * @property position - The user's position data including coordinates and timestamp
+ */
 interface MemberCardProps {
   member: Member;
   position?: UserPosition;

@@ -1,5 +1,15 @@
 import authService from './authService';
 
+/**
+ * Represents a friend's information in the system
+ * @property id - The unique identifier of the friend
+ * @property firstName - The first name of the friend
+ * @property lastName - The last name of the friend
+ * @property displayName - The display name of the friend
+ * @property email - The email address of the friend
+ * @property picture - The URL to the friend's profile picture
+ * @property googleId - The Google ID of the friend
+ */
 export interface Friend {
   id: string;
   firstName?: string;
@@ -10,6 +20,15 @@ export interface Friend {
   googleId?: string;
 }
 
+/**
+ * Response structure for user data from the API
+ * @property id - The unique identifier of the user
+ * @property googleId - The Google ID of the user
+ * @property email - The email address of the user
+ * @property displayName - The display name of the user
+ * @property picture - The URL to the user's profile picture
+ * @property friends - The friends of the user (ids)
+ */
 interface UserResponse {
   id: string;
   googleId: string;

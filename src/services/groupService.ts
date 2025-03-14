@@ -1,5 +1,14 @@
 import authService from './authService';
 
+/**
+ * Represents a group's information in the system
+ * @property _id - The unique identifier of the group
+ * @property name - The name of the group
+ * @property description - The description of the group
+ * @property members - The members of the group
+ * @property createdBy - The user who created the group
+ * @property createdAt - The date and time when the group was created
+ */
 export interface Group {
   _id: {
     $oid: string;
@@ -13,6 +22,11 @@ export interface Group {
   };
 }
 
+/**
+ * Request structure for creating a new group
+ * @property name - The name of the group
+ * @property members - The members of the group
+ */
 interface CreateGroupRequest {
   name: string;
   members: string[];

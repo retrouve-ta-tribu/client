@@ -1,6 +1,10 @@
 import React from 'react';
 import {UserPosition} from "../../services/types.ts";
 
+/**
+ * Props for the MemberLocation component that displays a member's location
+ * @property position - The user's position data including coordinates and timestamp
+ */
 interface MemberLocationProps {
   position: UserPosition;
 }

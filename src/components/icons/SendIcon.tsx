@@ -1,5 +1,9 @@
 import { FC } from 'react';
 
+/**
+ * Props for the SendIcon component
+ * @property className - Optional CSS class name for styling the icon
+ */
 interface SendIconProps {
   className?: string;
 }

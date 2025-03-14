@@ -1,5 +1,9 @@
 import React from 'react';
 
+/**
+ * Props for the LocationUnavailable component that displays when location is not available
+ * @property className - Optional CSS class name for styling the component
+ */
 interface LocationUnavailableProps {
   className?: string;
 }

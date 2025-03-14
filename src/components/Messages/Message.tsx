@@ -1,5 +1,13 @@
 import { FC, useState } from 'react';
 
+/**
+ * Props for the Message component that displays a single chat message
+ * @property isSent - Whether the message was sent by the current user
+ * @property message - The message data object
+ * @property message.sender - Name of the message sender
+ * @property message.content - Content of the message
+ * @property message.time - Optional timestamp of the message
+ */
 interface MessageProps {
     isSent: boolean; // describe if the message is considered as sent or received
     message: {

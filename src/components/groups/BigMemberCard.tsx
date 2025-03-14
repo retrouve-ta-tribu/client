@@ -4,6 +4,11 @@ import LocationUnavailable from './LocationUnavailable.tsx';
 import OnlineStatus from './OnlineStatus.tsx';
 import {Member, UserPosition} from "../../services/types.ts";
 
+/**
+ * Props for the BigMemberCard component that displays detailed member information
+ * @property member - The member object containing information about the member
+ * @property position - The user's position data including coordinates and timestamp
+ */
 interface BigMemberCardProps {
   member: Member;
   position?: UserPosition;

@@ -1,5 +1,9 @@
 import React from 'react';
 
+/**
+ * Props for the OnlineStatus component that displays a member's online status
+ * @property isOnline - Boolean indicating if the member is currently online
+ */
 interface OnlineStatusProps {
     isOnline: boolean;
 }
