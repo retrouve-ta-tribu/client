@@ -8,8 +8,7 @@ import Spinner from '../components/common/Spinner'
 import locationSharingService from '../services/locationSharingService'
 import { UserPosition, Member } from "../services/types.ts"
 import MemberList from '../components/groups/MemberList'
-import MemberCard from '../components/groups/MemberCard'
-import HighlightedMemberCard from '../components/groups/HighlightedMemberCard'
+import authService from '../services/authService'
 
 const GroupDetails: FC = () => {
     const params = useParams();
@@ -23,27 +22,13 @@ const GroupDetails: FC = () => {
     const [isConnectingSocket, setIsConnectingSocket] = useState<boolean>(false)
     const [isGettingLocation, setIsGettingLocation] = useState<boolean>(false)
     const [debugUserId, setDebugUserId] = useState<string>('')
-    const [selectedUserId, setSelectedUserId] = useState<string>('');
     const [memberObjects, setMemberObjects] = useState<Member[]>([]);
-
-    // Create position map
-    const positionMap: Record<string, UserPosition> = userPositions.reduce((map, position) => {
-        map[position.userId] = position;
-        return map;
-    }, {} as Record<string, UserPosition>);
-
-    // Get highlighted member
-    const highlightedMember = selectedUserId && group ? 
-        group.members.find(m => m.id === selectedUserId) : null;
-    const highlightedPosition = selectedUserId ? 
-        positionMap[selectedUserId] : undefined;
-
-    const handleMemberSelect = (memberId: string) => {
-        setSelectedUserId(memberId);
-    };
 
     // Load group data
     useEffect(() => {
+        // console log the current user
+        console.log(authService.state.profile)
+
         const loadGroup = async () => {
             if (!id) return;
             
@@ -131,17 +116,30 @@ const GroupDetails: FC = () => {
 
     // Transform member IDs into Member objects when group loads
     useEffect(() => {
-        if (!group) return;
-        
-        const members: Member[] = group.members.map(memberId => ({
-            id: memberId,
-            // googleId: memberId,
-            email: getMemberName(memberId), // Temporary, replace with actual email
-            name: getMemberName(memberId),
-            // picture: '', // Add default avatar URL if needed
-        }));
-        
-        setMemberObjects(members);
+        const loadGroupMembers = async () => {
+            if (!group) return;
+            
+            try {
+                // Assuming groupService has a method to get members by their IDs
+                const members = await Promise.all(
+                    group.members.map(async (memberId) => {
+                        const member = await groupService.getMemberById(memberId);
+                        return {
+                            id: memberId,
+                            email: member.email,
+                            name: member.displayName,
+                            picture: member.picture
+                        };
+                    })
+                );
+                setMemberObjects(members);
+            } catch (err) {
+                console.error('Failed to load group members:', err);
+                setError('Failed to load group members');
+            }
+        };
+
+        loadGroupMembers();
     }, [group]);
 
     if (isLoading) {
@@ -164,13 +162,6 @@ const GroupDetails: FC = () => {
         );
     }
 
-    // Get member names from user service or API
-    // This is a placeholder - you'll need to implement this
-    const getMemberName = (memberId: string) => {
-        // Placeholder - replace with actual implementation
-        return `User ${memberId.substring(0, 5)}`;
-    };
-
     return (
         <PageContainer>
             <PageHeader 
@@ -180,25 +171,6 @@ const GroupDetails: FC = () => {
             />
 
             <div className="p-4">
-                {/* User selection dropdown */}
-                <div className="mb-4">
-                    <label htmlFor="userSelect" className="block text-sm font-medium text-gray-700 mb-1">
-                        Debug: Select User to Simulate
-                    </label>
-                    <select
-                        id="userSelect"
-                        value={debugUserId}
-                        onChange={handleUserChange}
-                        className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    >
-                        {group.members.map(memberId => (
-                            <option key={memberId} value={memberId}>
-                                {getMemberName(memberId)}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
                 {error && (
                     <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
                         {error}
@@ -221,7 +193,9 @@ const GroupDetails: FC = () => {
                 
                 {isSharing && !isConnectingSocket && !isGettingLocation && (
                     <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
-                        Sharing location as: <strong>{getMemberName(debugUserId)}</strong>
+                        Sharing location as: <strong>
+                            {group.members.find(m => m.googleId === debugUserId)?.displayName || debugUserId}
+                        </strong>
                     </div>
                 )}
                 
@@ -229,8 +203,6 @@ const GroupDetails: FC = () => {
                 <MemberList 
                     members={memberObjects}
                     userPositions={userPositions}
-                    selectedMemberId={selectedUserId}
-                    onMemberSelect={handleMemberSelect}
                 />
             </div>
         </PageContainer>

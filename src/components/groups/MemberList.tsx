@@ -3,34 +3,24 @@ import Spinner from '../common/Spinner';
 import MemberCard from './MemberCard';
 import HighlightedMemberCard from './HighlightedMemberCard';
 import {Member, UserPosition} from '../../services/types.ts';
+import authService from '../../services/authService';
 
 
 export interface MemberListProps {
   members: Member[];
   userPositions: UserPosition[];
-  selectedMemberId?: string;
-  onMemberSelect?: (memberId: string) => void;
 }
 const MemberList: FC<MemberListProps> = ({
   members = [],
   userPositions = [],
-  selectedMemberId,
-  onMemberSelect
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [selectedUserId, setSelectedUserId] = useState<string>(selectedMemberId || '');
 
   useEffect(() => {
     if (userPositions.length > 0) {
       setIsLoading(false);
     }
   }, [userPositions]);
-
-  useEffect(() => {
-    if (selectedMemberId) {
-      setSelectedUserId(selectedMemberId);
-    }
-  }, [selectedMemberId]);
 
   // Create a map of user positions by userId for quick lookup
   const positionMap: Record<string, UserPosition> = userPositions.reduce((map, position) => {
@@ -39,17 +29,17 @@ const MemberList: FC<MemberListProps> = ({
   }, {} as Record<string, UserPosition>);
 
   // Get the selected user (either from props or from local state)
-  const highlightedMember = selectedUserId ?
-    members.find(m => m.id === selectedUserId) : null;
-  const highlightedPosition = selectedUserId ?
-    positionMap[selectedUserId] : undefined;
+  const highlightedMember = authService.state.profile?.id ?
+    members.find(m => m.id === authService.state.profile?.id) : null;
+  const highlightedPosition = authService.state.profile?.id ?
+    positionMap[authService.state.profile?.id] : undefined;
 
-  const handleMemberSelect = (memberId: string) => {
-    setSelectedUserId(memberId);
-    if (onMemberSelect) {
-      onMemberSelect(memberId);
-    }
-  };
+  // const handleMemberSelect = (memberId: string) => {
+  //   setSelectedUserId(memberId);
+  //   if (onMemberSelect) {
+  //     onMemberSelect(memberId);
+  //   }
+  // };
 
   return (
     <div>
@@ -71,23 +61,7 @@ const MemberList: FC<MemberListProps> = ({
         />
       )}
       
-      <ul className="divide-y divide-gray-100">
-        {members.map((member) => {
-          console.log(member)
-          const position = positionMap[member.id];
-          const isHighlighted = member.id === selectedUserId;
-          
-          return (
-            <MemberCard
-              key={member.id}
-              member={member}
-              position={position}
-              isHighlighted={isHighlighted}
-              onClick={() => handleMemberSelect(member.id)}
-            />
-          );
-        })}
-      </ul>
+      
     </div>
   );
 };
