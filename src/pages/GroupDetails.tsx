@@ -8,7 +8,7 @@ import Spinner from '../components/common/Spinner'
 import locationSharingService from '../services/locationSharingService'
 import { UserPosition, Member } from "../services/types.ts"
 import MemberList from '../components/groups/MemberList'
-import SlidingPanel from '../components/groups/SlidingPanel'
+import SlidingPanel from '../components/layout/SlidingPanel.tsx'
 
 const GroupDetails: FC = () => {
     const params = useParams();
