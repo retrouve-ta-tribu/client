@@ -10,6 +10,7 @@ import { UserPosition, Member } from "../services/types.ts"
 import MemberList from '../components/groups/MemberList'
 import SlidingPanel from '../components/layout/SlidingPanel.tsx'
 import ChevronIcon from '../components/icons/ChevronIcon'
+import Conversation from '../components/Messages/Conversation'
 
 const GroupDetails: FC = () => {
     const params = useParams();
@@ -188,9 +189,9 @@ const GroupDetails: FC = () => {
             </div>
 
             <SlidingPanel>
-                <div className="space-y-4">
-                    <h2 className="text-lg font-semibold">Messages</h2>
-                </div>
+                <div className="relative max-w-3xl mx-auto bg-white shadow-md h-full flex flex-col overflow-hidden">
+                    <Conversation/>
+                </div>                
             </SlidingPanel>
         </PageContainer>
     );

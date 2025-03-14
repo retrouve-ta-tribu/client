@@ -1,6 +1,14 @@
 import { FC, useState } from 'react';
 import Message from './Message';
 
+const mockedMessages = [
+    {sender: "John Doe", content: "Hello"},
+    {sender: "Will", content: "Hello my friend"},
+    {sender: "Patrick", content: "I can't see you!"},
+    {sender: "Le laitier", content: "Did you install spunk ?"},
+    {sender: "Will", content: "OF COURSE !!!!!"},
+]
+
 interface ConversationProps {
     children: React.ReactNode;
 }
@@ -8,12 +16,19 @@ interface ConversationProps {
 const Conversation: FC<ConversationProps> = () => {
 
     return (
-        <div className="flex flex-col px-4 gap-4">
-        <Message message={{sender: "John Doe", content: "Hello"}}/>
-        <Message message={{sender: "Jane", content: "Hello my friend"}}/>
-        <Message message={{sender: "Will", content: "Hello my friend Hello my friend Hello my friend Hello my friend Hello my friend Hello my friend Hello my friend Hello my friend Hello my friend Hello my friend "}}/>
-        <Message message={{sender: "Kaarththigan", content: "Hello00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"}}/>
-        </div>
+        <>
+            <div className="flex h-full">
+                <div className="flex px-4 flex-col gap-4 w-full h-full pb-24 overflow-auto w-full no-scrollbar">
+
+                    <Message isSent={true} message={{sender: "Vous", content: "Hello"}}/>
+
+                    {mockedMessages.map((message, index) => (
+                        <Message key={index} message={message}/>
+                    ))}
+                </div>
+            </div>
+            <input type="text" placeholder="Message" className="w-full p-2 bg-white border border-gray-300 rounded-md absolute bottom-8" />
+        </>
     );
 };
 
