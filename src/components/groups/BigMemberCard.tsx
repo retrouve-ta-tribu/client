@@ -1,23 +1,23 @@
 import React from 'react';
-import MemberLocation from './MemberLocation';
-import LocationUnavailable from './LocationUnavailable';
-import MemberAvatar from './MemberAvatar';
-import OnlineStatus from './OnlineStatus';
+import MemberLocation from './MemberLocation.tsx';
+import LocationUnavailable from './LocationUnavailable.tsx';
+import MemberAvatar from './MemberAvatar.tsx';
+import OnlineStatus from './OnlineStatus.tsx';
 import {Member, UserPosition} from "../../services/types.ts";
 
-interface HighlightedMemberCardProps {
+interface BigMemberCardProps {
   member: Member;
   position?: UserPosition;
 }
 
-const HighlightedMemberCard: React.FC<HighlightedMemberCardProps> = ({ 
+const BigMemberCard: React.FC<BigMemberCardProps> = ({ 
   member, 
   position 
 }) => {
   const isOnline = !!position;
   
   return (
-    <div className="mb-6 p-4 bg-blue-50 rounded-lg shadow-sm border border-blue-100">
+    <div className="p-4 bg-blue-50 rounded-lg shadow-sm border border-blue-100">
       <div className="flex items-center">
         <div className="mr-4">
           <MemberAvatar name={member.name} isOnline={isOnline} size="lg" />
@@ -43,4 +43,4 @@ const HighlightedMemberCard: React.FC<HighlightedMemberCardProps> = ({
   );
 };
 
-export default HighlightedMemberCard; 
+export default BigMemberCard; 

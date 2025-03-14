@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import Spinner from '../common/Spinner';
 import MemberCard from './MemberCard';
-import HighlightedMemberCard from './HighlightedMemberCard';
+import BigMemberCard from './BigMemberCard';
 import {Member, UserPosition} from '../../services/types.ts';
 import authService from '../../services/authService';
 
@@ -48,24 +48,26 @@ const MemberList: FC<MemberListProps> = ({
       
       {/* Highlighted Member Card */}
       {highlightedMember && (
-        <HighlightedMemberCard 
+        <MemberCard 
           member={highlightedMember} 
           position={highlightedPosition} 
         />
       )}
 
+      <div className="mt-4 flex flex-col gap-2">
         {members.map((member) => {
           const position = positionMap[member.id];
           if (member.id === authService.state.profile?.id) return;
           
           return (
-            <MemberCard
+            <BigMemberCard
               key={member.id}
               member={member}
               position={position}
             />
           );
         })}
+      </div>
     </div>
   );
 };

@@ -17,7 +17,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   
   return (
     <li 
-      className={`py-3 flex items-center cursor-pointer hover:bg-gray-50`}
+      className={`py-3 flex items-center`}
     >
       <div className="mr-3">
         <MemberAvatar name={member.name} isOnline={isOnline} size="sm" />
