@@ -18,7 +18,7 @@ const SlidingPanel: FC<SlidingPanelProps> = ({ children }) => {
         >
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="absolute top-0 left-1/2 -translate-x-1/2 cursor-pointer hover:bg-gray-200 p-4 w-full flex justify-center"
+                className="absolute top-0 left-1/2 -translate-x-1/2 cursor-pointer hover:bg-gray-200 p-4 w-full flex justify-center border-b border-gray-200 bg-white"
             >
                 <ChevronIcon 
                     direction={isExpanded ? 'down' : 'up'} 
