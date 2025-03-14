@@ -2,7 +2,7 @@ import { FC, useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import NavBar from '../components/layout/NavBar';
-import Button from '../components/ui/Button';
+import Button from '../components/common/Button';
 import PersonCard from '../components/PersonCard';
 import friendService, { Friend } from '../services/friendService';
 import groupService from '../services/groupService';

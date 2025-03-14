@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import NavBar from '../components/layout/NavBar';
 import PersonCard from '../components/PersonCard';
-import Button from '../components/ui/Button';
+import Button from '../components/common/Button';
 import friendService, { Friend } from '../services/friendService';
 
 const Friends: FC = () => {
