@@ -189,7 +189,7 @@ const GroupDetails: FC = () => {
             </div>
 
             <SlidingPanel>
-                <div className="relative max-w-3xl mx-auto bg-white shadow-md h-full flex flex-col overflow-hidden">
+                <div className="relative max-w-3xl mx-auto bg-white shadow-md h-full flex flex-col justify-between overflow-hidden">
                     <Conversation/>
                 </div>                
             </SlidingPanel>
