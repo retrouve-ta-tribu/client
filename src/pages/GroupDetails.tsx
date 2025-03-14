@@ -9,6 +9,7 @@ import locationSharingService from '../services/locationSharingService'
 import { UserPosition, Member } from "../services/types.ts"
 import MemberList from '../components/groups/MemberList'
 import SlidingPanel from '../components/layout/SlidingPanel.tsx'
+import ChevronIcon from '../components/icons/ChevronIcon'
 
 const GroupDetails: FC = () => {
     const params = useParams();
@@ -152,20 +153,7 @@ const GroupDetails: FC = () => {
                             onClick={() => navigate('/')} 
                             className="p-1 hover:bg-gray-100 cursor-pointer rounded-full"
                         >
-                            <svg 
-                                xmlns="http://www.w3.org/2000/svg" 
-                                fill="none" 
-                                viewBox="0 0 24 24" 
-                                strokeWidth={2} 
-                                stroke="currentColor" 
-                                className="w-6 h-6"
-                            >
-                                <path 
-                                    strokeLinecap="round" 
-                                    strokeLinejoin="round" 
-                                    d="M15.75 19.5L8.25 12l7.5-7.5" 
-                                />
-                            </svg>
+                            <ChevronIcon direction="left" />
                         </button>
                         {group.name}
                     </div>

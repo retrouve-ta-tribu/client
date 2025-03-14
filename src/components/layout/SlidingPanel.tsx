@@ -1,4 +1,5 @@
 import { FC, useState } from 'react';
+import ChevronIcon from '../icons/ChevronIcon';
 
 interface SlidingPanelProps {
     children: React.ReactNode;
@@ -19,22 +20,10 @@ const SlidingPanel: FC<SlidingPanelProps> = ({ children }) => {
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="absolute top-0 left-1/2 -translate-x-1/2 cursor-pointer hover:bg-gray-200 p-4 w-full flex justify-center"
             >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className={`w-6 h-6 transition-transform duration-300 ${
-                        isExpanded ? 'rotate-180' : ''
-                    }`}
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M4.5 15.75l7.5-7.5 7.5 7.5"
-                    />
-                </svg>
+                <ChevronIcon 
+                    direction={isExpanded ? 'down' : 'up'} 
+                    className={`w-6 h-6 transition-transform duration-300`}
+                />
             </button>
             
             <div className="px-4 pt-16 overflow-y-auto h-full">
