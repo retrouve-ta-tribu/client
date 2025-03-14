@@ -7,22 +7,17 @@ import {Member, UserPosition} from "../../services/types.ts";
 interface MemberCardProps {
   member: Member;
   position?: UserPosition;
-  isHighlighted: boolean;
-  onClick: () => void;
 }
 
 const MemberCard: React.FC<MemberCardProps> = ({ 
   member, 
   position, 
-  isHighlighted, 
-  onClick 
 }) => {
   const isOnline = !!position;
   
   return (
     <li 
-      className={`py-3 flex items-center ${isHighlighted ? 'bg-blue-50' : ''} cursor-pointer hover:bg-gray-50`}
-      onClick={onClick}
+      className={`py-3 flex items-center cursor-pointer hover:bg-gray-50`}
     >
       <div className="mr-3">
         <MemberAvatar name={member.name} isOnline={isOnline} size="sm" />

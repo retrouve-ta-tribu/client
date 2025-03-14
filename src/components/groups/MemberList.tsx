@@ -34,13 +34,6 @@ const MemberList: FC<MemberListProps> = ({
   const highlightedPosition = authService.state.profile?.id ?
     positionMap[authService.state.profile?.id] : undefined;
 
-  // const handleMemberSelect = (memberId: string) => {
-  //   setSelectedUserId(memberId);
-  //   if (onMemberSelect) {
-  //     onMemberSelect(memberId);
-  //   }
-  // };
-
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
@@ -60,8 +53,19 @@ const MemberList: FC<MemberListProps> = ({
           position={highlightedPosition} 
         />
       )}
-      
-      
+
+        {members.map((member) => {
+          const position = positionMap[member.id];
+          if (member.id === authService.state.profile?.id) return;
+          
+          return (
+            <MemberCard
+              key={member.id}
+              member={member}
+              position={position}
+            />
+          );
+        })}
     </div>
   );
 };
