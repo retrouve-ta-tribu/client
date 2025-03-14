@@ -1,7 +1,6 @@
 import React from 'react';
 import MemberLocation from './MemberLocation.tsx';
 import LocationUnavailable from './LocationUnavailable.tsx';
-import MemberAvatar from './MemberAvatar.tsx';
 import OnlineStatus from './OnlineStatus.tsx';
 import {Member, UserPosition} from "../../services/types.ts";
 
@@ -15,12 +14,13 @@ const BigMemberCard: React.FC<BigMemberCardProps> = ({
   position 
 }) => {
   const isOnline = !!position;
+  console.log(member.picture);
   
   return (
     <div className={`p-4 ${isOnline ? 'bg-green-50 border-green-200' : 'bg-gray-100 border-gray-200'} rounded-lg shadow-sm border`}>
       <div className="flex items-center">
         <div className="mr-4">
-          <MemberAvatar name={member.name} isOnline={isOnline} size="lg" />
+          <img src={member.picture} alt={member.name} className="w-12 h-12 rounded-full" />
         </div>
         <div className="flex-1">
           <div className="flex items-center">

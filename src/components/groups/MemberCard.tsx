@@ -1,6 +1,5 @@
 import React from 'react';
 import MemberLocation from './MemberLocation';
-import MemberAvatar from './MemberAvatar';
 import OnlineStatus from './OnlineStatus';
 import {Member, UserPosition} from "../../services/types.ts";
 
@@ -20,7 +19,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
       className={`py-3 flex items-center`}
     >
       <div className="mr-3">
-        <MemberAvatar name={member.name} isOnline={isOnline} size="sm" />
+        <img src={member.picture} alt={member.name} className="w-8 h-8 rounded-full" />
       </div>
       <div className="flex-1">
         <div className="flex items-center">
