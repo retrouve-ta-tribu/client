@@ -17,12 +17,12 @@ const MemberLocation: React.FC<MemberLocationProps> = ({ position }) => {
     const secondsAgo = Math.floor((now - position.timestamp) / 1000);
     
     if (secondsAgo < 5) {
-      return 'just now';
+      return 'A l\'instant';
     } else if (secondsAgo < 60) {
-      return `${secondsAgo} seconds ago`;
+      return `Il y a ${secondsAgo} secondes`;
     } else {
       const minutesAgo = Math.floor(secondsAgo / 60);
-      return `${minutesAgo} minute${minutesAgo === 1 ? '' : 's'} ago`;
+      return `Il y a ${minutesAgo} minute${minutesAgo === 1 ? '' : 's'}`;
     }
   };
 

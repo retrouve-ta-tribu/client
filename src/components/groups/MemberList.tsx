@@ -37,7 +37,7 @@ const MemberList: FC<MemberListProps> = ({
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-medium text-gray-700">Members</h2>
+        <h2 className="text-lg font-medium text-gray-700">Membres</h2>
         {isLoading && (
           <div className="flex items-center">
             <Spinner size="sm" color="blue" className="mr-2" />
