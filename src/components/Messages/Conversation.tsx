@@ -27,7 +27,14 @@ const Conversation: FC<ConversationProps> = () => {
                     ))}
                 </div>
             </div>
-            <input type="text" placeholder="Message" className="w-full p-2 bg-white border border-gray-300 rounded-md absolute bottom-8" />
+            <textarea 
+                placeholder="Message" 
+                className="w-full p-2 bg-white border border-gray-300 rounded-md absolute bottom-8 resize-none overflow-auto max-h-32 h-10 no-scrollbar"
+                onInput={(e) => {
+                    const target = e.target as HTMLTextAreaElement;
+                    target.style.height = `${target.scrollHeight}px`;
+                }}
+            />
         </>
     );
 };
