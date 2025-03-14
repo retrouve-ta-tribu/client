@@ -8,6 +8,7 @@ import Spinner from '../components/common/Spinner'
 import locationSharingService from '../services/locationSharingService'
 import { UserPosition, Member } from "../services/types.ts"
 import MemberList from '../components/groups/MemberList'
+import SlidingPanel from '../components/groups/SlidingPanel'
 
 const GroupDetails: FC = () => {
     const params = useParams();
@@ -171,7 +172,7 @@ const GroupDetails: FC = () => {
                 }
             />
 
-            <div className="p-4">
+            <div className="p-4 pb-20">
                 {error && (
                     <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
                         {error}
@@ -192,12 +193,17 @@ const GroupDetails: FC = () => {
                     </div>
                 )}
                 
-                {/* Adapt MemberList to work with the new data structure */}                
                 <MemberList 
                     members={memberObjects}
                     userPositions={userPositions}
                 />
             </div>
+
+            <SlidingPanel>
+                <div className="space-y-4">
+                    <h2 className="text-lg font-semibold">Messages</h2>
+                </div>
+            </SlidingPanel>
         </PageContainer>
     );
 };
