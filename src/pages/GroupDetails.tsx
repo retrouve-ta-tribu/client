@@ -11,6 +11,7 @@ import MemberList from '../components/groups/MemberList'
 import SlidingPanel from '../components/layout/SlidingPanel.tsx'
 import ChevronIcon from '../components/icons/ChevronIcon'
 import Conversation from '../components/Messages/Conversation'
+import authService from '../services/authService'
 
 const GroupDetails: FC = () => {
     const params = useParams();
@@ -23,7 +24,6 @@ const GroupDetails: FC = () => {
     const [error, setError] = useState<string | null>(null)
     const [isConnectingSocket, setIsConnectingSocket] = useState<boolean>(false)
     const [isGettingLocation, setIsGettingLocation] = useState<boolean>(false)
-    const [debugUserId, setDebugUserId] = useState<string>('')
     const [memberObjects, setMemberObjects] = useState<Member[]>([]);
 
     // Load group data
@@ -49,17 +49,9 @@ const GroupDetails: FC = () => {
         loadGroup();
     }, [id]);
 
-    // DEBUG : Set the first user as default when group data loads
-    useEffect(() => {
-        if (group && group.members && group.members.length > 0 && !debugUserId) {
-            // Assuming members is an array of strings (user IDs)
-            setDebugUserId(group.members[0]);
-        }
-    }, [group, debugUserId]);
-
     // Start location sharing when component mounts or selected user changes
     useEffect(() => {
-        if (!group || !debugUserId) return;
+        if (!group || !authService.state.profile?.googleId) return;
 
         // Stop any existing location sharing
         locationSharingService.stopSharing();
@@ -78,7 +70,7 @@ const GroupDetails: FC = () => {
                 setIsGettingLocation(true);
                 await locationSharingService.startSharing(
                     id,
-                    debugUserId
+                    authService.state.profile?.googleId
                 );
                 setIsGettingLocation(false);
                 setIsSharing(true);
@@ -101,7 +93,7 @@ const GroupDetails: FC = () => {
             locationSharingService.stopSharing();
             locationSharingService.removeLocationUpdateListener(handleLocationUpdates);
         };
-    }, [id, group, debugUserId]);
+    }, [id, group]);
 
     // Handle location updates from other users
     const handleLocationUpdates = (positions: UserPosition[]) => {
