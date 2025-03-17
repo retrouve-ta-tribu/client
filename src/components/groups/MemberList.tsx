@@ -2,9 +2,20 @@ import { FC, useEffect, useState } from 'react';
 import Spinner from '../common/Spinner';
 import MemberCard from './MemberCard';
 import BigMemberCard from './BigMemberCard';
-import {Member, UserPosition} from '../../services/types.ts';
+import { Member, UserPosition } from '../../services/types';
 import authService from '../../services/authService';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
+// Fix pour les icônes manquantes dans Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: '/marker-icon-2x.png', // Chemin relatif vers l'icône dans le dossier public
+  iconUrl: '/marker-icon.png', // Chemin relatif vers l'icône dans le dossier public
+  shadowUrl: '/marker-shadow.png', // Chemin relatif vers l'ombre dans le dossier public
+});
 
 export interface MemberListProps {
   members: Member[];
@@ -68,6 +79,18 @@ const MemberList: FC<MemberListProps> = ({
           );
         })}
       </div>
+
+      <MapContainer center={[48.8566, 2.3522]} zoom={5} style={{ height: '400px', width: '100%' }}>
+        <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        {userPositions.map((position, index) => (
+            <Marker key={index} position={[position.latitude, position.longitude]}>
+              <Popup>User ID: {position.userId}</Popup>
+            </Marker>
+        ))}
+      </MapContainer>
     </div>
   );
 };
