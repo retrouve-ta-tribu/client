@@ -4,7 +4,7 @@ import MemberCard from './MemberCard';
 import BigMemberCard from './BigMemberCard';
 import { Member, UserPosition } from '../../services/types';
 import authService from '../../services/authService';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
