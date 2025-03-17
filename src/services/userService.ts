@@ -1,3 +1,5 @@
+import authService from './authService';
+
 /**
  * Data required to create a new user
  * @property googleId - Google account unique identifier
@@ -19,14 +21,18 @@ interface CreateUserDto {
  * @property id - Unique identifier in our system
  * @extends CreateUserDto - Includes all properties from CreateUserDto
  */
-interface User extends CreateUserDto {
+export interface User extends CreateUserDto {
     id: string;
-    // Add any other fields returned by the API
+    firstName?: string;
+    lastName?: string;
 }
 
 class UserService {
     private static instance: UserService;
     private baseUrl: string;
+    private allUsers: User[] = [];
+    private lastFetchTime: number = 0;
+    private static readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
     private constructor() {
         const apiUrl = import.meta.env.VITE_API_URL;
@@ -81,6 +87,138 @@ class UserService {
             console.error('Error creating user:', error);
             throw error;
         }
+    }
+
+    public async getFriends(): Promise<User[]> {
+        const googleId = authService.state.profile?.id;
+
+        try {
+            const currentUser = await this.getUserByGoogleId(googleId);
+            
+            if (!currentUser || !currentUser.friends || currentUser.friends.length === 0) {
+                return [];
+            }
+
+            const friendsPromises = currentUser.friends.map(async (friendId) => {
+                try {
+                    const friendData = await this.getUserByGoogleId(friendId);
+                    if (!friendData) return null;
+                    
+                    return {
+                        ...friendData,
+                        picture: friendData.picture || 'https://via.placeholder.com/150',
+                    };
+                } catch (error) {
+                    console.error(`Error fetching friend ${friendId}:`, error);
+                    return null;
+                }
+            });
+
+            const friendsResults = await Promise.all(friendsPromises);
+            return friendsResults.filter((friend): friend is User => friend !== null);
+            
+        } catch (error) {
+            console.error('Error fetching friends:', error);
+            return [];
+        }
+    }
+
+    public async addFriend(email: string): Promise<void> {
+        const googleId = authService.state.profile?.id;
+        
+        if (!googleId) {
+            throw new Error('User not authenticated');
+        }
+
+        try {
+            const response = await fetch(`${this.baseUrl}/users/${googleId}/friends`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to add friend');
+            }
+        } catch (error) {
+            console.error('Error adding friend:', error);
+            throw error;
+        }
+    }
+
+    public async removeFriend(friendId: string): Promise<void> {
+        const googleId = authService.state.profile?.id;
+        
+        if (!googleId) {
+            throw new Error('User not authenticated');
+        }
+
+        try {      
+            const response = await fetch(`${this.baseUrl}/users/${googleId}/friends`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ friendId }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+                throw new Error(errorData.message || `Failed to remove friend: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Error removing friend:', error);
+            throw error;
+        }
+    }
+
+    public async getAllUsers(): Promise<User[]> {
+        const now = Date.now();
+        if (this.allUsers.length > 0 && now - this.lastFetchTime < UserService.CACHE_DURATION) {
+            return this.allUsers;
+        }
+
+        try {
+            const response = await fetch(`${this.baseUrl}/users`);
+            
+            if (!response.ok) {
+                throw new Error(`Failed to fetch users: ${response.statusText}`);
+            }
+
+            const users = await response.json();
+            const currentUserId = authService.state.profile?.id;
+            
+            this.allUsers = users
+                .filter((user: User) => user.googleId !== currentUserId)
+                .map((user: User) => ({
+                    ...user,
+                    picture: user.picture || 'https://via.placeholder.com/150',
+                }));
+            this.lastFetchTime = now;
+            
+            return this.allUsers;
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            throw error;
+        }
+    }
+
+    public searchUsers(query: string): User[] {
+        const lowerQuery = query.toLowerCase();
+        const currentUserId = authService.state.profile?.id;
+        
+        return this.allUsers.filter(user => {
+            if (user.googleId === currentUserId) {
+                return false;
+            }
+            
+            const displayName = user.displayName?.toLowerCase() || '';
+            const email = user.email.toLowerCase();
+            return displayName.includes(lowerQuery) || email.includes(lowerQuery);
+        });
     }
 }
 

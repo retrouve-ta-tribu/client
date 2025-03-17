@@ -4,7 +4,7 @@ import PageContainer from '../components/layout/PageContainer';
 import NavBar from '../components/layout/NavBar';
 import Button from '../components/common/Button';
 import PersonCard from '../components/users/PersonCard';
-import friendService, { Friend } from '../services/friendService';
+import userService, { User } from '../services/userService';
 import groupService from '../services/groupService';
 import authService from '../services/authService';
 
@@ -13,8 +13,8 @@ const CreateGroup: FC = () => {
   const [activeTab, setActiveTab] = useState('groups');
   const [groupName, setGroupName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [friends, setFriends] = useState<Friend[]>([]);
-  const [selectedFriends, setSelectedFriends] = useState<Friend[]>([]);
+  const [friends, setFriends] = useState<User[]>([]);
+  const [selectedFriends, setSelectedFriends] = useState<User[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +30,7 @@ const CreateGroup: FC = () => {
   useEffect(() => {
     const loadFriends = async () => {
       try {
-        const friendsList = await friendService.getFriends();
+        const friendsList = await userService.getFriends();
         setFriends(friendsList);
       } catch (err) {
         console.error('Failed to load friends:', err);
@@ -62,7 +62,7 @@ const CreateGroup: FC = () => {
     });
   }, [searchTerm, friends, selectedFriends]);
 
-  const handleAddFriend = (friend: Friend) => {
+  const handleAddFriend = (friend: User) => {
     setSelectedFriends([...selectedFriends, friend]);
     setSearchTerm('');
   };
@@ -104,10 +104,10 @@ const CreateGroup: FC = () => {
     <PageContainer>
       <div className="flex flex-col h-full max-h-screen">
         <NavBar activeTab={activeTab} onTabChange={handleTabChange} />
-        <div className="p-4 border-b border-gray-200 flex-shrink-0">
-          <h1 className="text-xl font-semibold text-gray-800 mb-4">Créer un nouveau groupe</h1>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
+        
+        <div className="p-4">
+          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+            <div>
               <label htmlFor="groupName" className="block text-sm font-medium text-gray-700 mb-1">
                 Nom du groupe
               </label>
@@ -153,7 +153,7 @@ const CreateGroup: FC = () => {
               )}
             </div>
 
-            <div className="mb-4">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Membres du groupe ({selectedFriends.length})
               </label>

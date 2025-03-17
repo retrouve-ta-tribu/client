@@ -3,13 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import NavBar from '../components/layout/NavBar';
 import PersonCard from '../components/users/PersonCard';
-import Button from '../components/common/Button';
-import friendService, { Friend } from '../services/friendService';
+import userService, { User } from '../services/userService';
 
 const Friends: FC = () => {
-  const [friends, setFriends] = useState<Friend[]>([]);
+  const [friends, setFriends] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredUsers, setFilteredUsers] = useState<Friend[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +25,7 @@ const Friends: FC = () => {
   const loadFriends = async () => {
     setIsLoading(true);
     try {
-      const friendsList = await friendService.getFriends();
+      const friendsList = await userService.getFriends();
       setFriends(friendsList);
     } catch (err) {
       console.error('Failed to load friends:', err);
@@ -39,14 +38,14 @@ const Friends: FC = () => {
   useEffect(() => {
     loadFriends();
     // Load all users initially
-    friendService.getAllUsers().catch(err => {
+    userService.getAllUsers().catch(err => {
       console.error('Failed to load users:', err);
     });
   }, []);
 
   useEffect(() => {
     if (searchTerm.trim()) {
-      const results = friendService.searchUsers(searchTerm);
+      const results = userService.searchUsers(searchTerm);
       // Filter out users that are already friends
       const nonFriends = results.filter(user => 
         !friends.some(friend => friend.googleId === user.googleId)
@@ -57,12 +56,12 @@ const Friends: FC = () => {
     }
   }, [searchTerm, friends]);
 
-  const handleAddFriend = async (user: Friend) => {
+  const handleAddFriend = async (user: User) => {
     setIsSubmitting(true);
     setError(null);
     
     try {
-      await friendService.addFriend(user.email);
+      await userService.addFriend(user.email);
       setSearchTerm('');
       // Refresh friends list
       await loadFriends();
@@ -74,7 +73,7 @@ const Friends: FC = () => {
   };
 
   const handleFriendRemoved = (friendId: string) => {
-    friendService.removeFriend(friendId)
+    userService.removeFriend(friendId)
       .then(() => {
         loadFriends();
       })
