@@ -1,11 +1,15 @@
 import { FC, useState, useEffect, useRef } from 'react';
-import locationSharingService from '../../services/locationSharingService';
+import messageChatService from '../../services/messageChatService';
 import { ChatMessage } from '../../services/types';
 import authService from '../../services/authService';
 import Message from './Message';
 import SendIcon from '../icons/SendIcon';
 
-const Conversation: FC = () => {
+interface ConversationProps {
+    group: Group;
+}
+
+const Conversation: FC<ConversationProps> = ({ group }) => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -17,10 +21,11 @@ const Conversation: FC = () => {
             scrollToBottom();
         };
 
-        locationSharingService.addChatMessageListener(handleMessages);
+        messageChatService.joinChat(group._id, currentUser?.id);
+        messageChatService.addMessageListener(handleMessages);
 
         return () => {
-            locationSharingService.removeChatMessageListener(handleMessages);
+            messageChatService.removeMessageListener(handleMessages);
         };
     }, []);
 
@@ -46,10 +51,12 @@ const Conversation: FC = () => {
     }
 
     const handleSendMessage = () => {
-        locationSharingService.sendMessage(
+        if (!newMessage.trim()) return;
+        
+        messageChatService.sendMessage(
             newMessage.trim(),
             currentUser?.name,
-            currentUser?.picture,
+            currentUser?.picture
         );
         setNewMessage("");
         resetInputHeight();
@@ -68,9 +75,17 @@ const Conversation: FC = () => {
                 <div className="flex-1 flex overflow-auto no-scrollbar justify-end items-end">
                     <div className="flex px-4 flex-col gap-4 w-full">
                         {messages.map((message, index) => (
-                            <Message key={index} isSent={message.userId === currentUser?.id} message={{sender: message.userName, content: message.content, time: formatTime(message.timestamp)}}/>
+                            <Message 
+                                key={`${message.userId}-${message.timestamp}-${index}`}
+                                isSent={message.userId === currentUser?.id}
+                                message={{
+                                    sender: message.userName || 'Unknown',
+                                    content: message.content,
+                                    time: formatTime(message.timestamp)
+                                }}
+                            />
                         ))}
-                        <div ref={messagesEndRef} /> {/* Scroll anchor */}
+                        <div ref={messagesEndRef} />
                     </div>
                 </div>
                 
@@ -79,7 +94,7 @@ const Conversation: FC = () => {
                         placeholder="Message" 
                         className="w-full p-2 bg-white border border-gray-300 rounded-md resize-none overflow-auto max-h-32 h-10 no-scrollbar"
                         value={newMessage}
-                        onChange={(e) => handleWriteMessage(e)}
+                        onChange={handleWriteMessage}
                     />
 
                     <button 
