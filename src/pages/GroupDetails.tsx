@@ -51,7 +51,7 @@ const GroupDetails: FC = () => {
 
     // Start location sharing when component mounts or selected user changes
     useEffect(() => {
-        if (!group || !authService.state.profile?.googleId) return;
+        if (!group || !authService.state.profile?.id) return;
 
         // Stop any existing location sharing
         locationSharingService.stopSharing();
@@ -70,7 +70,7 @@ const GroupDetails: FC = () => {
                 setIsGettingLocation(true);
                 await locationSharingService.startSharing(
                     id,
-                    authService.state.profile?.googleId
+                    authService.state.profile?.id
                 );
                 setIsGettingLocation(false);
                 setIsSharing(true);
