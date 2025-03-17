@@ -3,9 +3,11 @@ import ChevronIcon from '../icons/ChevronIcon';
 
 interface SlidingPanelProps {
     children: React.ReactNode;
+    hasNotification?: boolean;
+    setHasNotification?: (hasNotification: boolean) => void;
 }
 
-const SlidingPanel: FC<SlidingPanelProps> = ({ children }) => {
+const SlidingPanel: FC<SlidingPanelProps> = ({ children, hasNotification, setHasNotification }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     return (
@@ -16,9 +18,12 @@ const SlidingPanel: FC<SlidingPanelProps> = ({ children }) => {
                     : 'translate-y-[calc(100%-58px)] shadow-[0_-3rem_3rem_-3rem_rgba(0,0,0,0.25)]'
             }`}
         >
-            <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="absolute top-0 left-1/2 -translate-x-1/2 cursor-pointer hover:bg-gray-200 p-4 w-full flex justify-center border-b border-gray-200 bg-white"
+            {hasNotification && !isExpanded && (
+                <div className="bg-blue-500 w-4 h-4 rounded-full absolute top-5 left-1/2 -translate-x-8 z-10 animate-pulse"></div>
+            )}
+                <button
+                    onClick={() => {setIsExpanded(!isExpanded); setHasNotification(false);}}
+                    className="absolute top-0 left-1/2 -translate-x-1/2 cursor-pointer hover:bg-gray-200 p-4 w-full flex justify-center border-b border-gray-200 bg-white"
             >
                 <ChevronIcon 
                     direction={isExpanded ? 'down' : 'up'} 
@@ -26,7 +31,7 @@ const SlidingPanel: FC<SlidingPanelProps> = ({ children }) => {
                 />
             </button>
             
-            <div className="px-4 pt-16 overflow-y-auto h-full">
+            <div className="pt-16 overflow-y-auto h-full">
                 {children}
             </div>
         </div>

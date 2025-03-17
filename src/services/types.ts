@@ -6,8 +6,10 @@
  */
 export interface Member {
   id: string;
-  name: string;
+  googleId: string;
+  displayName: string;
   email: string;
+  picture: string;
 }
 
 /**
@@ -36,4 +38,12 @@ export interface UserPosition {
   longitude: number;
   userId: string;
   timestamp: number;
+}
+
+export interface ChatMessage {
+  userId: string;
+  content: string;
+  timestamp: number;
+  userName?: string;
+  userPicture?: string;
 }

@@ -7,10 +7,11 @@ export interface AuthUser {
 }
 
 export interface AuthProfile {
-    picture: string;
+    googleId: string;
     name: string;
     email: string;
-    // Add other profile properties
+    picture: string;
+    access_token: string;
 }
 
 export interface AuthState {
