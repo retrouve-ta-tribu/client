@@ -22,10 +22,17 @@ class MessageChatService {
     private userId: string | null = null;
     private messages: ChatMessage[] = [];
     private messageListeners: Set<(messages: ChatMessage[]) => void> = new Set();
-    private typingUsers: Map<string, string> = new Map(); // userId -> userName
+    private typingUsers: Map<string, { userName: string; lastTypingTime: number }> = new Map(); // userId -> {userName, lastTypingTime}
     private typingListeners: Set<(typingUsers: string[]) => void> = new Set();
+    private typingInterval: number | null = null;
+    private isCurrentlyTyping: boolean = false;
+    private static readonly TYPING_INTERVAL = 5000; 
+    private static readonly TYPING_TIMEOUT = 7000;
 
-    private constructor() {}
+    private constructor() {
+        // Start the interval to check for stale typing statuses
+        setInterval(() => this.cleanStaleTypingStatuses(), MessageChatService.TYPING_INTERVAL);
+    }
 
     public static getInstance(): MessageChatService {
         if (!MessageChatService.instance) {
@@ -63,7 +70,11 @@ class MessageChatService {
 
     leaveChat(): void {
         if (this.groupId) {
-            this.setTyping(false);            
+            this.setTyping(false);
+            if (this.typingInterval) {
+                clearInterval(this.typingInterval);
+                this.typingInterval = null;
+            }
             socketService.removeListener(RoomEvents.Broadcast, this.handleMessage);
             socketService.leaveRoom(this.groupId);
             this.groupId = null;
@@ -72,6 +83,7 @@ class MessageChatService {
         this.userId = null;
         this.messages = [];
         this.typingUsers.clear();
+        this.isCurrentlyTyping = false;
         this.notifyListeners();
         this.notifyTypingListeners();
     }
@@ -81,7 +93,10 @@ class MessageChatService {
             this.messages.push(data.message!);
             this.notifyListeners();
         } else if (data.type === ChatEvents.Typing && data.typingData) {
-            this.typingUsers.set(data.typingData.userId, data.typingData.userName);
+            this.typingUsers.set(data.typingData.userId, {
+                userName: data.typingData.userName,
+                lastTypingTime: Date.now()
+            });
             this.notifyTypingListeners();
         } else if (data.type === ChatEvents.StoppedTyping && data.typingData) {
             this.typingUsers.delete(data.typingData.userId);
@@ -131,6 +146,62 @@ class MessageChatService {
     setTyping(isTyping: boolean, userName?: string): void {
         if (!this.groupId || !this.userId) return;
 
+        // If status hasn't changed, don't do anything unless it's a heartbeat for typing
+        if (this.isCurrentlyTyping === isTyping && !isTyping) return;
+
+        this.isCurrentlyTyping = isTyping;
+
+        // Clear existing interval if any
+        if (this.typingInterval) {
+            clearInterval(this.typingInterval);
+            this.typingInterval = null;
+        }
+
+        // If typing, start the heartbeat interval
+        if (isTyping) {
+            this.typingInterval = setInterval(() => {
+                this.sendTypingStatus(true, userName);
+            }, MessageChatService.TYPING_INTERVAL);
+        }
+
+        this.sendTypingStatus(isTyping, userName);
+    }
+
+    addTypingListener(callback: (typingUsers: string[]) => void): void {
+        this.typingListeners.add(callback);
+        callback(Array.from(this.typingUsers.values()).map(data => data.userName));
+    }
+
+    removeTypingListener(callback: (typingUsers: string[]) => void): void {
+        this.typingListeners.delete(callback);
+    }
+
+    private notifyTypingListeners(): void {
+        const typingUserNames = Array.from(this.typingUsers.values()).map(data => data.userName);
+        this.typingListeners.forEach(callback => {
+            callback(typingUserNames);
+        });
+    }
+
+    private cleanStaleTypingStatuses(): void {
+        const now = Date.now();
+        let hasChanges = false;
+        
+        for (const [userId, data] of this.typingUsers.entries()) {
+            if (now - data.lastTypingTime > MessageChatService.TYPING_TIMEOUT) {
+                this.typingUsers.delete(userId);
+                hasChanges = true;
+            }
+        }
+        
+        if (hasChanges) {
+            this.notifyTypingListeners();
+        }
+    }
+
+    private sendTypingStatus(isTyping: boolean, userName?: string): void {
+        if (!this.groupId || !this.userId) return;
+
         const broadcastData = {
             type: isTyping ? ChatEvents.Typing : ChatEvents.StoppedTyping,
             typingData: {
@@ -140,22 +211,6 @@ class MessageChatService {
         };
 
         socketService.broadcast(this.groupId, broadcastData);
-    }
-
-    addTypingListener(callback: (typingUsers: string[]) => void): void {
-        this.typingListeners.add(callback);
-        callback(Array.from(this.typingUsers.values()));
-    }
-
-    removeTypingListener(callback: (typingUsers: string[]) => void): void {
-        this.typingListeners.delete(callback);
-    }
-
-    private notifyTypingListeners(): void {
-        const typingUserNames = Array.from(this.typingUsers.values());
-        this.typingListeners.forEach(callback => {
-            callback(typingUserNames);
-        });
     }
 }
 
