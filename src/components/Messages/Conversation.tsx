@@ -58,7 +58,6 @@ const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => 
         messageChatService.sendMessage(
             newMessage.trim(),
             currentUser?.name,
-            currentUser?.picture
         );
         setNewMessage("");
         resetInputHeight();

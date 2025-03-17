@@ -72,7 +72,7 @@ class MessageChatService {
         }
     };
 
-    sendMessage(content: string, userName?: string, userPicture?: string): void {
+    sendMessage(content: string, userName?: string): void {
         if (!this.groupId || !this.userId || !content.trim()) return;
 
         const message: ChatMessage = {
@@ -80,7 +80,6 @@ class MessageChatService {
             content: content.trim(),
             timestamp: Date.now(),
             userName,
-            userPicture
         };
 
         const broadcastData = {
