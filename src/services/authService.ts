@@ -12,7 +12,6 @@ export interface AuthProfile {
     email: string;
     picture: string;
     access_token: string;
-    // Add other profile properties
 }
 
 export interface AuthState {

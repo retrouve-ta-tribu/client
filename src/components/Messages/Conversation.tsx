@@ -62,7 +62,6 @@ const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => 
         resetInputHeight();
         e.target.style.height = `${e.target.scrollHeight}px`;
         
-        // Toggle typing status
         messageChatService.setTyping(content.trim().length > 0, currentUser?.name);
     }
 
