@@ -73,7 +73,7 @@ const MemberList: FC<MemberListProps> = ({
       <div className="mt-4 flex flex-col gap-2">
         {members.map((member) => {
           const position = positionMap[member.id];
-          if (member.id === authService.state.profile?.id) return;
+          //if (member.id === authService.state.profile?.id) return;
           
           return (
             <BigMemberCard

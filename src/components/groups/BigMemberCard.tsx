@@ -3,6 +3,8 @@ import MemberLocation from './MemberLocation.tsx';
 import LocationUnavailable from './LocationUnavailable.tsx';
 import OnlineStatus from './OnlineStatus.tsx';
 import {Member, UserPosition} from "../../services/types.ts";
+import DirectionVisualizer from "../sprunk/DirectionVisualizer.tsx";
+import {Quaternion} from "sprunk-engine";
 
 /**
  * Props for the BigMemberCard component that displays detailed member information
@@ -41,6 +43,9 @@ const BigMemberCard: React.FC<BigMemberCardProps> = ({
               <LocationUnavailable />
             </div>
           )}
+        </div>
+        <div>
+          <DirectionVisualizer direction={new Quaternion()} />
         </div>
       </div>
     </div>
