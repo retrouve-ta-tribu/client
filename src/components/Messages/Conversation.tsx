@@ -7,9 +7,10 @@ import SendIcon from '../icons/SendIcon';
 
 interface ConversationProps {
     group: Group;
+    setHasUnreadMessage: (hasUnreadMessage: boolean) => void;
 }
 
-const Conversation: FC<ConversationProps> = ({ group }) => {
+const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -34,6 +35,7 @@ const Conversation: FC<ConversationProps> = ({ group }) => {
     };
 
     useEffect(() => {
+        setHasUnreadMessage(true);
         scrollToBottom();
     }, [newMessage, messages]);
 

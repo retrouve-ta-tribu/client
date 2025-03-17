@@ -25,6 +25,7 @@ const GroupDetails: FC = () => {
     const [isConnectingSocket, setIsConnectingSocket] = useState<boolean>(false)
     const [isGettingLocation, setIsGettingLocation] = useState<boolean>(false)
     const [memberObjects, setMemberObjects] = useState<Member[]>([]);
+    const [hasUnreadMessage, setHasUnreadMessage] = useState<boolean>(false);
 
     // Load group data
     useEffect(() => {
@@ -180,9 +181,9 @@ const GroupDetails: FC = () => {
                 />
             </div>
 
-            <SlidingPanel>
+            <SlidingPanel hasNotification={hasUnreadMessage} setHasNotification={setHasUnreadMessage}>
                 <div className="relative max-w-3xl mx-auto bg-white shadow-md h-full flex flex-col justify-between overflow-hidden">
-                    <Conversation group={group}/>
+                    <Conversation group={group} setHasUnreadMessage={setHasUnreadMessage}/>
                 </div>                
             </SlidingPanel>
         </PageContainer>
