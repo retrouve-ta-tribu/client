@@ -1,6 +1,6 @@
 import { FC, useState, useEffect, useRef } from 'react';
 import messageChatService from '../../services/messageChatService';
-import { ChatMessage } from '../../services/types';
+import { ChatMessage, Group } from '../../services/types';
 import authService from '../../services/authService';
 import Message from './Message';
 import SendIcon from '../icons/SendIcon';
@@ -21,7 +21,7 @@ const Conversation: FC<ConversationProps> = ({ group }) => {
             scrollToBottom();
         };
 
-        messageChatService.joinChat(group._id, currentUser?.id);
+        messageChatService.joinChat(group._id, currentUser.id);
         messageChatService.addMessageListener(handleMessages);
 
         return () => {
@@ -62,6 +62,13 @@ const Conversation: FC<ConversationProps> = ({ group }) => {
         resetInputHeight();
     }
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage();
+        }
+    };
+
     const formatTime = (timestamp: number) => {
         return new Date(timestamp).toLocaleTimeString('fr-FR', {
             hour: '2-digit',
@@ -95,6 +102,7 @@ const Conversation: FC<ConversationProps> = ({ group }) => {
                         className="w-full p-2 bg-white border border-gray-300 rounded-md resize-none overflow-auto max-h-32 h-10 no-scrollbar"
                         value={newMessage}
                         onChange={handleWriteMessage}
+                        onKeyDown={handleKeyDown}
                     />
 
                     <button 
