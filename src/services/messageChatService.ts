@@ -63,6 +63,7 @@ class MessageChatService {
 
     leaveChat(): void {
         if (this.groupId) {
+            this.setTyping(false);            
             socketService.removeListener(RoomEvents.Broadcast, this.handleMessage);
             socketService.leaveRoom(this.groupId);
             this.groupId = null;
