@@ -18,6 +18,7 @@ const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => 
 
     useEffect(() => {
         const handleMessages = (updatedMessages: ChatMessage[]) => {
+            setHasUnreadMessage(true);
             setMessages(updatedMessages);
             scrollToBottom();
         };
@@ -35,7 +36,6 @@ const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => 
     };
 
     useEffect(() => {
-        setHasUnreadMessage(true);
         scrollToBottom();
     }, [newMessage, messages]);
 
