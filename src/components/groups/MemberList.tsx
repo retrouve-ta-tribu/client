@@ -30,7 +30,7 @@ const MemberList: FC<MemberListProps> = ({
       html: `
       <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
         <img src="/marker-icon.png" alt="Marker" style="width: 25px; height: 41px;"/>
-        <div style="margin-top: 5px; font-size: 12px; color: black; white-space: nowrap;">${name}</div>
+        <div style="margin-top: 5px; font-size: 12px; color: black; white-space: nowrap;" class="font-semibold">${name}</div>
       </div>
     `,
       iconSize: [25, 41], // Taille de l'icône
