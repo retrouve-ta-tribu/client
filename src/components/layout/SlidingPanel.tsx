@@ -31,7 +31,7 @@ const SlidingPanel: FC<SlidingPanelProps> = ({ children, hasNotification, setHas
                 />
             </button>
             
-            <div className="px-4 pt-16 overflow-y-auto h-full">
+            <div className="pt-16 overflow-y-auto h-full">
                 {children}
             </div>
         </div>
