@@ -13,6 +13,7 @@ interface ConversationProps {
 const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [newMessage, setNewMessage] = useState('');
+    const [typingUsers, setTypingUsers] = useState<string[]>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const currentUser = authService.state.profile;
 
@@ -25,11 +26,18 @@ const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => 
             scrollToBottom();
         };
 
+        const handleTypingUsers = (users: string[]) => {
+            setTypingUsers(users.filter(name => name !== currentUser?.name));
+        };
+
         messageChatService.joinChat(group._id, currentUser.id);
         messageChatService.addMessageListener(handleMessages);
+        messageChatService.addTypingListener(handleTypingUsers);
 
         return () => {
             messageChatService.removeMessageListener(handleMessages);
+            messageChatService.removeTypingListener(handleTypingUsers);
+            messageChatService.leaveChat();
         };
     }, []);
 
@@ -49,14 +57,19 @@ const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => 
     }
 
     const handleWriteMessage = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setNewMessage(e.target.value);
+        const content = e.target.value;
+        setNewMessage(content);
         resetInputHeight();
         e.target.style.height = `${e.target.scrollHeight}px`;
+        
+        // Toggle typing status
+        messageChatService.setTyping(content.trim().length > 0, currentUser?.name);
     }
 
     const handleSendMessage = () => {
         if (!newMessage.trim()) return;
         
+        messageChatService.setTyping(false, currentUser?.name);
         messageChatService.sendMessage(
             newMessage.trim(),
             currentUser?.name,
@@ -95,6 +108,13 @@ const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => 
                                 }}
                             />
                         ))}
+                        {typingUsers.length > 0 && (
+                            <div className="text-sm text-gray-500 italic">
+                                {typingUsers.length === 1 
+                                    ? `${typingUsers[0]} est en train d'écrire...`
+                                    : `${typingUsers.join(', ')} sont en train d'écrire...`}
+                            </div>
+                        )}
                         <div ref={messagesEndRef} />
                     </div>
                 </div>

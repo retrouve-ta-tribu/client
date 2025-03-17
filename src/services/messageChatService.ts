@@ -2,12 +2,18 @@ import socketService, { RoomEvents } from './socketService';
 import { ChatMessage } from "./types";
 
 export enum ChatEvents {
-    Message = 'ChatMessage'
+    Message = 'ChatMessage',
+    Typing = 'UserTyping',
+    StoppedTyping = 'UserStoppedTyping'
 }
 
 interface IncomingChatBroadcastData {
     type: ChatEvents;
-    message: ChatMessage;
+    message?: ChatMessage;
+    typingData?: {
+        userId: string;
+        userName: string;
+    };
 }
 
 class MessageChatService {
@@ -16,6 +22,8 @@ class MessageChatService {
     private userId: string | null = null;
     private messages: ChatMessage[] = [];
     private messageListeners: Set<(messages: ChatMessage[]) => void> = new Set();
+    private typingUsers: Map<string, string> = new Map(); // userId -> userName
+    private typingListeners: Set<(typingUsers: string[]) => void> = new Set();
 
     private constructor() {}
 
@@ -62,13 +70,21 @@ class MessageChatService {
         
         this.userId = null;
         this.messages = [];
+        this.typingUsers.clear();
         this.notifyListeners();
+        this.notifyTypingListeners();
     }
 
     private handleMessage = (data: IncomingChatBroadcastData): void => {
         if (data.type === ChatEvents.Message) {
-            this.messages.push(data.message);
+            this.messages.push(data.message!);
             this.notifyListeners();
+        } else if (data.type === ChatEvents.Typing && data.typingData) {
+            this.typingUsers.set(data.typingData.userId, data.typingData.userName);
+            this.notifyTypingListeners();
+        } else if (data.type === ChatEvents.StoppedTyping && data.typingData) {
+            this.typingUsers.delete(data.typingData.userId);
+            this.notifyTypingListeners();
         }
     };
 
@@ -109,6 +125,36 @@ class MessageChatService {
 
     getAllMessages(): ChatMessage[] {
         return [...this.messages];
+    }
+
+    setTyping(isTyping: boolean, userName?: string): void {
+        if (!this.groupId || !this.userId) return;
+
+        const broadcastData = {
+            type: isTyping ? ChatEvents.Typing : ChatEvents.StoppedTyping,
+            typingData: {
+                userId: this.userId,
+                userName: userName || 'Unknown'
+            }
+        };
+
+        socketService.broadcast(this.groupId, broadcastData);
+    }
+
+    addTypingListener(callback: (typingUsers: string[]) => void): void {
+        this.typingListeners.add(callback);
+        callback(Array.from(this.typingUsers.values()));
+    }
+
+    removeTypingListener(callback: (typingUsers: string[]) => void): void {
+        this.typingListeners.delete(callback);
+    }
+
+    private notifyTypingListeners(): void {
+        const typingUserNames = Array.from(this.typingUsers.values());
+        this.typingListeners.forEach(callback => {
+            callback(typingUserNames);
+        });
     }
 }
 
