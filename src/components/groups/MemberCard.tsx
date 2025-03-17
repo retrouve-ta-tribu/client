@@ -1,31 +1,30 @@
 import React from 'react';
 import MemberLocation from './MemberLocation';
-import MemberAvatar from './MemberAvatar';
 import OnlineStatus from './OnlineStatus';
 import {Member, UserPosition} from "../../services/types.ts";
 
+/**
+ * Props for the MemberCard component that displays member information
+ * @property member - The member object containing information about the member
+ * @property position - The user's position data including coordinates and timestamp
+ */
 interface MemberCardProps {
   member: Member;
   position?: UserPosition;
-  isHighlighted: boolean;
-  onClick: () => void;
 }
 
 const MemberCard: React.FC<MemberCardProps> = ({ 
   member, 
   position, 
-  isHighlighted, 
-  onClick 
 }) => {
   const isOnline = !!position;
   
   return (
     <li 
-      className={`py-3 flex items-center ${isHighlighted ? 'bg-blue-50' : ''} cursor-pointer hover:bg-gray-50`}
-      onClick={onClick}
+      className={`py-3 flex items-center`}
     >
       <div className="mr-3">
-        <MemberAvatar name={member.name} isOnline={isOnline} size="sm" />
+        <img src={member.picture} alt={member.name} className="w-8 h-8 rounded-full" />
       </div>
       <div className="flex-1">
         <div className="flex items-center">

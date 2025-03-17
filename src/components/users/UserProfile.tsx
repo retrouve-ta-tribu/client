@@ -1,11 +1,21 @@
 import { FC } from 'react'
 
+/**
+ * Represents a user's basic profile information
+ * @property id - The unique identifier of the user
+ * @property name - The name of the user
+ * @property groupName - The name of the group the user is a member of
+ */
 interface User {
   id: string;
   name: string;
   groupName: string;
 }
 
+/**
+ * Props for the UserProfile component that displays user profile information
+ * @property user - The user object containing profile information
+ */
 interface UserProfileProps {
   user: User;
 }
