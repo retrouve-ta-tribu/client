@@ -8,7 +8,8 @@ import friendService, { Friend } from '../services/friendService';
 
 const Friends: FC = () => {
   const [friends, setFriends] = useState<Friend[]>([]);
-  const [email, setEmail] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredUsers, setFilteredUsers] = useState<Friend[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,16 +38,32 @@ const Friends: FC = () => {
 
   useEffect(() => {
     loadFriends();
+    // Load all users initially
+    friendService.getAllUsers().catch(err => {
+      console.error('Failed to load users:', err);
+    });
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (searchTerm.trim()) {
+      const results = friendService.searchUsers(searchTerm);
+      // Filter out users that are already friends
+      const nonFriends = results.filter(user => 
+        !friends.some(friend => friend.googleId === user.googleId)
+      );
+      setFilteredUsers(nonFriends);
+    } else {
+      setFilteredUsers([]);
+    }
+  }, [searchTerm, friends]);
+
+  const handleAddFriend = async (user: Friend) => {
     setIsSubmitting(true);
     setError(null);
     
     try {
-      await friendService.addFriend(email);
-      setEmail('');
+      await friendService.addFriend(user.email);
+      setSearchTerm('');
       // Refresh friends list
       await loadFriends();
     } catch (err) {
@@ -57,10 +74,8 @@ const Friends: FC = () => {
   };
 
   const handleFriendRemoved = (friendId: string) => {
-    // Call the API to remove the friend
     friendService.removeFriend(friendId)
       .then(() => {
-        // Refresh friends list
         loadFriends();
       })
       .catch(err => {
@@ -74,25 +89,37 @@ const Friends: FC = () => {
         <NavBar activeTab={activeTab} onTabChange={handleTabChange} />
         
         <div className="p-4 bg-gray-50 border-b border-gray-200 flex-shrink-0">
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="searchFriends" className="block text-sm font-medium text-gray-700">
+              Rechercher des amis
+            </label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              type="text"
+              id="searchFriends"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Rechercher par nom ou email"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <Button
-              type="submit"
-              variant="primary"
-              isLoading={isSubmitting}
-              loadingText="Envoi..."
-              disabled={!email.trim()}
-            >
-              Ajouter un ami
-            </Button>
-          </form>
+            
+            {searchTerm.trim() !== '' && (
+              <div className="mt-2 border border-gray-200 rounded-md max-h-40 overflow-y-auto">
+                {filteredUsers.length === 0 ? (
+                  <div className="p-2 text-sm text-gray-500">Aucun utilisateur trouvé</div>
+                ) : (
+                  filteredUsers.map(user => (
+                    <PersonCard
+                      key={user.email}
+                      person={user}
+                      onClick={() => handleAddFriend(user)}
+                      showRemoveButton={false}
+                      compact={true}
+                    />
+                  ))
+                )}
+              </div>
+            )}
+          </div>
           
           {error && (
             <div className="mt-2 text-sm text-red-600">
@@ -101,7 +128,7 @@ const Friends: FC = () => {
           )}
         </div>
         
-        <div className="flex-grow overflow-y-auto">
+        <div className="flex-1 overflow-auto">
           {isLoading ? (
             <div className="p-4 text-center text-gray-500">Chargement...</div>
           ) : friends.length === 0 ? (

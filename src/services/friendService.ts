@@ -41,6 +41,9 @@ interface UserResponse {
 class FriendService {
   private static instance: FriendService;
   private baseUrl: string;
+  private allUsers: Friend[] = [];
+  private lastFetchTime: number = 0;
+  private static readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   private constructor() {
     const apiUrl = import.meta.env.VITE_API_URL;
@@ -170,6 +173,57 @@ class FriendService {
       console.error('Error removing friend:', error);
       throw error;
     }
+  }
+
+  public async getAllUsers(): Promise<Friend[]> {
+    const now = Date.now();
+    // Return cached users if they're fresh enough
+    if (this.allUsers.length > 0 && now - this.lastFetchTime < FriendService.CACHE_DURATION) {
+      return this.allUsers;
+    }
+
+    try {
+      const response = await fetch(`${this.baseUrl}/users`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch users: ${response.statusText}`);
+      }
+
+      const users = await response.json();
+      const currentUserId = authService.state.profile?.id;
+      
+      this.allUsers = users
+        .filter((user: UserResponse) => user.googleId !== currentUserId)
+        .map((user: UserResponse) => ({
+          id: user.id,
+          googleId: user.googleId,
+          displayName: user.displayName,
+          email: user.email,
+          picture: user.picture,
+        }));
+      this.lastFetchTime = now;
+      
+      return this.allUsers;
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      throw error;
+    }
+  }
+
+  public searchUsers(query: string): Friend[] {
+    const lowerQuery = query.toLowerCase();
+    const currentUserId = authService.state.profile?.id;
+    
+    return this.allUsers.filter(user => {
+      // Skip if this is the current user
+      if (user.googleId === currentUserId) {
+        return false;
+      }
+      
+      const displayName = user.displayName?.toLowerCase() || '';
+      const email = user.email.toLowerCase();
+      return displayName.includes(lowerQuery) || email.includes(lowerQuery);
+    });
   }
 }
 
