@@ -1,26 +1,28 @@
-import { FC, useState, useRef, useEffect } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
+import locationSharingService from '../../services/locationSharingService';
+import { ChatMessage } from '../../services/types';
+import authService from '../../services/authService';
 import Message from './Message';
 import SendIcon from '../icons/SendIcon';
 
-const mockedMessages = [
-    {sender: "John Doe", content: "Hello", time: "12:00"},
-    {sender: "Will", content: "Hello my friend", time: "12:01"},
-    {sender: "Patrick", content: "I can't see you!", time: "12:02"},
-    {sender: "Le laitier", content: "Did you install sprunk ?", time: "12:03"},
-    {sender: "Will", content: "OF COURSE !!!!!", time: "12:04"},
-]
-
-/**
- * Props for the Conversation component that displays a chat interface
- * @property children - React child elements to be rendered within the conversation
- */
-interface ConversationProps {
-    children: React.ReactNode;
-}
-
-const Conversation: FC<ConversationProps> = () => {
-    const [newMessage, setNewMessage] = useState("");
+const Conversation: FC = () => {
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const currentUser = authService.state.profile;
+
+    useEffect(() => {
+        const handleMessages = (updatedMessages: ChatMessage[]) => {
+            setMessages(updatedMessages);
+            scrollToBottom();
+        };
+
+        locationSharingService.addChatMessageListener(handleMessages);
+
+        return () => {
+            locationSharingService.removeChatMessageListener(handleMessages);
+        };
+    }, []);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -28,7 +30,7 @@ const Conversation: FC<ConversationProps> = () => {
 
     useEffect(() => {
         scrollToBottom();
-    }, [newMessage, mockedMessages]);
+    }, [newMessage, messages]);
 
     const resetInputHeight = () => {
         const input = document.querySelector("textarea");
@@ -44,10 +46,21 @@ const Conversation: FC<ConversationProps> = () => {
     }
 
     const handleSendMessage = () => {
-        console.log(newMessage);
+        locationSharingService.sendMessage(
+            newMessage.trim(),
+            currentUser?.name,
+            currentUser?.picture,
+        );
         setNewMessage("");
         resetInputHeight();
     }
+
+    const formatTime = (timestamp: number) => {
+        return new Date(timestamp).toLocaleTimeString('fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
 
     return (
         <>
@@ -56,8 +69,8 @@ const Conversation: FC<ConversationProps> = () => {
                     <div className="flex px-4 flex-col gap-4 w-full">
                         <Message isSent={true} message={{sender: "Vous", content: "Hello", time: "12:00"}}/>
 
-                        {mockedMessages.map((message, index) => (
-                            <Message key={index} message={message}/>
+                        {messages.map((message, index) => (
+                            <Message key={index} isSent={message.userId === currentUser?.id} message={{sender: message.userName, content: message.content, time: formatTime(message.timestamp)}}/>
                         ))}
                         <div ref={messagesEndRef} /> {/* Scroll anchor */}
                     </div>

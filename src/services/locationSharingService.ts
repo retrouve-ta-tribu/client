@@ -1,15 +1,23 @@
 import socketService, { RoomEvents } from './socketService';
 import geolocationService from './geolocationService';
-import {UserPosition} from "./types.ts";
+import {UserPosition, ChatMessage} from "./types.ts";
 
 export enum LocationEvents {
-  LocationUpdate = 'LocationUpdate'
+  LocationUpdate = 'LocationUpdate',
+  ChatMessage = 'ChatMessage'
 }
 
 interface IncomingPositionBroadcastData {
   type: LocationEvents;
   position: UserPosition;
 }
+
+interface IncomingChatBroadcastData {
+  type: LocationEvents;
+  message: ChatMessage;
+}
+
+type BroadcastData = IncomingPositionBroadcastData | IncomingChatBroadcastData;
 
 /**
  * A real time location sharing service using socketService to transmit geolocationService data
@@ -19,7 +27,9 @@ class LocationSharingService {
   private userId: string | null = null;
   private intervalId: number | null = null;
   private positions: Map<string, UserPosition> = new Map();
+  private messages: ChatMessage[] = [];
   private locationUpdateListeners: Set<(positions: UserPosition[]) => void> = new Set();
+  private chatMessageListeners: Set<(messages: ChatMessage[]) => void> = new Set();
   
   /**
    * Check if socket is connected
@@ -57,15 +67,15 @@ class LocationSharingService {
     // Join the room for this group
     socketService.joinRoom(groupId);
     
-    // Set up listener for location updates from other users
-    socketService.addListener<IncomingPositionBroadcastData>(RoomEvents.Broadcast, this.handleLocationUpdate);
+    // Set up listener for location updates and chat messages from other users
+    socketService.addListener<BroadcastData>(RoomEvents.Broadcast, this.handleBroadcast);
     
     // Start tracking location and broadcasting updates
     await geolocationService.startTracking(userId, (position) => {
       this.broadcastLocation(position);
     });
     
-    // Set up interval to broadcast location periodically (every second)
+    // Set up interval to broadcast location periodically
     this.intervalId = window.setInterval(() => {
       const position = geolocationService.getLastPosition();
       if (position) {
@@ -86,24 +96,25 @@ class LocationSharingService {
     geolocationService.stopTracking();
     
     if (this.groupId) {
-      socketService.removeListener(RoomEvents.Broadcast, this.handleLocationUpdate);
+      socketService.removeListener(RoomEvents.Broadcast, this.handleBroadcast);
       socketService.leaveRoom(this.groupId);
       this.groupId = null;
     }
     
     this.userId = null;
     this.positions.clear();
-    this.notifyListeners();
+    this.messages = [];
+    this.notifyLocationListeners();
+    this.notifyChatListeners();
   }
   
   /**
    * Handle location update from another user
    * @param data The location message
    */
-  private handleLocationUpdate = (data: IncomingPositionBroadcastData): void => {
-    // Check if this is a location update message
-    if (data && data.type === LocationEvents.LocationUpdate) {
-      const position = data.position;
+  private handleBroadcast = (data: BroadcastData): void => {
+    if (data.type === LocationEvents.LocationUpdate) {
+      const position = (data as IncomingPositionBroadcastData).position;
       this.positions.set(position.userId, position);
 
       // Clean up old positions (older than 60 seconds)
@@ -114,8 +125,11 @@ class LocationSharingService {
         }
       }
 
-      // Notify listeners
-      this.notifyListeners();
+      this.notifyLocationListeners();
+    } else if (data.type === LocationEvents.ChatMessage) {
+      const message = (data as IncomingChatBroadcastData).message;
+      this.messages.push(message);
+      this.notifyChatListeners();
     }
   };
   
@@ -136,6 +150,27 @@ class LocationSharingService {
     socketService.broadcast(this.groupId, message);
   }
   
+  sendMessage(content: string, userName?: string, userPicture?: string): void {
+    if (!this.groupId || !this.userId) return;
+
+    const message: ChatMessage = {
+      userId: this.userId,
+      content,
+      timestamp: Date.now(),
+      userName,
+      userPicture
+    };
+
+    const broadcastData = {
+      type: LocationEvents.ChatMessage,
+      message
+    };
+
+    socketService.broadcast(this.groupId, broadcastData);
+    
+    this.notifyChatListeners();
+  }
+  
   /**
    * Add a listener for location updates
    * @param callback The callback to call when locations are updated
@@ -152,13 +187,28 @@ class LocationSharingService {
     this.locationUpdateListeners.delete(callback);
   }
   
+  addChatMessageListener(callback: (messages: ChatMessage[]) => void): void {
+    this.chatMessageListeners.add(callback);
+    callback(this.messages); // Send current messages immediately
+  }
+  
+  removeChatMessageListener(callback: (messages: ChatMessage[]) => void): void {
+    this.chatMessageListeners.delete(callback);
+  }
+  
   /**
    * Notify all listeners of location updates
    */
-  private notifyListeners(): void {
+  private notifyLocationListeners(): void {
     const positions = Array.from(this.positions.values());
     this.locationUpdateListeners.forEach(callback => {
       callback(positions);
+    });
+  }
+  
+  private notifyChatListeners(): void {
+    this.chatMessageListeners.forEach(callback => {
+      callback(this.messages);
     });
   }
   
@@ -168,6 +218,10 @@ class LocationSharingService {
    */
   getAllPositions(): UserPosition[] {
     return Array.from(this.positions.values());
+  }
+
+  getAllMessages(): ChatMessage[] {
+    return [...this.messages];
   }
 }
 
