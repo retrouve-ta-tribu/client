@@ -8,15 +8,6 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Fix pour les icônes manquantes dans Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: '/marker-icon-2x.png', // Chemin relatif vers l'icône dans le dossier public
-  iconUrl: '/marker-icon.png', // Chemin relatif vers l'icône dans le dossier public
-  shadowUrl: '/marker-shadow.png', // Chemin relatif vers l'ombre dans le dossier public
-});
-
 export interface MemberListProps {
   members: Member[];
   userPositions: UserPosition[];
@@ -32,6 +23,20 @@ const MemberList: FC<MemberListProps> = ({
       setIsLoading(false);
     }
   }, [userPositions]);
+
+  const createCustomMarker = (name: string) => {
+    return L.divIcon({
+      className: 'custom-marker', // Classe CSS pour le style
+      html: `
+      <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+        <img src="/marker-icon.png" alt="Marker" style="width: 25px; height: 41px;"/>
+        <div style="margin-top: 5px; font-size: 12px; color: black; white-space: nowrap;">${name}</div>
+      </div>
+    `,
+      iconSize: [25, 41], // Taille de l'icône
+      iconAnchor: [12, 41], // Point d'ancrage de l'icône
+    });
+  };
 
   // Create a map of user positions by userId for quick lookup
   const positionMap: Record<string, UserPosition> = userPositions.reduce((map, position) => {
@@ -86,8 +91,11 @@ const MemberList: FC<MemberListProps> = ({
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {userPositions.map((position, index) => (
-            <Marker key={index} position={[position.latitude, position.longitude]}>
-              <Popup>User ID: {position.userId}</Popup>
+            <Marker
+                key={index}
+                position={[position.latitude, position.longitude]}
+                icon={createCustomMarker(members[index].name)} // Utiliser le marqueur personnalisé
+            >
             </Marker>
         ))}
       </MapContainer>
