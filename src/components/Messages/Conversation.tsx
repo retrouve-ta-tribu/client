@@ -67,8 +67,6 @@ const Conversation: FC = () => {
             <div className="flex flex-col h-full">
                 <div className="flex-1 flex overflow-auto no-scrollbar justify-end items-end">
                     <div className="flex px-4 flex-col gap-4 w-full">
-                        <Message isSent={true} message={{sender: "Vous", content: "Hello", time: "12:00"}}/>
-
                         {messages.map((message, index) => (
                             <Message key={index} isSent={message.userId === currentUser?.id} message={{sender: message.userName, content: message.content, time: formatTime(message.timestamp)}}/>
                         ))}
