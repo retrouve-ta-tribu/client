@@ -113,7 +113,9 @@ const GroupDetails: FC = () => {
             
             try {
                 const members = await groupService.getGroupMembers(id);
-                console.log(members)
+                if (members.length > 0 && !members.some(member => parseInt(member.id) === parseInt(authService.state.profile?.id))) {
+                    navigate('/');
+                }
                 setMemberObjects(members);
             } catch (err) {
                 console.error('Failed to load group members:', err);
