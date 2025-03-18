@@ -175,6 +175,16 @@ const GroupDetails: FC = () => {
                     </div>
                 )}
                 
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-medium text-gray-700">Membres</h2>
+                    <button
+                        onClick={() => navigate(`/group/${id}/edit`)}
+                        className="px-3 py-1 text-sm text-indigo-600 hover:text-indigo-800 border border-indigo-600 hover:border-indigo-800 rounded-md"
+                    >
+                        Modifier
+                    </button>
+                </div>
+                
                 <MemberList 
                     members={memberObjects}
                     userPositions={userPositions}
