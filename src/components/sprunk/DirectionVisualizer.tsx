@@ -6,7 +6,6 @@ import {
   MeshRenderBehavior,
   ObjLoader,
   Quaternion,
-  RenderGameEngineComponent,
   Sprunk
 } from "sprunk-engine";
 import BasicVertexMVPWithUV from "../../shaders/BasicVertexMVPWithUVAndNormals.vert.wgsl?raw";
@@ -18,36 +17,33 @@ interface DirectionVisualizerProps {
 
 const PageContainer: FC<DirectionVisualizerProps> = ({ direction }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const gameEngineWindowRef = useRef<GameEngineWindow | null>(null);
-  const cameraRef = useRef<GameObject | null>(null);
+  const arrowRef = useRef<GameObject | null>(null);
 
   // Initialisation du jeu (uniquement au montage)
   useEffect(() => {
     if (!canvasRef.current) return;
-
     const canvas = canvasRef.current;
 
     // Initialiser le jeu Sprunk
     const gameEngineWindow: GameEngineWindow | null = Sprunk.newGame(canvas, false, [
       'RenderGameEngineComponent',
     ]);
-    gameEngineWindowRef.current = gameEngineWindow;
-
-    const renderComponent: RenderGameEngineComponent | null = gameEngineWindow.getEngineComponent(RenderGameEngineComponent)!;
+    const gameEngineWindowRef = gameEngineWindow;
 
     // Créer la caméra
     const camera = new GameObject("Camera");
-    camera.addBehavior(new Camera(renderComponent));
-    camera.transform.position.z = 5;
-    cameraRef.current = camera; // Stocker la référence de la caméra
     gameEngineWindow.root.addChild(camera);
+    camera.addBehavior(new Camera());
+    camera.transform.position.z = 5;
 
     // Créer l'objet flèche
     const arrowObject = new GameObject("Arrow");
+    gameEngineWindow.root.addChild(arrowObject);
+    console.log(gameEngineWindow.injectionContainer);
     ObjLoader.load("/arrow.obj").then((obj) => {
+      if(arrowObject === null || arrowObject.parent === null) return;
       arrowObject.addBehavior(
           new MeshRenderBehavior(
-              renderComponent,
               obj,
               "/arrow.png",
               BasicVertexMVPWithUV,
@@ -55,22 +51,20 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ direction }) => {
           ),
       );
     });
-    gameEngineWindow.root.addChild(arrowObject);
+    arrowRef.current = arrowObject;
 
     // Nettoyer à la destruction
     return () => {
-      gameEngineWindowRef.current?.dispose();
-      gameEngineWindowRef.current = null;
-      cameraRef.current = null;
+      gameEngineWindowRef?.dispose();
+      arrowRef.current = null;
     };
-  }, []); // Le tableau de dépendances vide garantit que cela ne s'exécute qu'une fois
+  }, []);
 
-  // Mettre à jour la rotation de la caméra lorsque `direction` change
   useEffect(() => {
-    if (cameraRef.current) {
-      cameraRef.current.transform.rotation = direction; // Mettre à jour la rotation
+    if (arrowRef.current) {
+      arrowRef.current.transform.rotation.setFromQuaternion(direction);
     }
-  }, [direction]); // Ce useEffect dépend de `direction`
+  }, [direction]);
 
   return (
       <canvas ref={canvasRef} style={{width:128+"px", height:64+"px"}}/>

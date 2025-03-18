@@ -45,7 +45,7 @@ const BigMemberCard: React.FC<BigMemberCardProps> = ({
           )}
         </div>
         <div>
-          <DirectionVisualizer direction={new Quaternion()} />
+          <DirectionVisualizer direction={new Quaternion(Math.random(), Math.random(), Math.random(), Math.random()).normalize()} />
         </div>
       </div>
     </div>
