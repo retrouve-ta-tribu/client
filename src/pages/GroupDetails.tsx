@@ -9,7 +9,7 @@ import locationSharingService from '../services/locationSharingService'
 import { UserPosition, Member, PointOfInterest, Group } from "../services/types"
 import MemberList from '../components/groups/MemberList'
 import SlidingPanel from '../components/layout/SlidingPanel'
-import Conversation from '../components/Messages/Conversation'
+import Conversation from '../components/messages/Conversation'
 import authService from '../services/authService'
 import Button from '../components/common/Button'
 import pointsOfInterestService from '../services/pointsOfInterestService'
