@@ -113,6 +113,7 @@ const GroupDetails: FC = () => {
             
             try {
                 const members = await groupService.getGroupMembers(id);
+                console.log(members)
                 setMemberObjects(members);
             } catch (err) {
                 console.error('Failed to load group members:', err);

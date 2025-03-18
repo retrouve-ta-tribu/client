@@ -224,6 +224,9 @@ class GroupService {
         const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
         throw new Error(errorData.message || `Failed to add member: ${response.statusText}`);
       }
+
+      // Broadcast the change to all clients
+      this.broadcastMembersChanged(groupId);
     } catch (error) {
       console.error('Error adding member:', error);
       throw error;
@@ -249,6 +252,9 @@ class GroupService {
         const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
         throw new Error(errorData.message || `Failed to remove member: ${response.statusText}`);
       }
+
+      // Broadcast the change to all clients
+      this.broadcastMembersChanged(groupId);
     } catch (error) {
       console.error('Error removing member:', error);
       throw error;
