@@ -40,6 +40,14 @@ export interface UserPosition {
   timestamp: number;
 }
 
+/**
+ * Represents a message in a chat
+ * @property userId - Unique identifier of the user who sent the message
+ * @property content - Content of the message
+ * @property timestamp - Unix timestamp of when the message was sent
+ * @property userName - Display name of the user who sent the message
+ * @property userPicture - URL of the user's profile picture
+ */
 export interface ChatMessage {
   userId: string;
   content: string;

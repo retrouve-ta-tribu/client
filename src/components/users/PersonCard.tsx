@@ -54,7 +54,7 @@ const PersonCard: FC<PersonCardProps> = ({
 
   return (
     <div 
-      className={cardClasses}
+      className={cardClasses + " cursor-pointer hover:bg-gray-100"}
       onClick={onClick}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}

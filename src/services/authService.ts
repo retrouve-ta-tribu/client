@@ -45,6 +45,10 @@ class AuthService {
         this.init();
     }
 
+    /**
+     * Get the singleton instance of the AuthService
+     * @returns The singleton instance of the AuthService
+     */
     public static getInstance(): AuthService {
         if (!AuthService.instance) {
             AuthService.instance = new AuthService();
@@ -53,24 +57,43 @@ class AuthService {
         return AuthService.instance;
     }
 
+    /**
+     * Set the state of the AuthService
+     * @param newState - The new state of the AuthService
+     */
     private setState(newState: Partial<AuthState>) {
         this._state = { ...this._state, ...newState };
         this.notifyListeners();
     }
 
+    /**
+     * Notify listeners of the AuthService
+     */
     private notifyListeners() {
         this.listeners.forEach(listener => listener());
     }
 
+    /**
+     * Subscribe to the AuthService
+     * @param listener - The listener to subscribe to
+     * @returns A function to unsubscribe from the AuthService
+     */
     public subscribe(listener: Listener): () => void {
         this.listeners.add(listener);
         return () => this.listeners.delete(listener);
     }
 
+    /**
+     * Get the state of the AuthService
+     * @returns The state of the AuthService
+     */
     public get state(): AuthState {
         return this._state;
     }
 
+    /**
+     * Initialize the AuthService
+     */
     private async init(): Promise<void> {
         try {
             await this.checkStoredUser();
@@ -82,6 +105,9 @@ class AuthService {
         }
     }
 
+    /**
+     * Check if a user is stored in localStorage
+     */
     private async checkStoredUser(): Promise<void> {
         const storedUser = localStorage.getItem('google_user');
         if (!storedUser) {
@@ -113,6 +139,10 @@ class AuthService {
         }
     }
 
+    /**
+     * Get the Google login component
+     * @returns The Google login component
+     */
     public getGoogleLogin() {
         return useGoogleLogin({
             onSuccess: async (response) => {
@@ -125,6 +155,10 @@ class AuthService {
         });
     }
 
+    /**
+     * Login with Google
+     * @param googleResponse - The Google response
+     */
     public async login(googleResponse: any): Promise<void> {
         try {
             this.setState({ isLoading: true });
@@ -145,6 +179,9 @@ class AuthService {
         }
     }
 
+    /**
+     * Log out the user
+     */
     public logOut = (): void => {
         googleLogout();
         localStorage.removeItem('google_user');
@@ -155,6 +192,9 @@ class AuthService {
         });
     }
 
+    /**
+     * Fetch the user profile
+     */
     private async fetchProfile(): Promise<void> {
         if (!this._state.user) return;
 
@@ -210,6 +250,10 @@ class AuthService {
         }
     }
 
+    /**
+     * Get the authentication status
+     * @returns True if the user is authenticated, false otherwise
+     */
     public get isAuthenticated(): boolean {
         return !!this._state.profile;
     }
