@@ -261,7 +261,11 @@ class GroupService {
     }
   }
 
-  // WebSocket related methods
+  /**
+   * Add a listener for a group
+   * @param groupId - The ID of the group
+   * @param callback - The callback to add
+   */
   addMemberListener(groupId: string, callback: () => void): void {
     if (!this.memberListeners.has(groupId)) {
       this.memberListeners.set(groupId, new Set());
@@ -269,6 +273,11 @@ class GroupService {
     this.memberListeners.get(groupId)?.add(callback);
   }
 
+  /**
+   * Remove a listener for a group
+   * @param groupId - The ID of the group
+   * @param callback - The callback to remove
+   */
   removeMemberListener(groupId: string, callback: () => void): void {
     this.memberListeners.get(groupId)?.delete(callback);
     if (this.memberListeners.get(groupId)?.size === 0) {
@@ -276,12 +285,20 @@ class GroupService {
     }
   }
 
+  /**
+   * Notify listeners of a group
+   * @param groupId - The ID of the group
+   */
   private notifyListeners(groupId: string): void {
     this.memberListeners.get(groupId)?.forEach(callback => {
       callback();
     });
   }
 
+  /**
+   * Broadcast a members changed event to all clients
+   * @param groupId - The ID of the group
+   */
   private broadcastMembersChanged(groupId: string): void {
     const broadcastData: GroupBroadcastData = {
       type: GroupEvents.MembersChanged,
