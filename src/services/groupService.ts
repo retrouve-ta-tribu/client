@@ -1,4 +1,5 @@
 import authService from './authService';
+import { Member } from './types';
 
 /**
  * Represents a group's information in the system
@@ -182,6 +183,56 @@ class GroupService {
         name: member.displayName,
         picture: member.picture
     }));
+  }
+
+  /**
+   * Add a member to a group
+   * @param groupId - The ID of the group to add the member to
+   * @param userId - The ID of the user to add to the group
+   * @returns A promise that resolves when the member is added
+   */
+  public async addMember(groupId: string, userId: string): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseUrl}/groups/${groupId}/members/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || `Failed to add member: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('Error adding member:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Remove a member from a group
+   * @param groupId - The ID of the group to remove the member from
+   * @param userId - The ID of the user to remove from the group
+   * @returns A promise that resolves when the member is removed
+   */
+  public async removeMember(groupId: string, userId: string): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseUrl}/groups/${groupId}/members/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || `Failed to remove member: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('Error removing member:', error);
+      throw error;
+    }
   }
 }
 

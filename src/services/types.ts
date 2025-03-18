@@ -55,3 +55,17 @@ export interface ChatMessage {
   userName?: string;
   userPicture?: string;
 }
+
+/**
+ * Represents a user's authentication profile
+ * @property id - The user's Google ID
+ * @property name - The user's display name
+ * @property email - The user's email address
+ * @property picture - The user's profile picture URL
+ */
+export interface AuthProfile {
+    id: string;
+    name: string;
+    email: string;
+    picture: string;
+}
