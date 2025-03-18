@@ -1,5 +1,6 @@
 import authService from './authService';
 import { Member } from './types';
+import socketService, { RoomEvents } from './socketService';
 
 /**
  * Represents a group's information in the system
@@ -33,9 +34,19 @@ interface CreateGroupRequest {
   members: string[];
 }
 
+export enum GroupEvents {
+    MembersChanged = 'MembersChanged'
+}
+
+interface GroupBroadcastData {
+    type: GroupEvents;
+    groupId: string;
+}
+
 class GroupService {
   private static instance: GroupService;
   private baseUrl: string;
+  private memberListeners: Map<string, Set<() => void>> = new Map(); // groupId -> Set of listeners
 
   private constructor() {
     const apiUrl = import.meta.env.VITE_API_URL;
@@ -43,7 +54,16 @@ class GroupService {
       throw new Error('VITE_API_URL environment variable is not defined');
     }
     this.baseUrl = `${apiUrl}/api`;
+
+    // Set up listener for group updates
+    socketService.addListener<GroupBroadcastData>(RoomEvents.Broadcast, this.handleGroupUpdate);
   }
+
+  private handleGroupUpdate = (data: GroupBroadcastData): void => {
+    if (data.type === GroupEvents.MembersChanged) {
+      this.notifyListeners(data.groupId);
+    }
+  };
 
   /**
    * Get the singleton instance of the GroupService
@@ -233,6 +253,35 @@ class GroupService {
       console.error('Error removing member:', error);
       throw error;
     }
+  }
+
+  // WebSocket related methods
+  addMemberListener(groupId: string, callback: () => void): void {
+    if (!this.memberListeners.has(groupId)) {
+      this.memberListeners.set(groupId, new Set());
+    }
+    this.memberListeners.get(groupId)?.add(callback);
+  }
+
+  removeMemberListener(groupId: string, callback: () => void): void {
+    this.memberListeners.get(groupId)?.delete(callback);
+    if (this.memberListeners.get(groupId)?.size === 0) {
+      this.memberListeners.delete(groupId);
+    }
+  }
+
+  private notifyListeners(groupId: string): void {
+    this.memberListeners.get(groupId)?.forEach(callback => {
+      callback();
+    });
+  }
+
+  private broadcastMembersChanged(groupId: string): void {
+    const broadcastData: GroupBroadcastData = {
+      type: GroupEvents.MembersChanged,
+      groupId
+    };
+    socketService.broadcast(groupId, broadcastData);
   }
 }
 

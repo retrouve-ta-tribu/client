@@ -120,7 +120,17 @@ const GroupDetails: FC = () => {
             }
         };
 
+        // Add members listener for real-time updates
+        const handleMembersUpdate = () => {
+            loadGroupMembers();
+        };
+        
         loadGroupMembers();
+        groupService.addMemberListener(id, handleMembersUpdate);
+        
+        return () => {
+            groupService.removeMemberListener(id, handleMembersUpdate);
+        };
     }, [group, id]);
 
     // Load points of interest
