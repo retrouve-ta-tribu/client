@@ -12,6 +12,7 @@ import SlidingPanel from '../components/layout/SlidingPanel.tsx'
 import ChevronIcon from '../components/icons/ChevronIcon'
 import Conversation from '../components/Messages/Conversation'
 import authService from '../services/authService'
+import Button from '../components/common/Button'
 
 const GroupDetails: FC = () => {
     const params = useParams();
@@ -177,12 +178,12 @@ const GroupDetails: FC = () => {
                 
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-lg font-medium text-gray-700">Membres</h2>
-                    <button
+                    <Button
+                        variant="secondary"
                         onClick={() => navigate(`/group/${id}/edit`)}
-                        className="px-3 py-1 text-sm text-indigo-600 hover:text-indigo-800 border border-indigo-600 hover:border-indigo-800 rounded-md"
                     >
                         Modifier
-                    </button>
+                    </Button>
                 </div>
                 
                 <MemberList 
