@@ -1,4 +1,14 @@
 import { PointOfInterest } from './types';
+import socketService, { RoomEvents } from './socketService';
+
+export enum PointEvents {
+    PointsChanged = 'PointsChanged'
+}
+
+interface PointsBroadcastData {
+    type: PointEvents;
+    groupId: string;
+}
 
 /**
  * Service for managing points of interest
@@ -6,6 +16,7 @@ import { PointOfInterest } from './types';
 class PointsOfInterestService {
     private static instance: PointsOfInterestService;
     private baseUrl: string;
+    private pointsListeners: Map<string, Set<() => void>> = new Map(); // groupId -> Set of listeners
 
     private constructor() {
         const apiUrl = import.meta.env.VITE_API_URL;
@@ -13,7 +24,16 @@ class PointsOfInterestService {
             throw new Error('VITE_API_URL environment variable is not defined');
         }
         this.baseUrl = `${apiUrl}/api`;
+
+        // Set up listener for points updates
+        socketService.addListener<PointsBroadcastData>(RoomEvents.Broadcast, this.handlePointsUpdate);
     }
+
+    private handlePointsUpdate = (data: PointsBroadcastData): void => {
+        if (data.type === PointEvents.PointsChanged) {
+            this.notifyListeners(data.groupId);
+        }
+    };
 
     /*
      * Get all points of interest for a group
@@ -60,7 +80,12 @@ class PointsOfInterestService {
             })
         });
         if (!response.ok) throw new Error('Failed to add point of interest');
-        return response.json();
+        const result = await response.json();
+        
+        // Broadcast the change
+        this.broadcastPointsChanged(groupId);
+        
+        return result;
     }
 
     /*
@@ -73,6 +98,55 @@ class PointsOfInterestService {
             method: 'DELETE'
         });
         if (!response.ok) throw new Error('Failed to remove point of interest');
+        
+        // Broadcast the change
+        this.broadcastPointsChanged(groupId);
+    }
+
+    /*
+     * Add a listener for points of interest
+     * @param groupId - The ID of the group
+     * @param callback - The callback to add
+     */
+    addPointsListener(groupId: string, callback: () => void): void {
+        if (!this.pointsListeners.has(groupId)) {
+            this.pointsListeners.set(groupId, new Set());
+        }
+        this.pointsListeners.get(groupId)?.add(callback);
+    }
+
+    /*
+     * Remove a listener for points of interest
+     * @param groupId - The ID of the group
+     * @param callback - The callback to remove
+     */
+    removePointsListener(groupId: string, callback: () => void): void {
+        this.pointsListeners.get(groupId)?.delete(callback);
+        if (this.pointsListeners.get(groupId)?.size === 0) {
+            this.pointsListeners.delete(groupId);
+        }
+    }
+
+    /*
+     * Notify listeners of a group
+     * @param groupId - The ID of the group
+     */
+    private notifyListeners(groupId: string): void {
+        this.pointsListeners.get(groupId)?.forEach(callback => {
+            callback();
+        });
+    }
+
+    /*
+     * Broadcast the points changed event to all listeners
+     * @param groupId - The ID of the group
+     */
+    private broadcastPointsChanged(groupId: string): void {
+        const broadcastData: PointsBroadcastData = {
+            type: PointEvents.PointsChanged,
+            groupId
+        };
+        socketService.broadcast(groupId, broadcastData);
     }
 }
 

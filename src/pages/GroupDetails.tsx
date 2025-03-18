@@ -135,8 +135,18 @@ const GroupDetails: FC = () => {
                 setError('Failed to load points of interest');
             }
         };
+
+        // Add points listener for real-time updates
+        const handlePointsUpdate = () => {
+            loadPoints();
+        };
         
         loadPoints();
+        pointsOfInterestService.addPointsListener(id, handlePointsUpdate);
+        
+        return () => {
+            pointsOfInterestService.removePointsListener(id, handlePointsUpdate);
+        };
     }, [id]);
 
     const handleAddPoint = async (e: React.FormEvent) => {
@@ -158,10 +168,7 @@ const GroupDetails: FC = () => {
                 myPosition.longitude
             );
             setPointName('');
-            // Refetch points from backend
-            const updatedPoints = await pointsOfInterestService.getGroupPoints(id);
-            setPoints(updatedPoints);
-            console.log(updatedPoints)
+            // Points will be automatically updated through WebSocket
         } catch (err) {
             console.error('Failed to add point:', err);
             setError('Failed to add point of interest');
@@ -173,9 +180,7 @@ const GroupDetails: FC = () => {
     const handleRemovePoint = async (pointId: string) => {
         try {
             await pointsOfInterestService.removePoint(id, pointId);
-            // Refetch points from backend
-            const updatedPoints = await pointsOfInterestService.getGroupPoints(id);
-            setPoints(updatedPoints);
+            // Points will be automatically updated through WebSocket
         } catch (err) {
             console.error('Failed to remove point:', err);
             setError('Failed to remove point of interest');
