@@ -69,3 +69,18 @@ export interface AuthProfile {
     email: string;
     picture: string;
 }
+
+/**
+ * Represents a point of interest in a group
+ * @property _id - Unique identifier of the point
+ * @property name - Name of the point of interest
+ * @property location - GeoJSON Point location
+ */
+export interface PointOfInterest {
+    _id: string;
+    name: string;
+    location: {
+        type: 'Point';
+        coordinates: [number, number]; // [longitude, latitude]
+    };
+}

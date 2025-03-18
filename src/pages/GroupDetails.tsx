@@ -1,24 +1,26 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState, FC } from 'react'
-import groupService, { Group } from '../services/groupService'
+import groupService, { Group as ServerGroup } from '../services/groupService'
 import PageContainer from '../components/layout/PageContainer'
 import PageHeader from '../components/layout/PageHeader'
 import NotFound from '../components/common/NotFound'
 import Spinner from '../components/common/Spinner'
 import locationSharingService from '../services/locationSharingService'
-import { UserPosition, Member } from "../services/types.ts"
+import { UserPosition, Member, PointOfInterest, Group } from "../services/types"
 import MemberList from '../components/groups/MemberList'
-import SlidingPanel from '../components/layout/SlidingPanel.tsx'
+import SlidingPanel from '../components/layout/SlidingPanel'
 import ChevronIcon from '../components/icons/ChevronIcon'
 import Conversation from '../components/Messages/Conversation'
 import authService from '../services/authService'
 import Button from '../components/common/Button'
+import pointsOfInterestService from '../services/pointsOfInterestService'
+import PointOfInterestList from '../components/groups/PointOfInterestList'
 
 const GroupDetails: FC = () => {
     const params = useParams();
     const navigate = useNavigate();
     const id = params.id || '';
-    const [group, setGroup] = useState<Group | null>(null)
+    const [group, setGroup] = useState<ServerGroup | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [userPositions, setUserPositions] = useState<UserPosition[]>([])
     const [isSharing, setIsSharing] = useState<boolean>(false)
@@ -27,6 +29,9 @@ const GroupDetails: FC = () => {
     const [isGettingLocation, setIsGettingLocation] = useState<boolean>(false)
     const [memberObjects, setMemberObjects] = useState<Member[]>([]);
     const [hasUnreadMessage, setHasUnreadMessage] = useState<boolean>(false);
+    const [points, setPoints] = useState<PointOfInterest[]>([]);
+    const [pointName, setPointName] = useState('');
+    const [isAddingPoint, setIsAddingPoint] = useState(false);
 
     // Load group data
     useEffect(() => {
@@ -119,6 +124,60 @@ const GroupDetails: FC = () => {
         loadGroupMembers();
     }, [group, id]);
 
+    // Load points of interest
+    useEffect(() => {
+        const loadPoints = async () => {
+            if (!id) return;
+            try {
+                const points = await pointsOfInterestService.getGroupPoints(id);
+                setPoints(points);
+            } catch (err) {
+                console.error('Failed to load points:', err);
+                setError('Failed to load points of interest');
+            }
+        };
+        
+        loadPoints();
+    }, [id]);
+
+    const handleAddPoint = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!pointName.trim() || !userPositions.length) return;
+
+        const myPosition = userPositions.find(pos => pos.userId === authService.state.profile?.id);
+        if (!myPosition) {
+            setError('Your location is not available');
+            return;
+        }
+
+        setIsAddingPoint(true);
+        try {
+            const newPoint = await pointsOfInterestService.addPoint(
+                id,
+                pointName,
+                myPosition.latitude,
+                myPosition.longitude
+            );
+            setPoints(prev => [...prev, newPoint]);
+            setPointName('');
+        } catch (err) {
+            console.error('Failed to add point:', err);
+            setError('Failed to add point of interest');
+        } finally {
+            setIsAddingPoint(false);
+        }
+    };
+
+    const handleRemovePoint = async (pointId: string) => {
+        try {
+            await pointsOfInterestService.removePoint(id, pointId);
+            setPoints(prev => prev.filter(p => p._id !== pointId));
+        } catch (err) {
+            console.error('Failed to remove point:', err);
+            setError('Failed to remove point of interest');
+        }
+    };
+
     if (isLoading) {
         return (
             <PageContainer>
@@ -142,17 +201,8 @@ const GroupDetails: FC = () => {
     return (
         <PageContainer>
             <PageHeader 
-                title={
-                    <div className="flex items-center gap-2">
-                        <button 
-                            onClick={() => navigate('/')} 
-                            className="p-1 hover:bg-gray-100 cursor-pointer rounded-full"
-                        >
-                            <ChevronIcon direction="left" />
-                        </button>
-                        {group.name}
-                    </div>
-                }
+                backLink="/"
+                title={group.name}
             />
 
             <div className="p-4 pb-20">
@@ -190,11 +240,44 @@ const GroupDetails: FC = () => {
                     members={memberObjects}
                     userPositions={userPositions}
                 />
+
+                <div className="mt-8">
+                    <h2 className="text-lg font-medium text-gray-700 mb-4">Points d'intérêt</h2>
+                    
+                    <form onSubmit={handleAddPoint} className="mb-4 flex gap-2">
+                        <input
+                            type="text"
+                            value={pointName}
+                            onChange={(e) => setPointName(e.target.value)}
+                            placeholder="Nom du point d'intérêt"
+                            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            disabled={isAddingPoint}
+                        />
+                        <Button
+                            type="submit"
+                            disabled={isAddingPoint || !pointName.trim() || !userPositions.length}
+                        >
+                            {isAddingPoint ? 'Ajout...' : 'Créer'}
+                        </Button>
+                    </form>
+
+                    <PointOfInterestList 
+                        points={points}
+                        onRemovePoint={handleRemovePoint}
+                    />
+                </div>
             </div>
 
             <SlidingPanel hasNotification={hasUnreadMessage} setHasNotification={setHasUnreadMessage}>
                 <div className="relative max-w-3xl mx-auto bg-white shadow-md h-full flex flex-col justify-between overflow-hidden">
-                    <Conversation group={group} setHasUnreadMessage={setHasUnreadMessage}/>
+                    <Conversation 
+                        group={{
+                            _id: group._id,
+                            name: group.name,
+                            members: memberObjects
+                        }} 
+                        setHasUnreadMessage={setHasUnreadMessage}
+                    />
                 </div>                
             </SlidingPanel>
         </PageContainer>
