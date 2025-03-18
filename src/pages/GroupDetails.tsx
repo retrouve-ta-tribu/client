@@ -230,7 +230,7 @@ const GroupDetails: FC = () => {
                     </div>
                 )}
                 
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center">
                     <h2 className="text-lg font-medium text-gray-700">Membres</h2>
                     <Button
                         variant="secondary"
@@ -253,8 +253,8 @@ const GroupDetails: FC = () => {
                             type="text"
                             value={pointName}
                             onChange={(e) => setPointName(e.target.value)}
-                            placeholder="Nom du point d'intérêt"
-                            className="flex-1 pl-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            placeholder="Nom du point"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             disabled={isAddingPoint}
                         />
                         <Button
