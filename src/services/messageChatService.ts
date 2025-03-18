@@ -16,6 +16,9 @@ interface IncomingChatBroadcastData {
     };
 }
 
+/**
+ * Service for managing chat functionality
+ */
 class MessageChatService {
     private static instance: MessageChatService;
     private groupId: string | null = null;
@@ -34,6 +37,10 @@ class MessageChatService {
         setInterval(() => this.cleanStaleTypingStatuses(), MessageChatService.TYPING_INTERVAL);
     }
 
+    /**
+     * Get the singleton instance of the MessageChatService
+     * @returns The singleton instance of the MessageChatService
+     */
     public static getInstance(): MessageChatService {
         if (!MessageChatService.instance) {
             MessageChatService.instance = new MessageChatService();
@@ -41,14 +48,27 @@ class MessageChatService {
         return MessageChatService.instance;
     }
 
+    /**
+     * Check if the socket is connected
+     * @returns True if the socket is connected, false otherwise
+     */
     isSocketConnected(): boolean {
         return socketService.isConnected();
     }
 
+    /**
+     * Connect to the socket
+     * @returns A promise that resolves when the socket is connected
+     */
     async connectSocket(): Promise<void> {
         return socketService.connect();
     }
 
+    /**
+     * Join a chat room
+     * @param groupId - The ID of the group to join
+     * @param userId - The ID of the user to join the chat
+     */
     async joinChat(groupId: string, userId: string): Promise<void> {
         // Leave any existing chat
         this.leaveChat();
@@ -68,6 +88,9 @@ class MessageChatService {
         socketService.addListener<IncomingChatBroadcastData>(RoomEvents.Broadcast, this.handleMessage);
     }
 
+    /**
+     * Leave a chat room
+     */
     leaveChat(): void {
         if (this.groupId) {
             this.setTyping(false);
@@ -88,6 +111,10 @@ class MessageChatService {
         this.notifyTypingListeners();
     }
 
+    /**
+     * Handle incoming chat messages
+     * @param data - The incoming chat message data
+     */
     private handleMessage = (data: IncomingChatBroadcastData): void => {
         if (data.type === ChatEvents.Message) {
             this.messages.push(data.message!);
@@ -104,6 +131,11 @@ class MessageChatService {
         }
     };
 
+    /**
+     * Send a message to the chat
+     * @param content - The content of the message
+     * @param userName - The name of the user sending the message
+     */
     sendMessage(content: string, userName?: string): void {
         if (!this.groupId || !this.userId || !content.trim()) return;
 
@@ -124,25 +156,45 @@ class MessageChatService {
             this.notifyListeners();
     }
 
+    /**
+     * Add a message listener
+     * @param callback - The callback to add
+     */
     addMessageListener(callback: (messages: ChatMessage[]) => void): void {
         this.messageListeners.add(callback);
         callback(this.messages); // Send current messages immediately
     }
 
+    /**
+     * Remove a message listener
+     * @param callback - The callback to remove
+     */
     removeMessageListener(callback: (messages: ChatMessage[]) => void): void {
         this.messageListeners.delete(callback);
     }
 
+    /**
+     * Notify listeners of new messages
+     */
     private notifyListeners(): void {
         this.messageListeners.forEach(callback => {
             callback(this.messages);
         });
     }
 
+    /**
+     * Get all messages
+     * @returns All messages in the chat
+     */
     getAllMessages(): ChatMessage[] {
         return [...this.messages];
     }
 
+    /**
+     * Set the typing status
+     * @param isTyping - True if the user is typing, false otherwise
+     * @param userName - The name of the user typing
+     */
     setTyping(isTyping: boolean, userName?: string): void {
         if (!this.groupId || !this.userId) return;
 
@@ -167,15 +219,26 @@ class MessageChatService {
         this.sendTypingStatus(isTyping, userName);
     }
 
+    /**
+     * Add a typing listener
+     * @param callback - The callback to add
+     */
     addTypingListener(callback: (typingUsers: string[]) => void): void {
         this.typingListeners.add(callback);
         callback(Array.from(this.typingUsers.values()).map(data => data.userName));
     }
 
+    /**
+     * Remove a typing listener
+     * @param callback - The callback to remove
+     */
     removeTypingListener(callback: (typingUsers: string[]) => void): void {
         this.typingListeners.delete(callback);
     }
 
+    /**
+     * Notify typing listeners
+     */
     private notifyTypingListeners(): void {
         const typingUserNames = Array.from(this.typingUsers.values()).map(data => data.userName);
         this.typingListeners.forEach(callback => {
@@ -183,6 +246,9 @@ class MessageChatService {
         });
     }
 
+    /**
+     * Clean stale typing statuses
+     */
     private cleanStaleTypingStatuses(): void {
         const now = Date.now();
         let hasChanges = false;
@@ -199,6 +265,11 @@ class MessageChatService {
         }
     }
 
+    /**
+     * Send a typing status
+     * @param isTyping - True if the user is typing, false otherwise
+     * @param userName - The name of the user typing
+     */
     private sendTypingStatus(isTyping: boolean, userName?: string): void {
         if (!this.groupId || !this.userId) return;
 

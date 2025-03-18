@@ -21,6 +21,10 @@ class LocationSharingService {
 
     private constructor() {}
 
+    /**
+     * Get the singleton instance of the LocationSharingService
+     * @returns The singleton instance of the LocationSharingService
+     */
     public static getInstance(): LocationSharingService {
         if (!LocationSharingService.instance) {
             LocationSharingService.instance = new LocationSharingService();
@@ -28,14 +32,28 @@ class LocationSharingService {
         return LocationSharingService.instance;
     }
 
+    /**
+     * Check if the socket is connected
+     * @returns True if the socket is connected, false otherwise
+     */
     isSocketConnected(): boolean {
         return socketService.isConnected();
     }
 
+    /**
+     * Connect to the socket
+     * @returns A promise that resolves when the socket is connected
+     */
     async connectSocket(): Promise<void> {
         return socketService.connect();
     }
 
+    /**
+     * Start sharing location updates
+     * @param groupId - The ID of the group to share location updates with
+     * @param userId - The ID of the user to share location updates from
+     * @returns A promise that resolves when the location sharing starts
+     */
     async startSharing(groupId: string, userId: string): Promise<void> {
         // Stop any existing sharing
         this.stopSharing();
@@ -68,6 +86,9 @@ class LocationSharingService {
         }, 1000);
     }
 
+    /**
+     * Stop sharing location updates
+     */
     stopSharing(): void {
         if (this.intervalId !== null) {
             clearInterval(this.intervalId);
@@ -87,6 +108,10 @@ class LocationSharingService {
         this.notifyListeners();
     }
 
+    /**
+     * Handle incoming location updates
+     * @param data - The incoming location update data
+     */
     private handleLocationUpdate = (data: IncomingPositionBroadcastData): void => {
         if (data.type === LocationEvents.LocationUpdate) {
             const position = data.position;
@@ -104,6 +129,10 @@ class LocationSharingService {
         }
     };
 
+    /**
+     * Broadcast a location update
+     * @param position - The position to broadcast
+     */
     private broadcastLocation(position: UserPosition): void {
         if (!this.groupId || !this.userId) return;
 
@@ -115,14 +144,25 @@ class LocationSharingService {
         socketService.broadcast(this.groupId, message);
     }
 
+    /**
+     * Add a location update listener
+     * @param callback - The callback to add
+     */
     addLocationUpdateListener(callback: (positions: UserPosition[]) => void): void {
         this.locationUpdateListeners.add(callback);
     }
 
+    /**
+     * Remove a location update listener
+     * @param callback - The callback to remove
+     */
     removeLocationUpdateListener(callback: (positions: UserPosition[]) => void): void {
         this.locationUpdateListeners.delete(callback);
     }
 
+    /**
+     * Notify listeners of location updates
+     */
     private notifyListeners(): void {
         const positions = Array.from(this.positions.values());
         this.locationUpdateListeners.forEach(callback => {
@@ -130,6 +170,10 @@ class LocationSharingService {
         });
     }
 
+    /**
+     * Get all positions
+     * @returns All positions
+     */
     getAllPositions(): UserPosition[] {
         return Array.from(this.positions.values());
     }

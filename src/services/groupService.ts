@@ -44,6 +44,10 @@ class GroupService {
     this.baseUrl = `${apiUrl}/api`;
   }
 
+  /**
+   * Get the singleton instance of the GroupService
+   * @returns The singleton instance of the GroupService
+   */
   public static getInstance(): GroupService {
     if (!GroupService.instance) {
       GroupService.instance = new GroupService();
@@ -74,6 +78,11 @@ class GroupService {
     }
   }
 
+  /**
+   * Get a group by its ID
+   * @param groupId - The ID of the group to fetch
+   * @returns A promise that resolves to the group or null if the group is not found
+   */
   public async getGroupById(groupId: string): Promise<Group | null> {
     try {
       const response = await fetch(`${this.baseUrl}/groups/${groupId}`);
@@ -93,6 +102,11 @@ class GroupService {
     }
   }
 
+  /**
+   * Create a new group
+   * @param groupData - The data for the new group
+   * @returns A promise that resolves to the created group
+   */
   public async createGroup(groupData: CreateGroupRequest): Promise<any> {
     const googleId = authService.state.profile?.id;
     if (!googleId) {
@@ -124,6 +138,12 @@ class GroupService {
     }
   }
 
+  /**
+   * Leave a group
+   * @param groupId - The ID of the group to leave
+   * @param userId - The ID of the user to leave the group
+   * @returns A promise that resolves when the user leaves the group
+   */
   public async leaveGroup(groupId: string, userId: string): Promise<void> {
     try {
       const response = await fetch(`${this.baseUrl}/groups/${groupId}/members/${userId}`, {
@@ -143,6 +163,11 @@ class GroupService {
     }
   }
 
+  /**
+   * Get the members of a group
+   * @param groupId - The ID of the group to get the members of
+   * @returns A promise that resolves to the members of the group
+   */
   public async getGroupMembers(groupId: string): Promise<Member[]> {
     const response = await fetch(`${this.baseUrl}/groups/${groupId}/members`);
     
