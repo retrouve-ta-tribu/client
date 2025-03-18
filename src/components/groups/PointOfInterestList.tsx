@@ -9,7 +9,7 @@ interface PointOfInterestListProps {
 
 const PointOfInterestList: FC<PointOfInterestListProps> = ({ points, onRemovePoint }) => {
     return (
-        <div className="space-y-2 max-h-48 overflow-y-auto">
+        <div className="space-y-2 max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-2">
             {points.map((point) => (
                 <div 
                     key={point._id}
