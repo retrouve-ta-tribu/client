@@ -31,7 +31,7 @@ const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, backLink }) => {
         </div>
       </div>
 
-      {profile && (
+      {profile && window.location.pathname == '/' && (
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <img 
