@@ -4,7 +4,6 @@ import LocationUnavailable from './LocationUnavailable.tsx';
 import OnlineStatus from './OnlineStatus.tsx';
 import {Member, UserPosition} from "../../services/types.ts";
 import DirectionVisualizer from "../sprunk/DirectionVisualizer.tsx";
-import {Quaternion} from "sprunk-engine";
 
 /**
  * Props for the BigMemberCard component that displays detailed member information
@@ -14,14 +13,16 @@ import {Quaternion} from "sprunk-engine";
 interface BigMemberCardProps {
   member: Member;
   position?: UserPosition;
+  startPosition?: UserPosition;
 }
 
 const BigMemberCard: React.FC<BigMemberCardProps> = ({ 
   member, 
-  position 
+  position,
+  startPosition
 }) => {
   const isOnline = !!position;
-  
+
   return (
     <div className={`p-4 ${isOnline ? 'bg-green-50 border-green-200' : 'bg-gray-100 border-gray-200'} rounded-lg shadow-sm border`}>
       <div className="flex items-center">
@@ -45,7 +46,7 @@ const BigMemberCard: React.FC<BigMemberCardProps> = ({
           )}
         </div>
         <div>
-          <DirectionVisualizer direction={new Quaternion(Math.random(), Math.random(), Math.random(), Math.random()).normalize()} />
+          <DirectionVisualizer position={position} startPosition={startPosition}/>
         </div>
       </div>
     </div>

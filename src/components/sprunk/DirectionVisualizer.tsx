@@ -1,23 +1,26 @@
-import { FC, useEffect, useRef } from 'react';
+import {FC, useEffect, useRef, useState} from 'react';
 import {
   Camera,
   GameEngineWindow,
   GameObject,
   MeshRenderBehavior,
   ObjLoader,
-  Quaternion,
   Sprunk
 } from "sprunk-engine";
 import BasicVertexMVPWithUV from "../../shaders/BasicVertexMVPWithUVAndNormals.vert.wgsl?raw";
 import BasicTextureSample from "../../shaders/BasicTextureSample-OpenGL-Like.frag.wgsl?raw";
+import {DeviceOrientationData, UserPosition} from "../../services/types.ts";
+import deviceOrientationService from "../../services/deviceOrientationService.ts";
 
 interface DirectionVisualizerProps {
-  direction: Quaternion;
+  position?: UserPosition;
+  startPosition?: UserPosition;
 }
 
-const PageContainer: FC<DirectionVisualizerProps> = ({ direction }) => {
+const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const arrowRef = useRef<GameObject | null>(null);
+  const [deviceOrientation, setDeviceOrientation] = useState<DeviceOrientationData | null>(null);
 
   // Initialisation du jeu (uniquement au montage)
   useEffect(() => {
@@ -53,6 +56,10 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ direction }) => {
     });
     arrowRef.current = arrowObject;
 
+    deviceOrientationService.startTracking((orientation) => {
+      setDeviceOrientation(orientation);
+    });
+
     // Nettoyer à la destruction
     return () => {
       gameEngineWindowRef?.dispose();
@@ -62,9 +69,9 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ direction }) => {
 
   useEffect(() => {
     if (arrowRef.current) {
-      arrowRef.current.transform.rotation.setFromQuaternion(direction);
+      //arrowRef.current.transform.rotation.setFromQuaternion(direction);
     }
-  }, [direction]);
+  }, [position, startPosition, deviceOrientation]);
 
   return (
       <canvas ref={canvasRef} style={{width:128+"px", height:64+"px"}}/>

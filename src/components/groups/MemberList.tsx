@@ -74,12 +74,14 @@ const MemberList: FC<MemberListProps> = ({
         {members.map((member) => {
           const position = positionMap[member.id];
           if (member.id === authService.state.profile?.id) return;
+          const startPosition = positionMap[authService.state.profile?.id];
           
           return (
             <BigMemberCard
               key={member.id}
               member={member}
               position={position}
+              startPosition={startPosition}
             />
           );
         })}
