@@ -9,7 +9,6 @@ import locationSharingService from '../services/locationSharingService'
 import { UserPosition, Member, PointOfInterest, Group } from "../services/types"
 import MemberList from '../components/groups/MemberList'
 import SlidingPanel from '../components/layout/SlidingPanel'
-import ChevronIcon from '../components/icons/ChevronIcon'
 import Conversation from '../components/Messages/Conversation'
 import authService from '../services/authService'
 import Button from '../components/common/Button'
@@ -162,6 +161,7 @@ const GroupDetails: FC = () => {
             // Refetch points from backend
             const updatedPoints = await pointsOfInterestService.getGroupPoints(id);
             setPoints(updatedPoints);
+            console.log(updatedPoints)
         } catch (err) {
             console.error('Failed to add point:', err);
             setError('Failed to add point of interest');

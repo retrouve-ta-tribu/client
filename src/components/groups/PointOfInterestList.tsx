@@ -18,7 +18,7 @@ const PointOfInterestList: FC<PointOfInterestListProps> = ({ points, onRemovePoi
                     <div>
                         <h3 className="font-medium text-gray-900">{point.name}</h3>
                         <p className="text-sm text-gray-500">
-                    // coords
+                        {point.location.coordinates[0]}, {point.location.coordinates[1]}
                         </p>
                     </div>
                     <button
