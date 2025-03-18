@@ -214,7 +214,7 @@ const GroupDetails: FC = () => {
                 title={group.name}
             />
 
-            <div className="p-4 pb-20">
+            <div className="p-4 pb-[76px] h-full overflow-y-auto">
                 {error && (
                     <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
                         {error}
