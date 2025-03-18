@@ -152,14 +152,16 @@ const GroupDetails: FC = () => {
 
         setIsAddingPoint(true);
         try {
-            const newPoint = await pointsOfInterestService.addPoint(
+            await pointsOfInterestService.addPoint(
                 id,
                 pointName,
                 myPosition.latitude,
                 myPosition.longitude
             );
-            setPoints(prev => [...prev, newPoint]);
             setPointName('');
+            // Refetch points from backend
+            const updatedPoints = await pointsOfInterestService.getGroupPoints(id);
+            setPoints(updatedPoints);
         } catch (err) {
             console.error('Failed to add point:', err);
             setError('Failed to add point of interest');
@@ -171,7 +173,9 @@ const GroupDetails: FC = () => {
     const handleRemovePoint = async (pointId: string) => {
         try {
             await pointsOfInterestService.removePoint(id, pointId);
-            setPoints(prev => prev.filter(p => p._id !== pointId));
+            // Refetch points from backend
+            const updatedPoints = await pointsOfInterestService.getGroupPoints(id);
+            setPoints(updatedPoints);
         } catch (err) {
             console.error('Failed to remove point:', err);
             setError('Failed to remove point of interest');
@@ -250,7 +254,7 @@ const GroupDetails: FC = () => {
                             value={pointName}
                             onChange={(e) => setPointName(e.target.value)}
                             placeholder="Nom du point d'intérêt"
-                            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            className="flex-1 pl-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                             disabled={isAddingPoint}
                         />
                         <Button
