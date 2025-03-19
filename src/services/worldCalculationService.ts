@@ -36,7 +36,8 @@ class WorldCalculationService {
         const { alpha } = deviceOrientation;
 
         if (alpha === null) {
-            throw new Error('Device orientation data (alpha) is not available');
+            const arrowDirection = (targetBearing + 360) % 360;
+            return arrowDirection;
         }
 
         // Adjust the target bearing based on the device's compass direction (alpha)
