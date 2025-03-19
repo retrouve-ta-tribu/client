@@ -7,7 +7,7 @@ export interface AuthUser {
 }
 
 export interface AuthProfile {
-    googleId: string;
+    id: string;
     name: string;
     email: string;
     picture: string;
