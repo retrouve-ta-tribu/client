@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import Friends from './pages/Friends'
 import { useAuthState } from './hooks/useAuthState'
 import CreateGroup from './pages/CreateGroup'
+import EditGroup from './pages/EditGroup'
 
 function App() {
     const { profile, isLoading } = useAuthState();
@@ -23,6 +24,10 @@ function App() {
                 <Route
                     path="/group/:id"
                     element={profile ? <GroupDetails /> : <Navigate to="/login" replace />}
+                />
+                <Route
+                    path="/group/:id/edit"
+                    element={profile ? <EditGroup /> : <Navigate to="/login" replace />}
                 />
                 <Route
                     path="/friends"
