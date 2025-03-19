@@ -4,8 +4,6 @@ import MemberCard from './MemberCard';
 import BigMemberCard from './BigMemberCard';
 import { Member, UserPosition } from '../../services/types';
 import authService from '../../services/authService';
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
-import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 export interface MemberListProps {
@@ -23,20 +21,6 @@ const MemberList: FC<MemberListProps> = ({
       setIsLoading(false);
     }
   }, [userPositions]);
-
-  const createCustomMarker = (name: string) => {
-    return L.divIcon({
-      className: 'custom-marker', // Classe CSS pour le style
-      html: `
-      <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
-        <img src="/marker-icon.png" alt="Marker" style="width: 25px; height: 41px;"/>
-        <div style="margin-top: 5px; font-size: 12px; color: black; white-space: nowrap;" class="font-semibold">${name}</div>
-      </div>
-    `,
-      iconSize: [25, 41], // Taille de l'icône
-      iconAnchor: [12, 41], // Point d'ancrage de l'icône
-    });
-  };
 
   // Create a map of user positions by userId for quick lookup
   const positionMap: Record<string, UserPosition> = userPositions.reduce((map, position) => {
@@ -85,21 +69,6 @@ const MemberList: FC<MemberListProps> = ({
           );
         })}
       </div>
-
-      <MapContainer center={[48.8566, 2.3522]} zoom={5} style={{ height: '400px', width: '100%' }}>
-        <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        {userPositions.map((position, index) => (
-            <Marker
-                key={index}
-                position={[position.latitude, position.longitude]}
-                icon={createCustomMarker(members[index].name)} // Utiliser le marqueur personnalisé
-            >
-            </Marker>
-        ))}
-      </MapContainer>
     </div>
   );
 };

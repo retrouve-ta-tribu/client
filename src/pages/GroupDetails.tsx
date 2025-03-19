@@ -6,7 +6,7 @@ import PageHeader from '../components/layout/PageHeader'
 import NotFound from '../components/common/NotFound'
 import Spinner from '../components/common/Spinner'
 import locationSharingService from '../services/locationSharingService'
-import { UserPosition, Member, PointOfInterest, Group } from "../services/types"
+import { UserPosition, Member, PointOfInterest } from "../services/types"
 import MemberList from '../components/groups/MemberList'
 import SlidingPanel from '../components/layout/SlidingPanel'
 import Conversation from '../components/messages/Conversation'
@@ -14,6 +14,8 @@ import authService from '../services/authService'
 import Button from '../components/common/Button'
 import pointsOfInterestService from '../services/pointsOfInterestService'
 import PointOfInterestList from '../components/groups/PointOfInterestList'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import L from "leaflet";
 
 const GroupDetails: FC = () => {
     const params = useParams();
@@ -31,6 +33,20 @@ const GroupDetails: FC = () => {
     const [points, setPoints] = useState<PointOfInterest[]>([]);
     const [pointName, setPointName] = useState('');
     const [isAddingPoint, setIsAddingPoint] = useState(false);
+
+    const createCustomMarker = (name: string) => {
+        return L.divIcon({
+            className: 'custom-marker', // Classe CSS pour le style
+            html: `
+      <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+        <img src="/marker-icon.png" alt="Marker" style="width: 25px; height: 41px;"/>
+        <div style="margin-top: 5px; font-size: 12px; color: black; white-space: nowrap;" class="font-semibold">${name}</div>
+      </div>
+    `,
+            iconSize: [25, 41], // Taille de l'icône
+            iconAnchor: [12, 41], // Point d'ancrage de l'icône
+        });
+    };
 
     // Load group data
     useEffect(() => {
@@ -76,7 +92,7 @@ const GroupDetails: FC = () => {
                 setIsGettingLocation(true);
                 await locationSharingService.startSharing(
                     id,
-                    authService.state.profile?.id
+                    authService.state.profile?.id!
                 );
                 setIsGettingLocation(false);
                 setIsSharing(true);
@@ -287,6 +303,23 @@ const GroupDetails: FC = () => {
                         points={points}
                         onRemovePoint={handleRemovePoint}
                     />
+                </div>
+
+                <div className="mt-8">
+                    <MapContainer center={[48.8566, 2.3522]} zoom={5} style={{ height: '400px', width: '100%' }}>
+                        <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        />
+                        {userPositions.map((position, index) => (
+                            <Marker
+                                key={index}
+                                position={[position.latitude, position.longitude]}
+                                icon={createCustomMarker(memberObjects[index].name)} // Utiliser le marqueur personnalisé
+                            >
+                            </Marker>
+                        ))}
+                    </MapContainer>
                 </div>
             </div>
 
