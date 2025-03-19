@@ -55,3 +55,32 @@ export interface ChatMessage {
   userName?: string;
   userPicture?: string;
 }
+
+/**
+ * Represents a user's authentication profile
+ * @property id - The user's Google ID
+ * @property name - The user's display name
+ * @property email - The user's email address
+ * @property picture - The user's profile picture URL
+ */
+export interface AuthProfile {
+    id: string;
+    name: string;
+    email: string;
+    picture: string;
+}
+
+/**
+ * Represents a point of interest in a group
+ * @property _id - Unique identifier of the point
+ * @property name - Name of the point of interest
+ * @property location - GeoJSON Point location
+ */
+export interface PointOfInterest {
+    _id: string;
+    name: string;
+    location: {
+        type: 'Point';
+        coordinates: [number, number]; // [longitude, latitude]
+    };
+}

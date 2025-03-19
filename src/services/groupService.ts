@@ -1,4 +1,6 @@
 import authService from './authService';
+import { Member } from './types';
+import socketService, { RoomEvents } from './socketService';
 
 /**
  * Represents a group's information in the system
@@ -32,9 +34,19 @@ interface CreateGroupRequest {
   members: string[];
 }
 
+export enum GroupEvents {
+    MembersChanged = 'MembersChanged'
+}
+
+interface GroupBroadcastData {
+    type: GroupEvents;
+    groupId: string;
+}
+
 class GroupService {
   private static instance: GroupService;
   private baseUrl: string;
+  private memberListeners: Map<string, Set<() => void>> = new Map(); // groupId -> Set of listeners
 
   private constructor() {
     const apiUrl = import.meta.env.VITE_API_URL;
@@ -42,7 +54,16 @@ class GroupService {
       throw new Error('VITE_API_URL environment variable is not defined');
     }
     this.baseUrl = `${apiUrl}/api`;
+
+    // Set up listener for group updates
+    socketService.addListener<GroupBroadcastData>(RoomEvents.Broadcast, this.handleGroupUpdate);
   }
+
+  private handleGroupUpdate = (data: GroupBroadcastData): void => {
+    if (data.type === GroupEvents.MembersChanged) {
+      this.notifyListeners(data.groupId);
+    }
+  };
 
   /**
    * Get the singleton instance of the GroupService
@@ -182,6 +203,108 @@ class GroupService {
         name: member.displayName,
         picture: member.picture
     }));
+  }
+
+  /**
+   * Add a member to a group
+   * @param groupId - The ID of the group to add the member to
+   * @param userId - The ID of the user to add to the group
+   * @returns A promise that resolves when the member is added
+   */
+  public async addMember(groupId: string, userId: string): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseUrl}/groups/${groupId}/members/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || `Failed to add member: ${response.statusText}`);
+      }
+
+      // Broadcast the change to all clients
+      this.broadcastMembersChanged(groupId);
+    } catch (error) {
+      console.error('Error adding member:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Remove a member from a group
+   * @param groupId - The ID of the group to remove the member from
+   * @param userId - The ID of the user to remove from the group
+   * @returns A promise that resolves when the member is removed
+   */
+  public async removeMember(groupId: string, userId: string): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseUrl}/groups/${groupId}/members/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || `Failed to remove member: ${response.statusText}`);
+      }
+
+      // Broadcast the change to all clients
+      this.broadcastMembersChanged(groupId);
+    } catch (error) {
+      console.error('Error removing member:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Add a listener for a group
+   * @param groupId - The ID of the group
+   * @param callback - The callback to add
+   */
+  addMemberListener(groupId: string, callback: () => void): void {
+    if (!this.memberListeners.has(groupId)) {
+      this.memberListeners.set(groupId, new Set());
+    }
+    this.memberListeners.get(groupId)?.add(callback);
+  }
+
+  /**
+   * Remove a listener for a group
+   * @param groupId - The ID of the group
+   * @param callback - The callback to remove
+   */
+  removeMemberListener(groupId: string, callback: () => void): void {
+    this.memberListeners.get(groupId)?.delete(callback);
+    if (this.memberListeners.get(groupId)?.size === 0) {
+      this.memberListeners.delete(groupId);
+    }
+  }
+
+  /**
+   * Notify listeners of a group
+   * @param groupId - The ID of the group
+   */
+  private notifyListeners(groupId: string): void {
+    this.memberListeners.get(groupId)?.forEach(callback => {
+      callback();
+    });
+  }
+
+  /**
+   * Broadcast a members changed event to all clients
+   * @param groupId - The ID of the group
+   */
+  private broadcastMembersChanged(groupId: string): void {
+    const broadcastData: GroupBroadcastData = {
+      type: GroupEvents.MembersChanged,
+      groupId
+    };
+    socketService.broadcast(groupId, broadcastData);
   }
 }
 
