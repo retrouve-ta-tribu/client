@@ -34,7 +34,7 @@ const BigMemberCard: React.FC<BigMemberCardProps> = ({
             <h3 className="font-medium text-gray-800">{member.name}</h3>
             <OnlineStatus isOnline={isOnline} />
           </div>
-          <p className="text-sm text-gray-600">{member.email}</p>
+          <p className="text-xs text-gray-600">{member.email}</p>
           {position ? (
             <div className="mt-1">
               <MemberLocation position={position} />
