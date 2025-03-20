@@ -34,12 +34,26 @@ const GroupDetails: FC = () => {
     const [pointName, setPointName] = useState('');
     const [isAddingPoint, setIsAddingPoint] = useState(false);
 
-    const createCustomMarker = (name: string) => {
+    const createCustomPersonMarker = (name: string) => {
         return L.divIcon({
             className: 'custom-marker', // Classe CSS pour le style
             html: `
       <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
         <img src="/marker-icon.png" alt="Marker" style="width: 25px; height: 41px;"/>
+        <div style="margin-top: 5px; font-size: 12px; color: black; white-space: nowrap;" class="font-semibold">${name}</div>
+      </div>
+    `,
+            iconSize: [25, 41], // Taille de l'icône
+            iconAnchor: [12, 41], // Point d'ancrage de l'icône
+        });
+    };
+
+    const createCustomPointMarker = (name: string) => {
+        return L.divIcon({
+            className: 'custom-marker', // Classe CSS pour le style
+            html: `
+      <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+        <img src="/marker-icon-point.png" alt="Marker" style="width: 25px; height: 41px;"/>
         <div style="margin-top: 5px; font-size: 12px; color: black; white-space: nowrap;" class="font-semibold">${name}</div>
       </div>
     `,
@@ -190,6 +204,7 @@ const GroupDetails: FC = () => {
 
         setIsAddingPoint(true);
         try {
+            console.log(myPosition)
             await pointsOfInterestService.addPoint(
                 id,
                 pointName,
@@ -316,7 +331,15 @@ const GroupDetails: FC = () => {
                             <Marker
                                 key={index}
                                 position={[position.latitude, position.longitude]}
-                                icon={createCustomMarker(memberObjects.find(member => member.id === position.userId)?.name || '')}
+                                icon={createCustomPersonMarker(memberObjects.find(member => member.id === position.userId)?.name || '')}
+                            >
+                            </Marker>
+                        ))}
+                        {points.map((position, index) => (
+                            <Marker
+                                key={index+userPositions.length}
+                                position={[position.location.coordinates[1], position.location.coordinates[0]]}
+                                icon={createCustomPointMarker(position.name)}
                             >
                             </Marker>
                         ))}
