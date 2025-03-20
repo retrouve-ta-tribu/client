@@ -91,7 +91,6 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
       cameraRef.current.transform.position.set(0, positionY, positionZ);
 
       // Convertir l'angle en radians et appliquer la rotation à la flèche
-      console.log(arrowDirection);
       arrowRef.current.transform.rotation.setFromQuaternion(arrowDirection);
     } catch (error) {
       console.error('Erreur lors du calcul de la direction :', error);
