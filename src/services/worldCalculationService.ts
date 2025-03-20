@@ -56,6 +56,33 @@ class WorldCalculationService {
     }
 
     /**
+     * Calculate the distance between two geographical points using the Haversine formula
+     * @param start The starting position (latitude, longitude)
+     * @param end The target position (latitude, longitude)
+     * @returns The distance in meters
+     */
+    calculateDistance(start: Position, end: Position): number {
+        const earthRadius = 6371000; // Earth's radius in meters
+
+        const startLat = this.toRadians(start.latitude);
+        const startLong = this.toRadians(start.longitude);
+        const endLat = this.toRadians(end.latitude);
+        const endLong = this.toRadians(end.longitude);
+
+        const dLat = endLat - startLat;
+        const dLong = endLong - startLong;
+
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(startLat) * Math.cos(endLat) *
+            Math.sin(dLong / 2) * Math.sin(dLong / 2);
+
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return earthRadius * c; // Distance in meters
+    }
+
+    /**
      * Convert degrees to radians
      * @param degrees The angle in degrees
      * @returns The angle in radians
