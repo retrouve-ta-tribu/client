@@ -7,7 +7,7 @@
 export interface Member {
   id: string;
   googleId: string;
-  displayName: string;
+  name: string;
   email: string;
   picture: string;
 }
