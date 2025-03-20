@@ -5,6 +5,7 @@ import {
   GameObject,
   MeshRenderBehavior,
   ObjLoader,
+  Quaternion,
   Sprunk, Vector3,
 } from 'sprunk-engine';
 import BasicVertexMVPWithUV from '../../shaders/BasicVertexMVPWithUVAndNormals.vert.wgsl?raw';
@@ -21,6 +22,7 @@ interface DirectionVisualizerProps {
 const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const arrowRef = useRef<GameObject | null>(null);
+  const cameraRef = useRef<GameObject | null>(null);
   const [deviceOrientation, setDeviceOrientation] = useState<DeviceOrientationData | null>(null);
 
   // Initialisation du jeu (uniquement au montage)
@@ -39,8 +41,7 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
     gameEngineWindow.root.addChild(camera);
     camera.addBehavior(new Camera(Math.PI / 6));
     camera.transform.position.z = 5;
-    camera.transform.position.y = 5;
-    camera.transform.rotation.rotateAroundAxis(Vector3.right(), -Math.PI / 4);
+    cameraRef.current = camera;
 
     // Créer l'objet flèche
     const arrowObject = new GameObject('Arrow');
@@ -62,13 +63,14 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
     return () => {
       gameEngineWindowRef?.dispose();
       arrowRef.current = null;
+      cameraRef.current = null;
       deviceOrientationService.stopTracking();
     };
   }, []);
 
   // Mettre à jour la rotation de la flèche
   useEffect(() => {
-    if (!arrowRef.current || !deviceOrientation || !position || !startPosition) return;
+    if (!arrowRef.current || !cameraRef.current || !deviceOrientation || !position || !startPosition) return;
 
     try {
       // Calculer l'angle de la cible par rapport à la position actuelle
@@ -79,6 +81,14 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
           targetBearing,
           deviceOrientation,
       );
+
+      const betaRad = deviceOrientation.beta ? worldCalculationService.toRadians(270 + deviceOrientation.beta) : 0;
+      const positionZ = Math.cos(betaRad) * 4;
+      const positionY = -Math.sin(betaRad) * 4;
+
+      const cameraOrientation = Quaternion.fromAxisAngle(new Vector3(1, 0, 0), betaRad);
+      cameraRef.current.transform.rotation.setFromQuaternion(cameraOrientation)
+      cameraRef.current.transform.position.set(0, positionY, positionZ);
 
       // Convertir l'angle en radians et appliquer la rotation à la flèche
       console.log(arrowDirection);
