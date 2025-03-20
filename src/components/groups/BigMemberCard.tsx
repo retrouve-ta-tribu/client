@@ -24,7 +24,7 @@ const BigMemberCard: React.FC<BigMemberCardProps> = ({
   const isOnline = !!position;
 
   return (
-    <div className={`p-4 ${isOnline ? 'bg-green-50 border-green-200' : 'bg-gray-100 border-gray-200'} rounded-lg shadow-sm border`}>
+    <div className={`p-2 ${isOnline ? 'bg-green-50 border-green-200' : 'bg-gray-100 border-gray-200'} rounded-lg shadow-sm border`}>
       <div className="flex items-center">
         <div className="mr-4">
           <img src={member.picture} alt={member.name} className="w-12 h-12 rounded-full" />
