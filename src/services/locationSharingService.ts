@@ -85,10 +85,10 @@ class LocationSharingService {
         
         // Set up interval to broadcast location periodically
         this.intervalId = window.setInterval(() => {
-            const position = geolocationService.getLastPosition();
+            /*const position = geolocationService.getLastPosition();
             if (position) {
                 this.broadcastLocation(position);
-            }
+            }*/
         }, 1000);
     }
 
