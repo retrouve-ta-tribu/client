@@ -319,7 +319,7 @@ const GroupDetails: FC = () => {
                 </div>
 
                 <div className="mt-8">
-                    <MapContainer center={[48.8566, 2.3522]} zoom={5} style={{ height: '400px', width: '100%' }}>
+                    <MapContainer center={[46.9, 6.71]} zoom={10} style={{ height: '400px', width: '100%' }}>
                         <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
