@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import {PointOfInterest, Position} from '../../services/types';
 import XIcon from '../icons/XIcon';
 import DirectionVisualizer from "../sprunk/DirectionVisualizer.tsx";
+import MemberLocation from "./MemberLocation.tsx";
 
 interface PointOfInterestCardProps {
     point: PointOfInterest;
@@ -16,9 +17,7 @@ const PointOfInterestCard: FC<PointOfInterestCardProps> = ({ point, myPosition, 
         >
             <div>
                 <h3 className="font-medium text-gray-900">{point.name}</h3>
-                <p className="text-xs text-gray-500">
-                    {point.location.coordinates[1]}, {point.location.coordinates[0]}
-                </p>
+                <MemberLocation position={{longitude: point.location.coordinates[0], latitude: point.location.coordinates[1]}} startPosition={myPosition}/>
             </div>
             <div>
                 { point.location.coordinates && myPosition && (

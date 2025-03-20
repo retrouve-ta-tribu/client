@@ -1,5 +1,5 @@
 import React from 'react';
-import {UserPosition} from "../../services/types.ts";
+import {Position, UserPosition} from "../../services/types.ts";
 import worldCalculationService from "../../services/worldCalculationService.ts";
 
 /**
@@ -8,12 +8,13 @@ import worldCalculationService from "../../services/worldCalculationService.ts";
  */
 interface MemberLocationProps {
   position: UserPosition;
-  startPosition?: UserPosition;
+  startPosition?: Position;
 }
 
 const MemberLocation: React.FC<MemberLocationProps> = ({ position, startPosition }) => {
   // Calculate how recent the location update is
   const getTimeSinceUpdate = (): string => {
+    if(!position.timestamp) return '';
     const now = Date.now();
     const secondsAgo = Math.floor((now - position.timestamp) / 1000);
     
