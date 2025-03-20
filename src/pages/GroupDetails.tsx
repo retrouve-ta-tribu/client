@@ -315,7 +315,7 @@ const GroupDetails: FC = () => {
                             <Marker
                                 key={index}
                                 position={[position.latitude, position.longitude]}
-                                icon={createCustomMarker(memberObjects[index].displayName)} // Utiliser le marqueur personnalisé
+                                icon={createCustomMarker(memberObjects[index].name)}
                             >
                             </Marker>
                         ))}
