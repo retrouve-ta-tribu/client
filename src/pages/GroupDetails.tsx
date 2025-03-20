@@ -39,7 +39,7 @@ const GroupDetails: FC = () => {
             html: `
       <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
         <img src="/marker-icon.png" alt="Marker" style="width: 25px; height: 41px;"/>
-        <div style="margin-top: 5px; font-size: 12px; color: black; white-space: nowrap;" class="font-semibold">${name}</div>
+        <div style="margin-top: 5px; font-size: 12px; color: white; white-space: nowrap;" class="font-semibold">${name}</div>
       </div>
     `,
             iconSize: [25, 41], // Taille de l'icône
@@ -53,7 +53,7 @@ const GroupDetails: FC = () => {
             html: `
       <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
         <img src="/marker-icon-point.png" alt="Marker" style="width: 25px; height: 41px;"/>
-        <div style="margin-top: 5px; font-size: 12px; color: black; white-space: nowrap;" class="font-semibold">${name}</div>
+        <div style="margin-top: 5px; font-size: 12px; color: white; white-space: nowrap;" class="font-semibold">${name}</div>
       </div>
     `,
             iconSize: [25, 41], // Taille de l'icône
@@ -319,10 +319,13 @@ const GroupDetails: FC = () => {
                 </div>
 
                 <div className="mt-8">
-                    <MapContainer center={[46.9, 6.71]} zoom={10} style={{ height: '400px', width: '100%' }}>
+                    <MapContainer center={[46.9, 6.71]} zoom={10}
+                                  zoomControl={false}  style={{ height: '400px', width: '100%' }}>
                         <TileLayer
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            url="https://api.maptiler.com/maps/satellite/{z}/{x}/{y}@2x.jpg?key=32M5AZlrVO120Ncyc1J5"
+                            attribution='<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
+                            maxNativeZoom={18}
+                            maxZoom={22}
                         />
                         {userPositions.map((position, index) => (
                             <Marker
