@@ -1,5 +1,6 @@
 import React from 'react';
 import {UserPosition} from "../../services/types.ts";
+import worldCalculationService from "../../services/worldCalculationService.ts";
 
 /**
  * Props for the MemberLocation component that displays a member's location
@@ -7,14 +8,10 @@ import {UserPosition} from "../../services/types.ts";
  */
 interface MemberLocationProps {
   position: UserPosition;
+  startPosition?: UserPosition;
 }
 
-const MemberLocation: React.FC<MemberLocationProps> = ({ position }) => {
-  // Format the coordinates to be more readable
-  const formatCoordinate = (coord: number): string => {
-    return coord.toFixed(6);
-  };
-
+const MemberLocation: React.FC<MemberLocationProps> = ({ position, startPosition }) => {
   // Calculate how recent the location update is
   const getTimeSinceUpdate = (): string => {
     const now = Date.now();
@@ -45,7 +42,9 @@ const MemberLocation: React.FC<MemberLocationProps> = ({ position }) => {
         />
       </svg>
       <span>
-            {formatCoordinate(position.latitude)}, {formatCoordinate(position.longitude)} • {getTimeSinceUpdate()}
+        {startPosition && position
+            ? `${Math.round(worldCalculationService.calculateDistance(startPosition, position))}m • ${getTimeSinceUpdate()}`
+            : getTimeSinceUpdate() }
       </span>
     </div>
   );
