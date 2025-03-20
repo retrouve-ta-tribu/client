@@ -24,7 +24,6 @@ const GroupDetails: FC = () => {
     const [group, setGroup] = useState<ServerGroup | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [userPositions, setUserPositions] = useState<UserPosition[]>([])
-    const [isSharing, setIsSharing] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const [isConnectingSocket, setIsConnectingSocket] = useState<boolean>(false)
     const [isGettingLocation, setIsGettingLocation] = useState<boolean>(false)
@@ -91,7 +90,6 @@ const GroupDetails: FC = () => {
 
         // Stop any existing location sharing
         locationSharingService.stopSharing();
-        setIsSharing(false);
         
         const startLocationSharing = async () => {
             try {
@@ -109,7 +107,6 @@ const GroupDetails: FC = () => {
                     authService.state.profile?.id!
                 );
                 setIsGettingLocation(false);
-                setIsSharing(true);
                 
                 // Add listener for location updates
                 locationSharingService.addLocationUpdateListener(handleLocationUpdates);
