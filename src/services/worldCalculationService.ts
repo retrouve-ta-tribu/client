@@ -1,4 +1,4 @@
-import {Quaternion} from "sprunk-engine";
+import {Quaternion, Vector3} from "sprunk-engine";
 import {DeviceOrientationData, Position} from "./types.ts";
 
 /**
@@ -46,8 +46,12 @@ class WorldCalculationService {
         const betaRad = this.toRadians(beta);
         const gammaRad = this.toRadians(gamma);
 
-        // Create a quaternion from the device's orientation (Euler angles in ZXY order)
-        const deviceOrientationQuaternion = Quaternion.fromEulerAngles(betaRad, alphaRad, gammaRad, "ZXY");
+        // Create a quaternion from the device's orientation
+        const deviceOrientationQuaternion = Quaternion.identity();
+        deviceOrientationQuaternion.rotateAroundAxis(new Vector3(0, 1, 0), alphaRad);
+        deviceOrientationQuaternion.rotateAroundAxis(new Vector3(1, 0, 0), betaRad);
+        deviceOrientationQuaternion.rotateAroundAxis(new Vector3(0, 0, 1), gammaRad);
+
 
         // Create a quaternion representing the target bearing (rotation around the Y-axis)
         const targetBearingQuaternion = Quaternion.fromEulerAngles(0, this.toRadians(targetBearing), 0);
