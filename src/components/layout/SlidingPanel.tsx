@@ -15,6 +15,7 @@ const SlidingPanel: FC<SlidingPanelProps> = ({ children }) => {
                     ? 'translate-y-0 shadow-[0_-4rem_12rem_-4rem_rgba(0,0,0,0.5)]' 
                     : 'translate-y-[calc(100%-58px)] shadow-[0_-3rem_3rem_-3rem_rgba(0,0,0,0.25)]'
             }`}
+            style={{ zIndex: 1000 }}
         >
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
