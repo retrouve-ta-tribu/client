@@ -39,7 +39,7 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
     // Créer la caméra
     const camera = new GameObject('Camera');
     gameEngineWindow.root.addChild(camera);
-    camera.addBehavior(new Camera(Math.PI / 6));
+    camera.addBehavior(new Camera(Math.PI / 4.5));
     camera.transform.position.z = 5;
     cameraRef.current = camera;
 

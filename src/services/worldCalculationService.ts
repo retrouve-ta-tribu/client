@@ -38,7 +38,7 @@ class WorldCalculationService {
 
         if (alpha === null) {
             // If orientation data is missing, return a quaternion based on the target bearing only
-            return Quaternion.fromEulerAngles(0, this.toRadians(targetBearing), 0);
+            return Quaternion.fromEulerAngles(0, this.toRadians(-targetBearing), 0);
         }
 
         // Convert device orientation angles to radians
@@ -49,7 +49,7 @@ class WorldCalculationService {
         deviceOrientationQuaternion.rotateAroundAxis(new Vector3(0, 1, 0), -alphaRad);
 
         // Create a quaternion representing the target bearing (rotation around the Y-axis)
-        const targetBearingQuaternion = Quaternion.fromEulerAngles(0, this.toRadians(targetBearing), 0);
+        const targetBearingQuaternion = Quaternion.fromEulerAngles(0, this.toRadians(-targetBearing), 0);
 
         // Combine the device orientation and target bearing quaternions
         return deviceOrientationQuaternion.clone().multiply(targetBearingQuaternion);
