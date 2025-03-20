@@ -9,13 +9,13 @@ import {
 } from 'sprunk-engine';
 import BasicVertexMVPWithUV from '../../shaders/BasicVertexMVPWithUVAndNormals.vert.wgsl?raw';
 import BasicTextureSample from '../../shaders/BasicTextureSample-OpenGL-Like.frag.wgsl?raw';
-import { DeviceOrientationData, UserPosition } from '../../services/types.ts';
+import { DeviceOrientationData, Position } from '../../services/types.ts';
 import deviceOrientationService from '../../services/deviceOrientationService.ts';
 import worldCalculationService from '../../services/worldCalculationService.ts';
 
 interface DirectionVisualizerProps {
-  position: UserPosition; // Position cible
-  startPosition: UserPosition; // Position de départ
+  position: Position;
+  startPosition: Position;
 }
 
 const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }) => {
