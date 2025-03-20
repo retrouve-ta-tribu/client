@@ -1,4 +1,4 @@
-import { UserPosition, DeviceOrientationData } from "./types.ts";
+import {DeviceOrientationData, Position} from "./types.ts";
 
 /**
  * Service for calculating the arrow direction based on user position, target position, and device orientation
@@ -10,7 +10,7 @@ class WorldCalculationService {
      * @param end The target position (latitude, longitude)
      * @returns The bearing angle in degrees (0-360)
      */
-    calculateBearing(start: UserPosition, end: UserPosition): number {
+    calculateBearing(start: Position, end: Position): number {
         const startLat = this.toRadians(start.latitude);
         const startLong = this.toRadians(start.longitude);
         const endLat = this.toRadians(end.latitude);
