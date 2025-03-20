@@ -301,6 +301,7 @@ const GroupDetails: FC = () => {
 
                     <PointOfInterestList 
                         points={points}
+                        myPosition={userPositions.find(pos => pos.userId === authService.state.profile?.id) || { userId: '', latitude: 0, longitude: 0 }}
                         onRemovePoint={handleRemovePoint}
                     />
                 </div>
