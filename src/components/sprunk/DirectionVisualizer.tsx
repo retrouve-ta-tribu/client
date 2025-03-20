@@ -38,8 +38,8 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
     const camera = new GameObject('Camera');
     gameEngineWindow.root.addChild(camera);
     camera.addBehavior(new Camera(Math.PI / 6));
-    camera.transform.position.z = 4;
-    camera.transform.position.y = 4;
+    camera.transform.position.z = 5;
+    camera.transform.position.y = 5;
     camera.transform.rotation.rotateAroundAxis(Vector3.right(), -Math.PI / 4);
 
     // Créer l'objet flèche
@@ -89,7 +89,7 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
     }
   }, [position, startPosition, deviceOrientation]);
 
-  return <canvas ref={canvasRef} style={{ width: '128px', height: '64px' }} />;
+  return <canvas ref={canvasRef} style={{ width: '80px', height: '80px' }} />;
 };
 
 export default PageContainer;
