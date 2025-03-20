@@ -6,8 +6,10 @@
  */
 export interface Member {
   id: string;
-  name: string;
+  googleId: string;
+  displayName: string;
   email: string;
+  picture: string;
 }
 
 /**
@@ -36,6 +38,51 @@ export interface UserPosition {
   longitude: number;
   userId: string;
   timestamp: number;
+}
+
+/**
+ * Represents a message in a chat
+ * @property userId - Unique identifier of the user who sent the message
+ * @property content - Content of the message
+ * @property timestamp - Unix timestamp of when the message was sent
+ * @property userName - Display name of the user who sent the message
+ * @property userPicture - URL of the user's profile picture
+ */
+export interface ChatMessage {
+  userId: string;
+  content: string;
+  timestamp: number;
+  userName?: string;
+  userPicture?: string;
+}
+
+/**
+ * Represents a user's authentication profile
+ * @property id - The user's Google ID
+ * @property name - The user's display name
+ * @property email - The user's email address
+ * @property picture - The user's profile picture URL
+ */
+export interface AuthProfile {
+    id: string;
+    name: string;
+    email: string;
+    picture: string;
+}
+
+/**
+ * Represents a point of interest in a group
+ * @property _id - Unique identifier of the point
+ * @property name - Name of the point of interest
+ * @property location - GeoJSON Point location
+ */
+export interface PointOfInterest {
+    _id: string;
+    name: string;
+    location: {
+        type: 'Point';
+        coordinates: [number, number]; // [longitude, latitude]
+    };
 }
 
 /**

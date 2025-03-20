@@ -1,5 +1,5 @@
 import { FC, useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import NavBar from '../components/layout/NavBar';
 import Button from '../components/common/Button';
@@ -7,9 +7,11 @@ import PersonCard from '../components/users/PersonCard';
 import userService, { User } from '../services/userService';
 import groupService from '../services/groupService';
 import authService from '../services/authService';
+import ChevronIcon from '../components/icons/ChevronIcon';
 
-const CreateGroup: FC = () => {
+const EditGroup: FC = () => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState('groups');
   const [groupName, setGroupName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,6 +19,44 @@ const CreateGroup: FC = () => {
   const [selectedFriends, setSelectedFriends] = useState<User[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadGroupAndFriends = async () => {
+      if (!id) return;
+      
+      try {
+        setIsLoading(true);
+        // Load group data
+        const group = await groupService.getGroupById(id);
+        if (!group) {
+          throw new Error('Group not found');
+        }
+        setGroupName(group.name);
+
+        // Load group members
+        const members = await groupService.getGroupMembers(id);
+        const memberIds = members.map(member => member.id);
+
+        // Load all friends
+        const friendsList = await userService.getFriends();
+        setFriends(friendsList);
+
+        // Set selected friends based on group members
+        const selectedMembers = friendsList.filter(friend => 
+          memberIds.includes(friend.googleId) && friend.googleId !== authService.state.profile?.id
+        );
+        setSelectedFriends(selectedMembers);
+      } catch (err) {
+        console.error('Failed to load group data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load group data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadGroupAndFriends();
+  }, [id]);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -26,20 +66,6 @@ const CreateGroup: FC = () => {
       navigate('/');
     }
   };
-
-  useEffect(() => {
-    const loadFriends = async () => {
-      try {
-        const friendsList = await userService.getFriends();
-        setFriends(friendsList);
-      } catch (err) {
-        console.error('Failed to load friends:', err);
-        setError('Failed to load friends. Please try again later.');
-      }
-    };
-
-    loadFriends();
-  }, []);
 
   const filteredFriends = useMemo(() => {
     if (!searchTerm.trim()) return [];
@@ -62,51 +88,51 @@ const CreateGroup: FC = () => {
     });
   }, [searchTerm, friends, selectedFriends]);
 
-  const handleAddFriend = (friend: User) => {
+  const handleAddFriend = async (friend: User) => {
+    await groupService.addMember(id, friend.googleId);
+
     setSelectedFriends([...selectedFriends, friend]);
     setSearchTerm('');
   };
 
-  const handleRemoveFriend = (friendGoogleId: string | undefined) => {
-    if (!friendGoogleId) return;
-    setSelectedFriends(selectedFriends.filter(friend => friend.googleId !== friendGoogleId));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
-
+  const handleRemoveFriend = async (friendGoogleId: string | undefined) => {
+    if (!friendGoogleId || !id) return;
+    
     try {
-      const currentUserId = authService.state.profile?.id;
-
-      if (!currentUserId) {
-        throw new Error('You must be logged in to create a group');
-      }
-
-      const memberIds = [currentUserId, ...selectedFriends.map(friend => friend.googleId).filter((id): id is string => id !== undefined)];
-
-      await groupService.createGroup({
-        name: groupName.trim(),
-        members: memberIds
-      });
-
-      navigate('/');
+      await groupService.removeMember(id, friendGoogleId);
+      setSelectedFriends(selectedFriends.filter(friend => friend.googleId !== friendGoogleId));
     } catch (err) {
-      console.error('Failed to create group:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create group. Please try again later.');
-    } finally {
-      setIsSubmitting(false);
+      console.error('Failed to remove member:', err);
+      setError(err instanceof Error ? err.message : 'Failed to remove member');
     }
   };
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <NavBar activeTab={activeTab} onTabChange={handleTabChange} />
+        <div className="p-4">Loading...</div>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
       <div className="flex flex-col h-full max-h-screen">
-        <NavBar activeTab={activeTab} onTabChange={handleTabChange} />
-        
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => navigate(`/group/${id}`)} 
+              className="p-1 hover:bg-gray-100 cursor-pointer rounded-full"
+            >
+              <ChevronIcon direction="left" />
+            </button>
+            <h1 className="text-xl font-semibold">Modifier le groupe</h1>
+          </div>
+        </div>
+
         <div className="p-4">
-          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+          <form className="max-w-2xl mx-auto space-y-6">
             <div>
               <label htmlFor="groupName" className="block text-sm font-medium text-gray-700 mb-1">
                 Nom du groupe
@@ -119,6 +145,7 @@ const CreateGroup: FC = () => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Entrez le nom du groupe"
                 required
+                disabled
               />
             </div>
 
@@ -180,25 +207,6 @@ const CreateGroup: FC = () => {
                 {error}
               </div>
             )}
-
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => navigate('/')}
-              >
-                Annuler
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                disabled={groupName.trim() === '' || selectedFriends.length === 0}
-                isLoading={isSubmitting}
-                loadingText="Création..."
-              >
-                Créer le groupe
-              </Button>
-            </div>
           </form>
         </div>
       </div>
@@ -206,4 +214,4 @@ const CreateGroup: FC = () => {
   );
 };
 
-export default CreateGroup; 
+export default EditGroup; 

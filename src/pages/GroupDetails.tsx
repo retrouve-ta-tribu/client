@@ -1,23 +1,27 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState, FC } from 'react'
-import groupService, { Group } from '../services/groupService'
+import groupService, { Group as ServerGroup } from '../services/groupService'
 import PageContainer from '../components/layout/PageContainer'
 import PageHeader from '../components/layout/PageHeader'
 import NotFound from '../components/common/NotFound'
 import Spinner from '../components/common/Spinner'
 import locationSharingService from '../services/locationSharingService'
-import { UserPosition, Member } from "../services/types.ts"
+import { UserPosition, Member, PointOfInterest } from "../services/types"
 import MemberList from '../components/groups/MemberList'
-import SlidingPanel from '../components/layout/SlidingPanel.tsx'
-import ChevronIcon from '../components/icons/ChevronIcon'
-import Conversation from '../components/Messages/Conversation'
+import SlidingPanel from '../components/layout/SlidingPanel'
+import Conversation from '../components/messages/Conversation'
 import authService from '../services/authService'
+import Button from '../components/common/Button'
+import pointsOfInterestService from '../services/pointsOfInterestService'
+import PointOfInterestList from '../components/groups/PointOfInterestList'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import L from "leaflet";
 
 const GroupDetails: FC = () => {
     const params = useParams();
     const navigate = useNavigate();
     const id = params.id || '';
-    const [group, setGroup] = useState<Group | null>(null)
+    const [group, setGroup] = useState<ServerGroup | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [userPositions, setUserPositions] = useState<UserPosition[]>([])
     const [isSharing, setIsSharing] = useState<boolean>(false)
@@ -25,6 +29,24 @@ const GroupDetails: FC = () => {
     const [isConnectingSocket, setIsConnectingSocket] = useState<boolean>(false)
     const [isGettingLocation, setIsGettingLocation] = useState<boolean>(false)
     const [memberObjects, setMemberObjects] = useState<Member[]>([]);
+    const [hasUnreadMessage, setHasUnreadMessage] = useState<boolean>(false);
+    const [points, setPoints] = useState<PointOfInterest[]>([]);
+    const [pointName, setPointName] = useState('');
+    const [isAddingPoint, setIsAddingPoint] = useState(false);
+
+    const createCustomMarker = (name: string) => {
+        return L.divIcon({
+            className: 'custom-marker', // Classe CSS pour le style
+            html: `
+      <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+        <img src="/marker-icon.png" alt="Marker" style="width: 25px; height: 41px;"/>
+        <div style="margin-top: 5px; font-size: 12px; color: black; white-space: nowrap;" class="font-semibold">${name}</div>
+      </div>
+    `,
+            iconSize: [25, 41], // Taille de l'icône
+            iconAnchor: [12, 41], // Point d'ancrage de l'icône
+        });
+    };
 
     // Load group data
     useEffect(() => {
@@ -70,7 +92,7 @@ const GroupDetails: FC = () => {
                 setIsGettingLocation(true);
                 await locationSharingService.startSharing(
                     id,
-                    authService.state.profile?.id
+                    authService.state.profile?.id!
                 );
                 setIsGettingLocation(false);
                 setIsSharing(true);
@@ -107,6 +129,9 @@ const GroupDetails: FC = () => {
             
             try {
                 const members = await groupService.getGroupMembers(id);
+                if (members.length > 0 && !members.some(member => parseInt(member.id) === parseInt(authService.state.profile?.id))) {
+                    navigate('/');
+                }
                 setMemberObjects(members);
             } catch (err) {
                 console.error('Failed to load group members:', err);
@@ -114,8 +139,82 @@ const GroupDetails: FC = () => {
             }
         };
 
+        // Add members listener for real-time updates
+        const handleMembersUpdate = () => {
+            loadGroupMembers();
+        };
+        
         loadGroupMembers();
+        groupService.addMemberListener(id, handleMembersUpdate);
+        
+        return () => {
+            groupService.removeMemberListener(id, handleMembersUpdate);
+        };
     }, [group, id]);
+
+    // Load points of interest
+    useEffect(() => {
+        const loadPoints = async () => {
+            if (!id) return;
+            try {
+                const points = await pointsOfInterestService.getGroupPoints(id);
+                setPoints(points);
+            } catch (err) {
+                console.error('Failed to load points:', err);
+                setError('Failed to load points of interest');
+            }
+        };
+
+        // Add points listener for real-time updates
+        const handlePointsUpdate = () => {
+            loadPoints();
+        };
+        
+        loadPoints();
+        pointsOfInterestService.addPointsListener(id, handlePointsUpdate);
+        
+        return () => {
+            pointsOfInterestService.removePointsListener(id, handlePointsUpdate);
+        };
+    }, [id]);
+
+    const handleAddPoint = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!pointName.trim() || !userPositions.length) return;
+
+        const myPosition = userPositions.find(pos => pos.userId === authService.state.profile?.id);
+        if (!myPosition) {
+            setError('Your location is not available');
+            return;
+        }
+
+        setIsAddingPoint(true);
+        try {
+            await pointsOfInterestService.addPoint(
+                id,
+                pointName,
+                myPosition.latitude,
+                myPosition.longitude
+            );
+            setPointName('');
+            // Points will be automatically updated through WebSocket
+        } catch (err) {
+            console.error('Failed to add point:', err);
+            setError('Failed to add point of interest');
+        } finally {
+            setIsAddingPoint(false);
+        }
+    };
+
+    const handleRemovePoint = async (pointId: string) => {
+        try {
+            await pointsOfInterestService.removePoint(id, pointId);
+            // Points will be automatically updated through WebSocket
+        } catch (err) {
+            console.error('Failed to remove point:', err);
+            setError('Failed to remove point of interest');
+        }
+    };
 
     if (isLoading) {
         return (
@@ -140,20 +239,11 @@ const GroupDetails: FC = () => {
     return (
         <PageContainer>
             <PageHeader 
-                title={
-                    <div className="flex items-center gap-2">
-                        <button 
-                            onClick={() => navigate('/')} 
-                            className="p-1 hover:bg-gray-100 cursor-pointer rounded-full"
-                        >
-                            <ChevronIcon direction="left" />
-                        </button>
-                        {group.name}
-                    </div>
-                }
+                backLink="/"
+                title={group.name}
             />
 
-            <div className="p-4 pb-20">
+            <div className="p-4 pb-[76px] h-full overflow-y-auto">
                 {error && (
                     <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
                         {error}
@@ -174,15 +264,75 @@ const GroupDetails: FC = () => {
                     </div>
                 )}
                 
+                <div className="flex justify-between items-center">
+                    <h2 className="text-lg font-medium text-gray-700">Membres</h2>
+                    <Button
+                        variant="secondary"
+                        onClick={() => navigate(`/group/${id}/edit`)}
+                    >
+                        Modifier
+                    </Button>
+                </div>
+                
                 <MemberList 
                     members={memberObjects}
                     userPositions={userPositions}
                 />
+
+                <div className="mt-8">
+                    <h2 className="text-lg font-medium text-gray-700 mb-4">Points d'intérêt</h2>
+                    
+                    <form onSubmit={handleAddPoint} className="mb-4 flex gap-2">
+                        <input
+                            type="text"
+                            value={pointName}
+                            onChange={(e) => setPointName(e.target.value)}
+                            placeholder="Nom du point"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            disabled={isAddingPoint}
+                        />
+                        <Button
+                            type="submit"
+                            disabled={isAddingPoint || !pointName.trim() || !userPositions.length}
+                        >
+                            {isAddingPoint ? 'Ajout...' : 'Créer'}
+                        </Button>
+                    </form>
+
+                    <PointOfInterestList 
+                        points={points}
+                        onRemovePoint={handleRemovePoint}
+                    />
+                </div>
+
+                <div className="mt-8">
+                    <MapContainer center={[48.8566, 2.3522]} zoom={5} style={{ height: '400px', width: '100%' }}>
+                        <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        />
+                        {userPositions.map((position, index) => (
+                            <Marker
+                                key={index}
+                                position={[position.latitude, position.longitude]}
+                                icon={createCustomMarker(memberObjects[index].displayName)} // Utiliser le marqueur personnalisé
+                            >
+                            </Marker>
+                        ))}
+                    </MapContainer>
+                </div>
             </div>
 
-            <SlidingPanel>
+            <SlidingPanel hasNotification={hasUnreadMessage} setHasNotification={setHasUnreadMessage}>
                 <div className="relative max-w-3xl mx-auto bg-white shadow-md h-full flex flex-col justify-between overflow-hidden">
-                    <Conversation/>
+                    <Conversation 
+                        group={{
+                            _id: group._id,
+                            name: group.name,
+                            members: memberObjects
+                        }} 
+                        setHasUnreadMessage={setHasUnreadMessage}
+                    />
                 </div>                
             </SlidingPanel>
         </PageContainer>
