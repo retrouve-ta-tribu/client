@@ -57,7 +57,7 @@ class DeviceOrientationService {
             onOrientationUpdate(newOrientation);
         };
 
-        window.addEventListener('deviceorientation', this.orientationListener);
+        window.addEventListener('deviceorientationabsolute', this.orientationListener);
     }
 
     /**
@@ -65,7 +65,7 @@ class DeviceOrientationService {
      */
     stopTracking(): void {
         if (this.orientationListener) {
-            window.removeEventListener('deviceorientation', this.orientationListener);
+            window.removeEventListener('deviceorientationabsolute', this.orientationListener);
             this.orientationListener = null;
         }
     }
