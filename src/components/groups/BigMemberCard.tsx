@@ -31,22 +31,24 @@ const BigMemberCard: React.FC<BigMemberCardProps> = ({
         </div>
         <div className="flex-1">
           <div className="flex items-center">
-            <h3 className="text-lg font-medium text-gray-800">{member.name}</h3>
+            <h3 className="font-medium text-gray-800">{member.name}</h3>
             <OnlineStatus isOnline={isOnline} />
           </div>
           <p className="text-sm text-gray-600">{member.email}</p>
           {position ? (
-            <div className="mt-2">
+            <div className="mt-1">
               <MemberLocation position={position} />
             </div>
           ) : (
-            <div className="mt-2">
+            <div className="mt-1">
               <LocationUnavailable />
             </div>
           )}
         </div>
         <div>
-          <DirectionVisualizer position={position} startPosition={startPosition}/>
+          {position && startPosition && (
+              <DirectionVisualizer position={position} startPosition={startPosition} />
+          )}
         </div>
       </div>
     </div>
