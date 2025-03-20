@@ -16,8 +16,8 @@ const PointOfInterestCard: FC<PointOfInterestCardProps> = ({ point, myPosition, 
         >
             <div>
                 <h3 className="font-medium text-gray-900">{point.name}</h3>
-                <p className="text-sm text-gray-500">
-                    {point.location.coordinates[0]}, {point.location.coordinates[1]}
+                <p className="text-xs text-gray-500">
+                    {point.location.coordinates[1]}, {point.location.coordinates[0]}
                 </p>
             </div>
             <div>
