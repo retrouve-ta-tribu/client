@@ -80,7 +80,7 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
       const arrowDirection = worldCalculationService.calculateArrowDirection(
           targetBearing,
           deviceOrientation,
-      );
+      ).multiply(Quaternion.fromAxisAngle(Vector3.up(), Math.PI / 2))
 
       const betaRad = deviceOrientation.beta ? worldCalculationService.toRadians(270 + deviceOrientation.beta) : 0;
       const positionZ = Math.cos(betaRad) * 4;
