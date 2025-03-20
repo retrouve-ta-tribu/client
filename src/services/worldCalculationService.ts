@@ -1,3 +1,4 @@
+import {Quaternion} from "sprunk-engine";
 import {DeviceOrientationData, Position} from "./types.ts";
 
 /**
@@ -30,20 +31,29 @@ class WorldCalculationService {
      * Calculate the arrow direction based on device orientation and target bearing
      * @param targetBearing The bearing angle to the target (0-360)
      * @param deviceOrientation The current device orientation (alpha, beta, gamma)
-     * @returns The arrow direction in degrees (0-360)
+     * @returns A quaternion representing the arrow direction
      */
-    calculateArrowDirection(targetBearing: number, deviceOrientation: DeviceOrientationData): number {
-        const { alpha } = deviceOrientation;
+    calculateArrowDirection(targetBearing: number, deviceOrientation: DeviceOrientationData): Quaternion {
+        const { alpha, beta, gamma } = deviceOrientation;
 
-        if (alpha === null) {
-            const arrowDirection = (targetBearing + 360) % 360;
-            return arrowDirection;
+        if (alpha === null || beta === null || gamma === null) {
+            // If orientation data is missing, return a quaternion based on the target bearing only
+            return Quaternion.fromEulerAngles(0, this.toRadians(targetBearing), 0);
         }
 
-        // Adjust the target bearing based on the device's compass direction (alpha)
-        const arrowDirection = (targetBearing - alpha + 360) % 360;
+        // Convert device orientation angles to radians
+        const alphaRad = this.toRadians(alpha);
+        const betaRad = this.toRadians(beta);
+        const gammaRad = this.toRadians(gamma);
 
-        return arrowDirection;
+        // Create a quaternion from the device's orientation (Euler angles in ZXY order)
+        const deviceOrientationQuaternion = Quaternion.fromEulerAngles(betaRad, alphaRad, gammaRad, "ZXY");
+
+        // Create a quaternion representing the target bearing (rotation around the Y-axis)
+        const targetBearingQuaternion = Quaternion.fromEulerAngles(0, this.toRadians(targetBearing), 0);
+
+        // Combine the device orientation and target bearing quaternions
+        return deviceOrientationQuaternion.clone().multiply(targetBearingQuaternion);
     }
 
     /**

@@ -81,9 +81,8 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
       );
 
       // Convertir l'angle en radians et appliquer la rotation à la flèche
-      const angleInRadians = (arrowDirection * Math.PI) / 180;
-      console.log(angleInRadians);
-      arrowRef.current.transform.rotation.setFromEulerAngles(0, 0, angleInRadians);
+      console.log(arrowDirection);
+      arrowRef.current.transform.rotation.setFromQuaternion(arrowDirection);
     } catch (error) {
       console.error('Erreur lors du calcul de la direction :', error);
     }
