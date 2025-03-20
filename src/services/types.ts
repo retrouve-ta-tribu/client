@@ -28,16 +28,22 @@ export interface Group {
 
 /**
  * Represents a user's geographical position at a specific time
- * @property latitude - Geographical latitude coordinate
- * @property longitude - Geographical longitude coordinate
  * @property userId - Unique identifier of the user
  * @property timestamp - Unix timestamp of when the position was recorded
  */
-export interface UserPosition {
-  latitude: number;
-  longitude: number;
+export interface UserPosition extends Position{
   userId: string;
   timestamp: number;
+}
+
+/**
+ * Represents a geographical position
+ * @property latitude - Geographical latitude coordinate
+ * @property longitude - Geographical longitude coordinate
+ */
+export interface Position {
+    latitude: number;
+    longitude: number;
 }
 
 /**
