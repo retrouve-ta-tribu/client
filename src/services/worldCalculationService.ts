@@ -34,30 +34,25 @@ class WorldCalculationService {
      * @returns A quaternion representing the arrow direction
      */
     calculateArrowDirection(targetBearing: number, deviceOrientation: DeviceOrientationData): Quaternion {
-        const { alpha, beta, gamma } = deviceOrientation;
+        const { alpha } = deviceOrientation;
 
-        if (alpha === null || beta === null || gamma === null) {
+        if (alpha === null) {
             // If orientation data is missing, return a quaternion based on the target bearing only
             return Quaternion.fromEulerAngles(0, this.toRadians(targetBearing), 0);
         }
 
         // Convert device orientation angles to radians
         const alphaRad = this.toRadians(alpha);
-        const betaRad = this.toRadians(beta);
-        const gammaRad = this.toRadians(gamma);
 
         // Create a quaternion from the device's orientation
         const deviceOrientationQuaternion = Quaternion.identity();
         deviceOrientationQuaternion.rotateAroundAxis(new Vector3(0, 1, 0), -alphaRad);
-        //deviceOrientationQuaternion.rotateAroundAxis(new Vector3(0, 0, 1), (Math.PI/2) -betaRad);
-        //deviceOrientationQuaternion.rotateAroundAxis(new Vector3(1, 0, 0), -gammaRad);
-
 
         // Create a quaternion representing the target bearing (rotation around the Y-axis)
-        //const targetBearingQuaternion = Quaternion.fromEulerAngles(0, this.toRadians(targetBearing), 0);
+        const targetBearingQuaternion = Quaternion.fromEulerAngles(0, this.toRadians(targetBearing), 0);
 
         // Combine the device orientation and target bearing quaternions
-        return deviceOrientationQuaternion.clone()/*.multiply(targetBearingQuaternion)*/;
+        return deviceOrientationQuaternion.clone().multiply(targetBearingQuaternion);
     }
 
     /**
