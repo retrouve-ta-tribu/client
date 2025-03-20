@@ -1,49 +1,44 @@
-import {UserPosition} from "./types.ts";
+import { Event } from "sprunk-engine";
 
 /**
  * Service for handling geolocation functionality
  */
 class GeolocationService {
   private watchId: number | null = null;
-  private lastPosition: UserPosition | null = null;
+  private lastPosition: GeolocationPosition | null = null;
+  public onPositionUpdated: Event<GeolocationPosition> = new Event();
   
   /**
    * Start tracking the user's location
-   * @param userId The ID of the user to track
    * @param onPositionUpdate Callback function to call when position is updated
    * @returns Promise that resolves when tracking starts
    */
-  startTracking(userId: string, onPositionUpdate: (position: UserPosition) => void): Promise<void> {
+  startTracking(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
         reject(new Error('Geolocation is not supported by this browser'));
         return;
       }
+      if(this.watchId) return;
       
       // Clear any existing watch
       this.stopTracking();
       
       this.watchId = navigator.geolocation.watchPosition(
         (position) => {
-          const newPosition: UserPosition = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            userId,
-            timestamp: Date.now()
-          };
-          
-          this.lastPosition = newPosition;
-          onPositionUpdate(newPosition);
+          this.lastPosition = position;
+          this.onPositionUpdated.emit(position);
           resolve();
         },
         (error) => {
           console.error('Error getting location:', error);
+          this.watchId = null;
           reject(error);
         },
         {
           enableHighAccuracy: true,
           maximumAge: 0,
-          timeout: 5000
+          timeout: 10000
         }
       );
     });
@@ -63,16 +58,15 @@ class GeolocationService {
    * Get the last known position
    * @returns The last known position or null if not available
    */
-  getLastPosition(): UserPosition | null {
+  getLastPosition(): GeolocationPosition | null {
     return this.lastPosition;
   }
   
   /**
    * Get the current position once
-   * @param userId The ID of the user
    * @returns Promise that resolves with the current position
    */
-  getCurrentPosition(userId: string): Promise<UserPosition> {
+  getCurrentPosition(): Promise<GeolocationPosition> {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
         reject(new Error('Geolocation is not supported by this browser'));
@@ -81,15 +75,8 @@ class GeolocationService {
       
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const newPosition: UserPosition = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            userId,
-            timestamp: Date.now()
-          };
-          
-          this.lastPosition = newPosition;
-          resolve(newPosition);
+          this.lastPosition = position;
+          resolve(position);
         },
         (error) => {
           console.error('Error getting location:', error);
@@ -98,7 +85,7 @@ class GeolocationService {
         {
           enableHighAccuracy: true,
           maximumAge: 0,
-          timeout: 5000
+          timeout: 10000
         }
       );
     });

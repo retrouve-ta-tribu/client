@@ -65,7 +65,7 @@ class WorldCalculationService {
      * @param degrees The angle in degrees
      * @returns The angle in radians
      */
-    private toRadians(degrees: number): number {
+    public toRadians(degrees: number): number {
         return degrees * (Math.PI / 180);
     }
 }

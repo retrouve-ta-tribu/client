@@ -73,8 +73,14 @@ class LocationSharingService {
         socketService.addListener<IncomingPositionBroadcastData>(RoomEvents.Broadcast, this.handleLocationUpdate);
         
         // Start tracking location and broadcasting updates
-        await geolocationService.startTracking(userId, (position) => {
-            this.broadcastLocation(position);
+        await geolocationService.startTracking();
+        geolocationService.onPositionUpdated.addObserver((position) => {
+            this.broadcastLocation({ 
+                longitude: position.coords.longitude,
+                latitude: position.coords.latitude,
+                userId,
+                timestamp: Date.now()
+            });
         });
         
         // Set up interval to broadcast location periodically
