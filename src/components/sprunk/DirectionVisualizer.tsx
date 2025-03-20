@@ -82,7 +82,7 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
           deviceOrientation,
       ).multiply(Quaternion.fromAxisAngle(Vector3.up(), Math.PI / 2))
 
-      const betaRad = deviceOrientation.beta ? worldCalculationService.toRadians(270 + deviceOrientation.beta) : 0;
+      const betaRad = deviceOrientation.beta ? worldCalculationService.toRadians(270 + deviceOrientation.beta) : -Math.PI / 4;
       const positionZ = Math.cos(betaRad) * 4;
       const positionY = -Math.sin(betaRad) * 4;
 
