@@ -1,6 +1,5 @@
 import React from 'react';
 import MemberLocation from './MemberLocation';
-import LocationUnavailable from './LocationUnavailable';
 import OnlineStatus from './OnlineStatus';
 import {Member, UserPosition} from "../../services/types.ts";
 import DirectionVisualizer from "../sprunk/DirectionVisualizer.tsx";
@@ -36,15 +35,9 @@ const MemberCard: React.FC<MemberCardProps> = ({
           <OnlineStatus isOnline={isOnline} />
         </div>
         <p className="text-xs text-gray-600">{member.email}</p>
-        {position ? (
-          <div className="mt-1">
-            <MemberLocation position={position} startPosition={startPosition}/>
-          </div>
-        ) : (
-          <div className="mt-1">
-            <LocationUnavailable />
-          </div>
-        )}
+        <div className="mt-1">
+          <MemberLocation position={position} startPosition={startPosition} />
+        </div>
       </div>
       <div>
         {position && startPosition && (
