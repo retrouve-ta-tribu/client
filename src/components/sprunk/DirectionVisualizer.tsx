@@ -25,25 +25,25 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
   const cameraRef = useRef<GameObject | null>(null);
   const [deviceOrientation, setDeviceOrientation] = useState<DeviceOrientationData | null>(null);
 
-  // Initialisation du jeu (uniquement au montage)
+  // Game initialization (only on mount)
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
 
-    // Initialiser le jeu Sprunk
+    // Initialize Sprunk game
     const gameEngineWindow: GameEngineWindow | null = Sprunk.newGame(canvas, false, [
       'RenderGameEngineComponent',
     ]);
     const gameEngineWindowRef = gameEngineWindow;
 
-    // Créer la caméra
+    // Create camera
     const camera = new GameObject('Camera');
     gameEngineWindow.root.addChild(camera);
     camera.addBehavior(new Camera(Math.PI / 4.5));
     camera.transform.position.z = 5;
     cameraRef.current = camera;
 
-    // Créer l'objet flèche
+    // Create arrow object
     const arrowObject = new GameObject('Arrow');
     gameEngineWindow.root.addChild(arrowObject);
     ObjLoader.load('/arrow.obj').then((obj) => {
@@ -54,12 +54,12 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
     });
     arrowRef.current = arrowObject;
 
-    // Démarrer le suivi de l'orientation de l'appareil
+    // Start tracking device orientation
     deviceOrientationService.startTracking((orientation) => {
       setDeviceOrientation(orientation);
     });
 
-    // Nettoyer à la destruction
+    // Clean up on destruction
     return () => {
       gameEngineWindowRef?.dispose();
       arrowRef.current = null;
@@ -68,15 +68,15 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
     };
   }, []);
 
-  // Mettre à jour la rotation de la flèche
+  // Update arrow rotation
   useEffect(() => {
     if (!arrowRef.current || !cameraRef.current || !deviceOrientation || !position || !startPosition) return;
 
     try {
-      // Calculer l'angle de la cible par rapport à la position actuelle
+      // Calculate target angle relative to current position
       const targetBearing = worldCalculationService.calculateBearing(startPosition, position);
 
-      // Calculer la direction de la flèche en fonction de l'orientation de l'appareil
+      // Calculate arrow direction based on device orientation
       const arrowDirection = worldCalculationService.calculateArrowDirection(
           targetBearing,
           deviceOrientation,
@@ -90,10 +90,10 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
       cameraRef.current.transform.rotation.setFromQuaternion(cameraOrientation)
       cameraRef.current.transform.position.set(0, positionY, positionZ);
 
-      // Convertir l'angle en radians et appliquer la rotation à la flèche
+      // Convert angle to radians and apply rotation to the arrow
       arrowRef.current.transform.rotation.setFromQuaternion(arrowDirection);
     } catch (error) {
-      console.error('Erreur lors du calcul de la direction :', error);
+      console.error('Error calculating direction:', error);
     }
   }, [position, startPosition, deviceOrientation]);
 
