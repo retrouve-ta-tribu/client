@@ -1,7 +1,9 @@
 import { FC, useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents, ZoomControl, Tooltip } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, ZoomControl, Tooltip, Popup } from 'react-leaflet';
 import L from "leaflet";
 import { Member, PointOfInterest, UserPosition } from "../../services/types";
+import worldCalculationService from '../../services/worldCalculationService';
+import authService from '../../services/authService';
 
 interface GroupMapProps {
     userPositions: UserPosition[];
@@ -9,15 +11,27 @@ interface GroupMapProps {
     memberObjects: Member[];
     groupId: string;
     onPointAdd: (name: string, lat: number, lng: number) => Promise<void>;
+    onPointRemove?: (pointId: string) => Promise<void>;
 }
 
 const GroupMap: FC<GroupMapProps> = ({ 
     userPositions, 
     points, 
     memberObjects,
-    onPointAdd
+    onPointAdd,
+    onPointRemove
 }) => {
     const [isAdding, setIsAdding] = useState<boolean>(false);
+    const [selectedPoint, setSelectedPoint] = useState<PointOfInterest | null>(null);
+
+    // Get current user position to calculate distance
+    const getCurrentUserPosition = () => {
+        const currentUserId = authService.state.profile?.id;
+        if (!currentUserId) return null;
+        
+        const userPosition = userPositions.find(pos => pos.userId === currentUserId);
+        return userPosition || null;
+    };
 
     const createCustomPersonMarker = (name: string) => {
         return L.divIcon({
@@ -90,6 +104,41 @@ const GroupMap: FC<GroupMapProps> = ({
         return [46.9, 6.71] as [number, number];
     };
 
+    // Function to calculate distance to another user from current user position
+    const calculateDistanceToUser = (otherUserPosition: UserPosition) => {
+        const userPosition = getCurrentUserPosition();
+        if (!userPosition || userPosition.userId === otherUserPosition.userId) return null;
+        
+        return worldCalculationService.calculateDistance(
+            { latitude: userPosition.latitude, longitude: userPosition.longitude },
+            { latitude: otherUserPosition.latitude, longitude: otherUserPosition.longitude }
+        );
+    };
+
+    // Function to calculate distance to a point from current user position
+    const calculateDistanceToPoint = (point: PointOfInterest) => {
+        const userPosition = getCurrentUserPosition();
+        if (!userPosition) return null;
+        
+        return worldCalculationService.calculateDistance(
+            { latitude: userPosition.latitude, longitude: userPosition.longitude },
+            { latitude: point.location.coordinates[1], longitude: point.location.coordinates[0] }
+        );
+    };
+
+    // Handle point marker click
+    const handlePointClick = (point: PointOfInterest) => {
+        setSelectedPoint(point);
+    };
+
+    // Handle removing a point
+    const handleRemovePoint = async (pointId: string) => {
+        if (onPointRemove) {
+            await onPointRemove(pointId);
+            setSelectedPoint(null);
+        }
+    };
+
     return (
         <div className="relative">
             <div className="rounded-lg overflow-hidden shadow-lg border border-gray-200">
@@ -113,22 +162,55 @@ const GroupMap: FC<GroupMapProps> = ({
                                 key={index}
                                 position={[position.latitude, position.longitude]}
                                 icon={createCustomPersonMarker(memberName)}
+                                eventHandlers={{
+                                    click: () => {} // Just to make it clickable
+                                }}
                             >
                                 <Tooltip permanent={false} direction="top" offset={[0, -35]}>
                                     {memberName}
                                 </Tooltip>
+                                <Popup>
+                                    <div className="p-0.5">
+                                        <h3 className="font-semibold text-base">{memberName}</h3>
+                                        <p className="text-sm mt-0.5">Dernière mise à jour: {new Date(position.timestamp).toLocaleTimeString()}</p>
+                                        {calculateDistanceToUser(position) !== null && (
+                                            <p className="text-sm font-medium mt-0.5">Distance: {Math.round(calculateDistanceToUser(position) || 0)}m</p>
+                                        )}
+                                    </div>
+                                </Popup>
                             </Marker>
                         );
                     })}
-                    {points.map((position, index) => (
+                    {points.map((point, index) => (
                         <Marker
                             key={index+userPositions.length}
-                            position={[position.location.coordinates[1], position.location.coordinates[0]]}
-                            icon={createCustomPointMarker(position.name)}
+                            position={[point.location.coordinates[1], point.location.coordinates[0]]}
+                            icon={createCustomPointMarker(point.name)}
+                            eventHandlers={{
+                                click: () => handlePointClick(point)
+                            }}
                         >
-                            <Tooltip permanent={false} direction="top" offset={[0, -35]}>
-                                {position.name}
-                            </Tooltip>
+                            {selectedPoint && selectedPoint._id === point._id && (
+                                <Popup>
+                                    <div className="p-0.5">
+                                        <h3 className="font-semibold text-base">{point.name}</h3>
+                                        {calculateDistanceToPoint(point) !== null && (
+                                            <p className="text-sm font-medium mt-0.5">Distance: {Math.round(calculateDistanceToPoint(point) || 0)}m</p>
+                                        )}
+                                        {onPointRemove && (
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleRemovePoint(point._id);
+                                                }}
+                                                className="mt-1 px-3 py-1.5 bg-red-500 text-white text-sm rounded hover:bg-red-600 w-full font-medium"
+                                            >
+                                                Supprimer
+                                            </button>
+                                        )}
+                                    </div>
+                                </Popup>
+                            )}
                         </Marker>
                     ))}
                     <MapHandler />

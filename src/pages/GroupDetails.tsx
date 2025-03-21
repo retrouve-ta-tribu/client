@@ -118,6 +118,7 @@ const GroupDetails: FC = () => {
                         memberObjects={memberObjects}
                         groupId={id}
                         onPointAdd={handleAddPointFromMap}
+                        onPointRemove={handleRemovePoint}
                     />
                 </div>
             </div>
