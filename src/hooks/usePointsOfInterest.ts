@@ -17,7 +17,7 @@ export function usePointsOfInterest(groupId: string, setError: (error: string | 
                 setPoints(points)
             } catch (err) {
                 console.error('Failed to load points:', err)
-                setError('Failed to load points of interest')
+                setError('Impossible de charger les points d\'intérêt')
             }
         }
 
@@ -39,7 +39,7 @@ export function usePointsOfInterest(groupId: string, setError: (error: string | 
 
         const myPosition = getCurrentUserPosition(userPositions, authService.state.profile?.id)
         if (myPosition.latitude === 0 && myPosition.longitude === 0) {
-            setError('Your location is not available')
+            setError('Votre localisation n\'est pas disponible')
             return
         }
 
@@ -54,7 +54,7 @@ export function usePointsOfInterest(groupId: string, setError: (error: string | 
             // Points will be automatically updated through WebSocket
         } catch (err) {
             console.error('Failed to add point:', err)
-            setError('Failed to add point of interest')
+            setError('Impossible d\'ajouter le point d\'intérêt')
         } finally {
             setIsAddingPoint(false)
         }
@@ -72,7 +72,7 @@ export function usePointsOfInterest(groupId: string, setError: (error: string | 
             // Points will be automatically updated through WebSocket
         } catch (err) {
             console.error('Failed to add point:', err)
-            setError('Failed to add point of interest')
+            setError('Impossible d\'ajouter le point d\'intérêt')
         } finally {
             setIsAddingPoint(false)
         }
@@ -84,7 +84,7 @@ export function usePointsOfInterest(groupId: string, setError: (error: string | 
             // Points will be automatically updated through WebSocket
         } catch (err) {
             console.error('Failed to remove point:', err)
-            setError('Failed to remove point of interest')
+            setError('Impossible de supprimer le point d\'intérêt')
         }
     }
 

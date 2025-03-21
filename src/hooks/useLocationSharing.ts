@@ -38,8 +38,8 @@ export function useLocationSharing(groupId: string, setError: (error: string | n
                 setIsConnectingSocket(false)
                 setIsGettingLocation(false)
                 console.error('Failed to start location sharing:', err)
-                const errorMessage = err instanceof Error ? err.message : 'Unknown error'
-                setError(`Failed to start location sharing: ${errorMessage}`)
+                const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue'
+                setError(`Impossible de partager la localisation: ${errorMessage}`)
             }
         }
         

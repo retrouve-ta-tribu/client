@@ -21,11 +21,11 @@ export function useGroupData(groupId: string) {
                 const groupData = await groupService.getGroupById(groupId)
                 setGroup(groupData)
                 if (!groupData) {
-                    setError('Group not found')
+                    setError('Groupe non trouvé')
                 }
             } catch (err) {
                 console.error('Failed to load group:', err)
-                setError('Failed to load group details')
+                setError('Impossible de charger les détails du groupe')
             } finally {
                 setIsLoading(false)
             }
@@ -50,7 +50,7 @@ export function useGroupData(groupId: string) {
                 setMemberObjects(members)
             } catch (err) {
                 console.error('Failed to load group members:', err)
-                setError('Failed to load group members')
+                setError('Impossible de charger les membres du groupe')
             }
         }
 
