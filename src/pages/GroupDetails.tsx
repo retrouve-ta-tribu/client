@@ -96,6 +96,17 @@ const GroupDetails: FC = () => {
                 />
 
                 <div className="mt-8">
+                    <GroupMap 
+                        userPositions={userPositions}
+                        points={points}
+                        memberObjects={memberObjects}
+                        groupId={id}
+                        onPointAdd={handleAddPointFromMap}
+                        onPointRemove={handleRemovePoint}
+                    />
+                </div>
+
+                <div className="mt-8">
                     <h2 className="text-lg font-medium text-gray-700 mb-4">Points d'intérêt</h2>
                     
                     <PointOfInterestForm 
@@ -108,17 +119,6 @@ const GroupDetails: FC = () => {
                         points={points}
                         myPosition={getCurrentUserPosition(userPositions, authService.state.profile?.id)}
                         onRemovePoint={handleRemovePoint}
-                    />
-                </div>
-
-                <div className="mt-8">
-                    <GroupMap 
-                        userPositions={userPositions}
-                        points={points}
-                        memberObjects={memberObjects}
-                        groupId={id}
-                        onPointAdd={handleAddPointFromMap}
-                        onPointRemove={handleRemovePoint}
                     />
                 </div>
             </div>
