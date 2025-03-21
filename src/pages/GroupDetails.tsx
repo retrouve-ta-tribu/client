@@ -14,7 +14,7 @@ import authService from '../services/authService'
 import Button from '../components/common/Button'
 import pointsOfInterestService from '../services/pointsOfInterestService'
 import PointOfInterestList from '../components/groups/PointOfInterestList'
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import {MapContainer, TileLayer, Marker, useMapEvents} from 'react-leaflet';
 import L from "leaflet";
 
 const GroupDetails: FC = () => {
@@ -59,6 +59,40 @@ const GroupDetails: FC = () => {
             iconSize: [25, 41], // Taille de l'icône
             iconAnchor: [12, 41], // Point d'ancrage de l'icône
         });
+    };
+
+
+    const MapHandler = () => {
+        const map = useMapEvents({
+            click(e) {
+                handleMapClick(e);
+            },
+        });
+        return null;
+    }
+
+    // Fonction pour gérer le clic sur la carte
+    const handleMapClick = async (e: L.LeafletMouseEvent) => {
+        const pointName = prompt('Entrez le nom du point d\'intérêt :');
+        if (!pointName) return;
+
+        const { lat, lng } = e.latlng;
+
+        setIsAddingPoint(true);
+        try {
+            await pointsOfInterestService.addPoint(
+                id,
+                pointName,
+                lat,
+                lng
+            );
+            // Les points seront automatiquement mis à jour via WebSocket
+        } catch (err) {
+            console.error('Failed to add point:', err);
+            setError('Failed to add point of interest');
+        } finally {
+            setIsAddingPoint(false);
+        }
     };
 
     // Load group data
@@ -343,6 +377,7 @@ const GroupDetails: FC = () => {
                             >
                             </Marker>
                         ))}
+                        <MapHandler></MapHandler>
                     </MapContainer>
                 </div>
             </div>
