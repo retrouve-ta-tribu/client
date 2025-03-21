@@ -11,11 +11,13 @@ import MemberList from '../components/groups/MemberList'
 import SlidingPanel from '../components/layout/SlidingPanel'
 import Conversation from '../components/messages/Conversation'
 import authService from '../services/authService'
-import Button from '../components/common/Button'
 import pointsOfInterestService from '../services/pointsOfInterestService'
 import PointOfInterestList from '../components/groups/PointOfInterestList'
-import {MapContainer, TileLayer, Marker, useMapEvents} from 'react-leaflet';
-import L from "leaflet";
+import GroupMap from '../components/groups/GroupMap'
+import PointOfInterestForm from '../components/groups/PointOfInterestForm'
+import LocationStatus from '../components/groups/LocationStatus'
+import GroupHeader from '../components/groups/GroupHeader'
+import { getCurrentUserPosition } from '../utils/positionUtils'
 
 const GroupDetails: FC = () => {
     const params = useParams();
@@ -30,70 +32,7 @@ const GroupDetails: FC = () => {
     const [memberObjects, setMemberObjects] = useState<Member[]>([]);
     const [hasUnreadMessage, setHasUnreadMessage] = useState<boolean>(false);
     const [points, setPoints] = useState<PointOfInterest[]>([]);
-    const [pointName, setPointName] = useState('');
     const [isAddingPoint, setIsAddingPoint] = useState(false);
-
-    const createCustomPersonMarker = (name: string) => {
-        return L.divIcon({
-            className: 'custom-marker', // Classe CSS pour le style
-            html: `
-      <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
-        <img src="/marker-icon.png" alt="Marker" style="width: 25px; height: 41px;"/>
-        <div style="margin-top: 5px; font-size: 12px; color: white; white-space: nowrap;" class="font-semibold">${name}</div>
-      </div>
-    `,
-            iconSize: [25, 41], // Taille de l'icône
-            iconAnchor: [12, 41], // Point d'ancrage de l'icône
-        });
-    };
-
-    const createCustomPointMarker = (name: string) => {
-        return L.divIcon({
-            className: 'custom-marker', // Classe CSS pour le style
-            html: `
-      <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
-        <img src="/marker-icon-point.png" alt="Marker" style="width: 25px; height: 41px;"/>
-        <div style="margin-top: 5px; font-size: 12px; color: white; white-space: nowrap;" class="font-semibold">${name}</div>
-      </div>
-    `,
-            iconSize: [25, 41], // Taille de l'icône
-            iconAnchor: [12, 41], // Point d'ancrage de l'icône
-        });
-    };
-
-
-    const MapHandler = () => {
-        const map = useMapEvents({
-            click(e) {
-                handleMapClick(e);
-            },
-        });
-        return null;
-    }
-
-    // Fonction pour gérer le clic sur la carte
-    const handleMapClick = async (e: L.LeafletMouseEvent) => {
-        const pointName = prompt('Entrez le nom du point d\'intérêt :');
-        if (!pointName) return;
-
-        const { lat, lng } = e.latlng;
-
-        setIsAddingPoint(true);
-        try {
-            await pointsOfInterestService.addPoint(
-                id,
-                pointName,
-                lat,
-                lng
-            );
-            // Les points seront automatiquement mis à jour via WebSocket
-        } catch (err) {
-            console.error('Failed to add point:', err);
-            setError('Failed to add point of interest');
-        } finally {
-            setIsAddingPoint(false);
-        }
-    };
 
     // Load group data
     useEffect(() => {
@@ -138,7 +77,7 @@ const GroupDetails: FC = () => {
                 setIsGettingLocation(true);
                 await locationSharingService.startSharing(
                     id,
-                    authService.state.profile?.id!
+                    authService.state.profile?.id || ''
                 );
                 setIsGettingLocation(false);
                 
@@ -174,7 +113,10 @@ const GroupDetails: FC = () => {
             
             try {
                 const members = await groupService.getGroupMembers(id);
-                if (members.length > 0 && !members.some(member => parseInt(member.id) === parseInt(authService.state.profile?.id))) {
+                if (members.length > 0 && !members.some(member => 
+                    authService.state.profile?.id && 
+                    parseInt(member.id) === parseInt(authService.state.profile.id)
+                )) {
                     navigate('/');
                 }
                 setMemberObjects(members);
@@ -195,7 +137,7 @@ const GroupDetails: FC = () => {
         return () => {
             groupService.removeMemberListener(id, handleMembersUpdate);
         };
-    }, [group, id]);
+    }, [group, id, navigate]);
 
     // Load points of interest
     useEffect(() => {
@@ -223,26 +165,41 @@ const GroupDetails: FC = () => {
         };
     }, [id]);
 
-    const handleAddPoint = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleAddPoint = async (pointName: string) => {
         if (!pointName.trim() || !userPositions.length) return;
 
-        const myPosition = userPositions.find(pos => pos.userId === authService.state.profile?.id);
-        if (!myPosition) {
+        const myPosition = getCurrentUserPosition(userPositions, authService.state.profile?.id);
+        if (myPosition.latitude === 0 && myPosition.longitude === 0) {
             setError('Your location is not available');
             return;
         }
 
         setIsAddingPoint(true);
         try {
-            console.log(myPosition)
             await pointsOfInterestService.addPoint(
                 id,
                 pointName,
                 myPosition.latitude,
                 myPosition.longitude
             );
-            setPointName('');
+            // Points will be automatically updated through WebSocket
+        } catch (err) {
+            console.error('Failed to add point:', err);
+            setError('Failed to add point of interest');
+        } finally {
+            setIsAddingPoint(false);
+        }
+    };
+
+    const handleAddPointFromMap = async (name: string, lat: number, lng: number) => {
+        setIsAddingPoint(true);
+        try {
+            await pointsOfInterestService.addPoint(
+                id,
+                name,
+                lat,
+                lng
+            );
             // Points will be automatically updated through WebSocket
         } catch (err) {
             console.error('Failed to add point:', err);
@@ -290,35 +247,16 @@ const GroupDetails: FC = () => {
             />
 
             <div className="p-4 pb-[76px] h-full overflow-y-auto">
-                {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
-                        {error}
-                    </div>
-                )}
+                <LocationStatus 
+                    error={error}
+                    isConnectingSocket={isConnectingSocket}
+                    isGettingLocation={isGettingLocation}
+                />
                 
-                {isConnectingSocket && (
-                    <div className="mb-4 p-3 bg-blue-50 text-blue-700 rounded-md flex items-center">
-                        <Spinner size="sm" color="blue" />
-                        <span className="ml-2">Connecting to server...</span>
-                    </div>
-                )}
-                
-                {isGettingLocation && (
-                    <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-md flex items-center">
-                        <Spinner size="sm" color="green" />
-                        <span className="ml-2">Getting your location...</span>
-                    </div>
-                )}
-                
-                <div className="flex justify-between items-center">
-                    <h2 className="text-lg font-medium text-gray-700">Membres</h2>
-                    <Button
-                        variant="secondary"
-                        onClick={() => navigate(`/group/${id}/edit`)}
-                    >
-                        Modifier
-                    </Button>
-                </div>
+                <GroupHeader 
+                    groupId={id} 
+                    title="Membres" 
+                />
                 
                 <MemberList 
                     members={memberObjects}
@@ -328,57 +266,27 @@ const GroupDetails: FC = () => {
                 <div className="mt-8">
                     <h2 className="text-lg font-medium text-gray-700 mb-4">Points d'intérêt</h2>
                     
-                    <form onSubmit={handleAddPoint} className="mb-4 flex gap-2">
-                        <input
-                            type="text"
-                            value={pointName}
-                            onChange={(e) => setPointName(e.target.value)}
-                            placeholder="Nom du point"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            disabled={isAddingPoint}
-                        />
-                        <Button
-                            type="submit"
-                            disabled={isAddingPoint || !pointName.trim() || !userPositions.length}
-                        >
-                            {isAddingPoint ? 'Ajout...' : 'Créer'}
-                        </Button>
-                    </form>
+                    <PointOfInterestForm 
+                        isAddingPoint={isAddingPoint}
+                        onAddPoint={handleAddPoint}
+                        hasLocation={!!userPositions.find(pos => pos.userId === authService.state.profile?.id)}
+                    />
 
                     <PointOfInterestList 
                         points={points}
-                        myPosition={userPositions.find(pos => pos.userId === authService.state.profile?.id) || { userId: '', latitude: 0, longitude: 0 }}
+                        myPosition={getCurrentUserPosition(userPositions, authService.state.profile?.id)}
                         onRemovePoint={handleRemovePoint}
                     />
                 </div>
 
                 <div className="mt-8">
-                    <MapContainer center={[46.9, 6.71]} zoom={10}
-                                  zoomControl={false}  style={{ height: '400px', width: '100%' }}>
-                        <TileLayer
-                            url="https://api.maptiler.com/maps/satellite/{z}/{x}/{y}@2x.jpg?key=32M5AZlrVO120Ncyc1J5"
-                            attribution='<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
-                            maxNativeZoom={18}
-                            maxZoom={22}
-                        />
-                        {userPositions.map((position, index) => (
-                            <Marker
-                                key={index}
-                                position={[position.latitude, position.longitude]}
-                                icon={createCustomPersonMarker(memberObjects.find(member => member.id === position.userId)?.name || '')}
-                            >
-                            </Marker>
-                        ))}
-                        {points.map((position, index) => (
-                            <Marker
-                                key={index+userPositions.length}
-                                position={[position.location.coordinates[1], position.location.coordinates[0]]}
-                                icon={createCustomPointMarker(position.name)}
-                            >
-                            </Marker>
-                        ))}
-                        <MapHandler></MapHandler>
-                    </MapContainer>
+                    <GroupMap 
+                        userPositions={userPositions}
+                        points={points}
+                        memberObjects={memberObjects}
+                        groupId={id}
+                        onPointAdd={handleAddPointFromMap}
+                    />
                 </div>
             </div>
 
