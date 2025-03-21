@@ -26,8 +26,8 @@ const Home: FC = () => {
             })
             setGroups(sortedGroups)
         } catch (err) {
-            console.error('Failed to load groups:', err)
-            setError('Failed to load groups. Please try again later.')
+            console.error('Impossible de charger les groupes:', err)
+            setError('Impossible de charger les groupes. Veuillez réessayer plus tard.')
         } finally {
             setIsLoading(false)
         }

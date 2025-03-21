@@ -15,7 +15,7 @@ const Login: FC = () => {
 
     return (
         <PageContainer>
-            <PageHeader title="Login" />
+            <PageHeader title="Connexion" />
             <div className="flex flex-col items-center justify-center p-8">
                 {authService.error && (
                     <div className="text-red-500 mb-4">
@@ -30,7 +30,7 @@ const Login: FC = () => {
                         authService.isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
                     }`}
                 >
-                    <span>{authService.isLoading ? 'Loading...' : 'Sign in with Google'}</span> 
+                    <span>{authService.isLoading ? 'Chargement...' : 'Se connecter avec Google'}</span> 
                     {!authService.isLoading}
                 </button>
             </div>

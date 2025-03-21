@@ -40,7 +40,7 @@ const MemberList: FC<MemberListProps> = ({
         {isLoading && (
           <div className="flex items-center">
             <Spinner size="sm" color="blue" className="mr-2" />
-            <span className="text-sm text-gray-500">Waiting for locations...</span>
+            <span className="text-sm text-gray-500">En attente de localisations...</span>
           </div>
         )}
       </div>

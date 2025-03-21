@@ -9,7 +9,6 @@ const Friends: FC = () => {
   const [friends, setFriends] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('friends');
@@ -28,8 +27,8 @@ const Friends: FC = () => {
       const friendsList = await userService.getFriends();
       setFriends(friendsList);
     } catch (err) {
-      console.error('Failed to load friends:', err);
-      setError('Failed to load friends. Please try again later.');
+      console.error('Impossible de charger les amis:', err);
+      setError('Impossible de charger les amis. Veuillez réessayer plus tard.');
     } finally {
       setIsLoading(false);
     }
@@ -39,7 +38,7 @@ const Friends: FC = () => {
     loadFriends();
     // Load all users initially
     userService.getAllUsers().catch(err => {
-      console.error('Failed to load users:', err);
+      console.error('Impossible de charger les utilisateurs:', err);
     });
   }, []);
 
@@ -57,7 +56,6 @@ const Friends: FC = () => {
   }, [searchTerm, friends]);
 
   const handleAddFriend = async (user: User) => {
-    setIsSubmitting(true);
     setError(null);
     
     try {
@@ -67,8 +65,6 @@ const Friends: FC = () => {
       await loadFriends();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -78,7 +74,7 @@ const Friends: FC = () => {
         loadFriends();
       })
       .catch(err => {
-        console.error('Failed to remove friend:', err);
+        console.error('Impossible de supprimer l\'ami:', err);
       });
   };
 
