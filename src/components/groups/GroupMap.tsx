@@ -24,7 +24,7 @@ const GroupMap: FC<GroupMapProps> = ({
             className: 'custom-marker',
             html: `
       <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
-        <div style="background-color:#7fe64c; border-radius: 50%; width: 36px; height: 36px; display: flex; justify-content: center; align-items: center; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">
+        <div style="background-color:oklch(0.723 0.219 149.579); border-radius: 50%; width: 36px; height: 36px; display: flex; justify-content: center; align-items: center; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="white" width="20" height="20">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
           </svg>
@@ -138,11 +138,11 @@ const GroupMap: FC<GroupMapProps> = ({
             {/* Legend */}
             <div className="absolute bottom-3 left-3 bg-white p-2 rounded-md shadow-md z-10 text-xs">
                 <div className="flex items-center mb-1">
-                    <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
                     <span>Membres</span>
                 </div>
                 <div className="flex items-center">
-                    <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                    <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
                     <span>Points d'intérêt</span>
                 </div>
             </div>
