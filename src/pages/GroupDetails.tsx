@@ -95,7 +95,7 @@ const GroupDetails: FC = () => {
                     userPositions={userPositions}
                 />
 
-                <div className="mt-8">
+                <div className="mt-2">
                     <GroupMap 
                         userPositions={userPositions}
                         points={points}
@@ -106,7 +106,7 @@ const GroupDetails: FC = () => {
                     />
                 </div>
 
-                <div className="mt-8">
+                <div className="mt-2">
                     <h2 className="text-lg font-medium text-gray-700 mb-4">Points d'intérêt</h2>
                     
                     <PointOfInterestForm 

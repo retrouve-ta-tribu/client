@@ -53,9 +53,11 @@ const MemberList: FC<MemberListProps> = ({
         />
       )}
 
-      <div className="mt-4 flex flex-col gap-2">
+
+      <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-2 flex flex-col gap-2 mt-4">
         {members.map((member) => {
           const position = positionMap[member.id];
+          if (!authService.state.profile?.id) return;
           if (member.id === authService.state.profile?.id) return;
           const startPosition = positionMap[authService.state.profile?.id];
           

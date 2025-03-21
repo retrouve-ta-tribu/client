@@ -145,13 +145,12 @@ const GroupMap: FC<GroupMapProps> = ({
                 <MapContainer 
                     center={getCenterPosition()} 
                     zoom={10}
-                    style={{ height: '450px', width: '100%' }}
+                    style={{ height: '350px', width: '100%' }}
                     className="z-0"
                 >
-                    <ZoomControl position="bottomright" />
                     <TileLayer
                         url="https://api.maptiler.com/maps/satellite/{z}/{x}/{y}@2x.jpg?key=32M5AZlrVO120Ncyc1J5"
-                        attribution='<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
+                        attribution='<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a>'
                         maxNativeZoom={18}
                         maxZoom={22}
                     />
