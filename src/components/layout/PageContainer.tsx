@@ -6,7 +6,7 @@ interface PageContainerProps {
 
 const PageContainer: FC<PageContainerProps> = ({ children }) => {
   return (
-    <div className="max-w-3xl mx-auto bg-white shadow-md h-screen flex flex-col overflow-hidden">
+    <div className="max-w-6xl mx-auto bg-white shadow-md h-screen flex flex-col overflow-hidden">
       {children}
     </div>
   );
