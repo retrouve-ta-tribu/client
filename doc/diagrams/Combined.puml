@@ -1,0 +1,162 @@
+@startuml
+package components {
+}
+package hooks {
+
+enum RoomEvents {
+    Join
+    Leave
+    Broadcast
+}
+enum GroupEvents {
+    MembersChanged
+}
+enum LocationEvents {
+    LocationUpdate
+}
+enum PointEvents {
+    PointsChanged
+}
+
+}
+package pages {
+}
+package services {
+
+class UserService {
+    +getUserByGoogleId(googleId: string): Promise<User>
+    +createUser(userData: CreateUserDto): Promise<User>
+    +getFriends(): Promise<User[]>
+    +addFriend(email: string): Promise<void>
+    +removeFriend(friendId: string): Promise<void>
+    +getAllUsers(): Promise<User[]>
+    +searchUsers(query: string): User[]
+}
+class AuthService {
+    +subscribe(listener: Listener): () => void
+    +state: AuthState
+    +getGoogleLogin(): (overrideConfig?: OverridableTokenClientConfig) => void
+    +login(googleResponse: any): Promise<void>
+    +logOut: () => void
+    +isAuthenticated: boolean
+}
+class DeviceOrientationService {
+    +startTracking(onOrientationUpdate: (orientation: DeviceOrientationData) => void): Promise<void>
+    +stopTracking(): void
+    +getLastOrientation(): DeviceOrientationData
+}
+class GeolocationService {
+    +onPositionUpdated: Event<GeolocationPosition>
+    +startTracking(): Promise<void>
+    +stopTracking(): void
+}
+enum RoomEvents {
+    Join
+    Leave
+    Broadcast
+}
+class SocketService {
+    +onConnected: Event<void>
+    +onDisconnected: Event<boolean>
+    +connect(): Promise<void>
+    +disconnect(): void
+    +joinRoom(roomName: string): void
+    +leaveRoom(roomName: string): void
+    +broadcast(roomName: string, content: T): void
+    +addListener(event: RoomEvents, callback: (data: T) => void): void
+    +removeListener(event: RoomEvents, callback: (data: T) => void): void
+    +getSocketId(): string
+    +isConnected(): boolean
+}
+enum GroupEvents {
+    MembersChanged
+}
+class GroupService {
+    +getGroups(): Promise<Group[]>
+    +getGroupById(groupId: string): Promise<Group>
+    +createGroup(groupData: CreateGroupRequest): Promise<any>
+    +leaveGroup(groupId: string, userId: string): Promise<void>
+    +getGroupMembers(groupId: string): Promise<Member[]>
+    +addMember(groupId: string, userId: string): Promise<void>
+    +removeMember(groupId: string, userId: string): Promise<void>
+    +addMemberListener(groupId: string, callback: () => void): void
+    +removeMemberListener(groupId: string, callback: () => void): void
+}
+enum LocationEvents {
+    LocationUpdate
+}
+class LocationSharingService {
+    +startSharing(groupId: string, userId: string): Promise<void>
+    +stopSharing(): void
+    +addLocationUpdateListener(callback: (positions: UserPosition[]) => void): void
+    +removeLocationUpdateListener(callback: (positions: UserPosition[]) => void): void
+    +getAllPositions(): UserPosition[]
+}
+enum ChatEvents {
+    Message
+    Typing
+    StoppedTyping
+}
+class MessageChatService {
+    +isSocketConnected(): boolean
+    +connectSocket(): Promise<void>
+    +joinChat(groupId: string, userId: string): Promise<void>
+    +leaveChat(): void
+    +sendMessage(content: string, userName?: string): void
+    +addMessageListener(callback: (messages: ChatMessage[]) => void): void
+    +removeMessageListener(callback: (messages: ChatMessage[]) => void): void
+    +getAllMessages(): ChatMessage[]
+    +setTyping(isTyping: boolean, userName?: string): void
+    +addTypingListener(callback: (typingUsers: string[]) => void): void
+    +removeTypingListener(callback: (typingUsers: string[]) => void): void
+}
+enum PointEvents {
+    PointsChanged
+}
+class PointsOfInterestService {
+    +getGroupPoints(groupId: string): Promise<PointOfInterest[]>
+    +addPoint(groupId: string, name: string, latitude: number, longitude: number): Promise<PointOfInterest>
+    +removePoint(groupId: string, pointId: string): Promise<void>
+    +addPointsListener(groupId: string, callback: () => void): void
+    +removePointsListener(groupId: string, callback: () => void): void
+}
+class WorldCalculationService {
+    +calculateBearing(start: Position, end: Position): number
+    +calculateArrowDirection(targetBearing: number, deviceOrientation: DeviceOrientationData): Quaternion
+    +calculateDistance(start: Position, end: Position): number
+    +toRadians(degrees: number): number
+}
+
+}
+package shaders {
+}
+package styles {
+}
+package utils {
+
+
+}
+UserService --> "*" User
+Group --> "*" Member
+GroupService --> "*" Group
+GroupService --> "*" Member
+LocationSharingService --> "*" UserPosition
+PointsOfInterestService --> "*" PointOfInterest
+UserService --> "1" User
+UserService --> "1" CreateUserDto
+AuthService --> "1" AuthState
+DeviceOrientationService --> "1" DeviceOrientationData
+SocketService --> "1" RoomEvents
+GroupService --> "1" GroupBroadcastData
+GroupService --> "1" Group
+GroupService --> "1" CreateGroupRequest
+LocationSharingService --> "1" UserPosition
+LocationSharingService --> "1" IncomingPositionBroadcastData
+MessageChatService --> "*" ChatMessage
+MessageChatService --> "1" IncomingChatBroadcastData
+MessageChatService --> "1" ChatMessage
+PointsOfInterestService --> "1" PointsBroadcastData
+PointsOfInterestService --> "1" PointOfInterest
+WorldCalculationService --> "1" Position
+WorldCalculationService --> "1" DeviceOrientationData
+@enduml

@@ -1,0 +1,22 @@
+@startuml
+enum RoomEvents {
+    Join
+    Leave
+    Broadcast
+}
+enum GroupEvents {
+    MembersChanged
+}
+enum LocationEvents {
+    LocationUpdate
+}
+enum PointEvents {
+    PointsChanged
+}
+UserService --> "*" User
+Group --> "*" Member
+GroupService --> "*" Group
+GroupService --> "*" Member
+LocationSharingService --> "*" UserPosition
+PointsOfInterestService --> "*" PointOfInterest
+@enduml
