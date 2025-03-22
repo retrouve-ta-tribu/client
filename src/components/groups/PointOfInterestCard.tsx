@@ -15,14 +15,16 @@ const PointOfInterestCard: FC<PointOfInterestCardProps> = ({ point, myPosition, 
         <div 
             className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 flex justify-between items-center"
         >
-            <div>
-                <h3 className="font-medium text-gray-900">{point.name}</h3>
-                <MemberLocation position={{longitude: point.location.coordinates[0], latitude: point.location.coordinates[1]}} startPosition={myPosition}/>
-            </div>
-            <div>
-                { point.location.coordinates && myPosition && (
-                    <DirectionVisualizer position={{longitude : point.location.coordinates[0], latitude : point.location.coordinates[1] }} startPosition={myPosition} />
-                )}
+            <div className='flex flex-row gap-4'>
+                <div className='bg-gray-200 rounded-2xl'>
+                    { point.location.coordinates && myPosition && (
+                        <DirectionVisualizer position={{longitude : point.location.coordinates[0], latitude : point.location.coordinates[1] }} startPosition={myPosition} />
+                    )}
+                </div>
+                <div>
+                    <h3 className="font-medium text-gray-900">{point.name}</h3>
+                    <MemberLocation position={{longitude: point.location.coordinates[0], latitude: point.location.coordinates[1]}} startPosition={myPosition}/>
+                </div>
             </div>
             <button
                 onClick={() => onRemove(point._id)}
