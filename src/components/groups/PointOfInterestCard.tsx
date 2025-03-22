@@ -18,7 +18,7 @@ const PointOfInterestCard: FC<PointOfInterestCardProps> = ({ point, myPosition, 
             <div className='flex flex-row gap-4'>
                 <div className='bg-gray-200 rounded-2xl'>
                     { point.location.coordinates && myPosition && (
-                        <DirectionVisualizer position={{longitude : point.location.coordinates[0], latitude : point.location.coordinates[1] }} startPosition={myPosition} />
+                        <DirectionVisualizer position={{longitude : point.location.coordinates[0], latitude : point.location.coordinates[1] }} startPosition={myPosition} arrowTexture='/arrow-blue.png'/>
                     )}
                 </div>
                 <div>

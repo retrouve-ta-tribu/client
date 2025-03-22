@@ -17,9 +17,10 @@ import worldCalculationService from '../../services/worldCalculationService.ts';
 interface DirectionVisualizerProps {
   position: Position;
   startPosition: Position;
+  arrowTexture?: string;
 }
 
-const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }) => {
+const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition, arrowTexture = '/arrow.png' }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const arrowRef = useRef<GameObject | null>(null);
   const cameraRef = useRef<GameObject | null>(null);
@@ -49,7 +50,7 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
     ObjLoader.load('/arrow.obj').then((obj) => {
       if (arrowObject === null || arrowObject.parent === null) return;
       arrowObject.addBehavior(
-          new MeshRenderBehavior(obj, '/arrow.png', BasicVertexMVPWithUV, BasicTextureSample),
+          new MeshRenderBehavior(obj, arrowTexture, BasicVertexMVPWithUV, BasicTextureSample),
       );
     });
     arrowRef.current = arrowObject;
@@ -66,7 +67,7 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
       cameraRef.current = null;
       deviceOrientationService.stopTracking();
     };
-  }, []);
+  }, [arrowTexture]);
 
   // Update arrow rotation
   useEffect(() => {
