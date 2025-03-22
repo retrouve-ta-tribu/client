@@ -39,7 +39,7 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
     // Create camera
     const camera = new GameObject('Camera');
     gameEngineWindow.root.addChild(camera);
-    camera.addBehavior(new Camera(Math.PI / 4.5));
+    camera.addBehavior(new Camera(Math.PI / 3.5));
     camera.transform.position.z = 5;
     cameraRef.current = camera;
 
@@ -97,7 +97,7 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
     }
   }, [position, startPosition, deviceOrientation]);
 
-  return <canvas ref={canvasRef} style={{ width: '80px', height: '50px' }} />;
+  return <canvas ref={canvasRef} style={{ width: '80px', height: '60px' }} />;
 };
 
 export default PageContainer;
