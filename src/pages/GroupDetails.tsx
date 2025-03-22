@@ -17,6 +17,7 @@ import { getCurrentUserPosition } from '../utils/positionUtils'
 import { useGroupData } from '../hooks/useGroupData'
 import { useLocationSharing } from '../hooks/useLocationSharing'
 import { usePointsOfInterest } from '../hooks/usePointsOfInterest'
+import PermissionsRequest from '../components/permissions/PermissionsRequest'
 
 const GroupDetails: FC = () => {
     const params = useParams()
@@ -79,6 +80,8 @@ const GroupDetails: FC = () => {
             />
 
             <div className="p-2 pb-[76px] h-full overflow-y-auto">
+                <PermissionsRequest />
+                
                 <LocationStatus 
                     error={error}
                     isConnectingSocket={isConnectingSocket}
