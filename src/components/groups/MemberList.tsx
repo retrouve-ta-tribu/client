@@ -1,7 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import Spinner from '../common/Spinner';
 import MemberCard from './MemberCard';
-import BigMemberCard from './BigMemberCard';
 import { Member, UserPosition } from '../../services/types';
 import authService from '../../services/authService';
 import 'leaflet/dist/leaflet.css';
@@ -62,7 +61,7 @@ const MemberList: FC<MemberListProps> = ({
           const startPosition = positionMap[authService.state.profile?.id];
           
           return (
-            <BigMemberCard
+            <MemberCard
               key={member.id}
               member={member}
               position={position}
