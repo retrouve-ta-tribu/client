@@ -129,7 +129,7 @@ const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => 
 
                     <button 
                         onClick={handleSendMessage}
-                        className="bg-indigo-500 text-white p-2 w-10 h-10 rounded-md hover:bg-indigo-600 cursor-pointer"
+                        className="bg-blue-500 text-white p-2 w-10 h-10 rounded-md hover:bg-blue-600 cursor-pointer"
                     >
                         <SendIcon />
                     </button>
