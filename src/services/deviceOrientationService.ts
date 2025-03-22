@@ -46,7 +46,7 @@ class DeviceOrientationService {
      */
     private setupOrientationListener(onOrientationUpdate: (orientation: DeviceOrientationData) => void): void {
         this.orientationListener = (event: DeviceOrientationEvent) => {
-            /*let alpha;
+            let alpha;
             // Check for iOS property
             if((event as any).webkitCompassHeading) {
               alpha = (event as any).webkitCompassHeading;
@@ -58,11 +58,11 @@ class DeviceOrientationService {
                 // Assume Android stock
                 alpha = alpha!-270;
               }
-            }*/
+            }
             //TODO : See if we need IOS special compas case
 
             const newOrientation: DeviceOrientationData = {
-                alpha: event.alpha, // Z-axis rotation (0-360)
+                alpha: alpha, // Z-axis rotation (0-360)
                 beta: event.beta,   // X-axis rotation (-180 to 180)
                 gamma: event.gamma, // Y-axis rotation (-90 to 90)
                 timestamp: Date.now(),
