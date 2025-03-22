@@ -68,7 +68,7 @@ class DeviceOrientationService {
             //TODO : See if we need IOS special compas case
 
             const newOrientation: DeviceOrientationData = {
-                alpha: alpha, // Z-axis rotation (0-360)
+                alpha: alpha === undefined ? null : alpha, // Z-axis rotation (0-360)
                 beta: event.beta,   // X-axis rotation (-180 to 180)
                 gamma: event.gamma, // Y-axis rotation (-90 to 90)
                 timestamp: Date.now(),

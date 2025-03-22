@@ -54,22 +54,25 @@ class UserService {
      * @param googleId - The Google ID of the user to fetch
      * @returns A promise that resolves to the user object or null if the user is not found
      */
-    public async getUserByGoogleId(googleId: string): Promise<User | null> {
+    public async getUserByGoogleId(googleId: string | undefined): Promise<User | null> {
+        if (!googleId) {
+            return null;
+        }
+        
         try {
             const response = await fetch(`${this.baseUrl}/users/${googleId}`);
             
-            if (response.status === 404) {
-                return null;
-            }
-
             if (!response.ok) {
+                if (response.status === 404) {
+                    return null;
+                }
                 throw new Error(`Failed to fetch user: ${response.statusText}`);
             }
-
+            
             return response.json();
         } catch (error) {
             console.error('Error fetching user:', error);
-            throw error;
+            return null;
         }
     }
 

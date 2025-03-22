@@ -10,7 +10,7 @@ import ChevronIcon from '../components/icons/ChevronIcon';
 
 const EditGroup: FC = () => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const [activeTab, setActiveTab] = useState('groups');
   const [groupName, setGroupName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');

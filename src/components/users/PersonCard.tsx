@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { Friend } from '../../services/friendService';
+import { User as Friend } from '../../services/userService';
 
 /**
  * Props for the PersonCard component that displays person information with actions

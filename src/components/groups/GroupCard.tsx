@@ -19,7 +19,7 @@ const GroupCard: FC<GroupCardProps> = ({ group, onLeave }) => {
     const [error, setError] = useState<string | null>(null);
     const currentUserId = authService.state.profile?.id;
 
-    const formatDate = (dateValue: any): string => {
+    const formatDate = (dateValue: { $date: string } | string | undefined): string => {
         try {
             const dateString = typeof dateValue === 'string' ? dateValue : 
                               (dateValue?.$date || '');
@@ -44,7 +44,7 @@ const GroupCard: FC<GroupCardProps> = ({ group, onLeave }) => {
         setError(null);
         
         try {
-            await onLeave(group._id);
+            await onLeave(group._id.$oid);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to leave group');
         } finally {
