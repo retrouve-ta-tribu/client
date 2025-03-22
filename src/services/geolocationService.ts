@@ -31,7 +31,6 @@ class GeolocationService {
         },
         (error) => {
           console.error('Error getting location:', error);
-          alert("Erreur lors de la récupération de la position : " + error);
           this.watchId = null;
           reject(error);
         },

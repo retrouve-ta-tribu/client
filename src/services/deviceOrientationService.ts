@@ -34,7 +34,6 @@ class DeviceOrientationService {
                     })
                     .catch((error: Error) => {
                         reject(error);
-                        alert("Erreur lors de la demande de permission pour accéder à l'orientation du périphérique : " + error);
                     });
             } else {
                 this.setupOrientationListener(onOrientationUpdate);
