@@ -97,7 +97,7 @@ const PageContainer: FC<DirectionVisualizerProps> = ({ position, startPosition }
     }
   }, [position, startPosition, deviceOrientation]);
 
-  return <canvas ref={canvasRef} style={{ width: '100px', height: '70px' }} />;
+  return <canvas ref={canvasRef} style={{ width: '80px', height: '50px' }} />;
 };
 
 export default PageContainer;
