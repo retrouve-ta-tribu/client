@@ -18,7 +18,7 @@
     "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.3.0",
     "socket.io-client": "^4.8.1",
-    "sprunk-engine": "^0.4.3",
+    "sprunk-engine": "^0.4.5",
     "tailwindcss": "^4.0.9"
   },
   "devDependencies": {
