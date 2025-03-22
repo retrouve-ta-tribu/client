@@ -5,7 +5,6 @@ import { Event } from "sprunk-engine";
  */
 class GeolocationService {
   private watchId: number | null = null;
-  private lastPosition: GeolocationPosition | null = null;
   public onPositionUpdated: Event<GeolocationPosition> = new Event();
   
   /**
@@ -17,6 +16,7 @@ class GeolocationService {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
         reject(new Error('Geolocation is not supported by this browser'));
+        alert("La géolocalisation n'est pas prise en charge par ce navigateur. Certaines fonctionnalités peuvent ne pas fonctionner correctement.");
         return;
       }
       if(this.watchId) return;
@@ -26,12 +26,12 @@ class GeolocationService {
       
       this.watchId = navigator.geolocation.watchPosition(
         (position) => {
-          this.lastPosition = position;
           this.onPositionUpdated.emit(position);
           resolve();
         },
         (error) => {
           console.error('Error getting location:', error);
+          alert("Erreur lors de la récupération de la position : " + error);
           this.watchId = null;
           reject(error);
         },
@@ -52,43 +52,6 @@ class GeolocationService {
       navigator.geolocation.clearWatch(this.watchId);
       this.watchId = null;
     }
-  }
-  
-  /**
-   * Get the last known position
-   * @returns The last known position or null if not available
-   */
-  getLastPosition(): GeolocationPosition | null {
-    return this.lastPosition;
-  }
-  
-  /**
-   * Get the current position once
-   * @returns Promise that resolves with the current position
-   */
-  getCurrentPosition(): Promise<GeolocationPosition> {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error('Geolocation is not supported by this browser'));
-        return;
-      }
-      
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          this.lastPosition = position;
-          resolve(position);
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-          reject(error);
-        },
-        {
-          enableHighAccuracy: true,
-          maximumAge: 0,
-          timeout: 10000
-        }
-      );
-    });
   }
 }
 
