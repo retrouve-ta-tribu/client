@@ -4,22 +4,27 @@ import worldCalculationService from "../../services/worldCalculationService.ts";
 
 /**
  * Props for the MemberLocation component that displays a member's location
- * @property position - The user's position data including coordinates and timestamp (optional)
+ * @property position - The position data which can be either a UserPosition or a regular Position
  * @property startPosition - The starting position for distance calculation (optional)
  * @property className - Optional CSS class name for styling the component
+ * @property locationType - Type of location to display different colors ('default' or 'poi')
  */
 interface MemberLocationProps {
-  position?: UserPosition;
+  position?: UserPosition | Position;
   startPosition?: Position;
+  locationType?: 'default' | 'poi';
 }
 
 const MemberLocation: React.FC<MemberLocationProps> = ({ 
   position, 
   startPosition,
+  locationType = 'default',
 }) => {
   // Calculate how recent the location update is
   const getTimeSinceUpdate = (): string => {
-    if(!position?.timestamp) return '';
+    // Check if position has timestamp property (indicating it's a UserPosition)
+    if(!position || !('timestamp' in position)) return '';
+    
     const now = Date.now();
     const secondsAgo = Math.floor((now - position.timestamp) / 1000);
     
@@ -33,9 +38,14 @@ const MemberLocation: React.FC<MemberLocationProps> = ({
     }
   };
 
-  const iconColor = position ? 'text-green-500' : 'text-gray-400';
+  let iconColor = 'text-gray-400';
+  if (position) {
+    iconColor = locationType === 'poi' ? 'text-blue-500' : 'text-green-500';
+  }
+  
+  // For a simple Position object without timestamp, only show distance
   const locationText = position 
-    ? (startPosition ? `${Math.round(worldCalculationService.calculateDistance(startPosition, position))}m • ${getTimeSinceUpdate()}` : getTimeSinceUpdate())
+    ? (startPosition ? `${Math.round(worldCalculationService.calculateDistance(startPosition, position))}m${('timestamp' in position) ? ` • ${getTimeSinceUpdate()}` : ''}` : ('timestamp' in position) ? getTimeSinceUpdate() : '')
     : 'Localisation non disponible';
   
   return (
