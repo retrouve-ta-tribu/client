@@ -45,6 +45,8 @@ class DeviceOrientationService {
      * @param onOrientationUpdate Callback function to call when orientation is updated
      */
     private setupOrientationListener(onOrientationUpdate: (orientation: DeviceOrientationData) => void): void {
+        const isIOS = navigator.userAgent.match(/(iPod|iPhone|iPad)/) && navigator.userAgent.match(/AppleWebKit/);
+
         this.orientationListener = (event: DeviceOrientationEvent) => {
             let alpha;
             // Check for iOS property
@@ -72,7 +74,12 @@ class DeviceOrientationService {
             onOrientationUpdate(newOrientation);
         };
 
-        window.addEventListener('deviceorientationabsolute', this.orientationListener);
+        if(isIOS){
+            //Because of the webkitCompassHeading property
+            window.addEventListener('deviceorientation', this.orientationListener);
+        }else{
+            window.addEventListener('deviceorientationabsolute', this.orientationListener);
+        }
     }
 
     /**
