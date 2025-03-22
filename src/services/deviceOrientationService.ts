@@ -53,16 +53,18 @@ class DeviceOrientationService {
         this.orientationListener = (event: DeviceOrientationEvent) => {
             let alpha;
             // Check for iOS property
-            if((event as any).webkitCompassHeading) {
-              alpha = (event as any).webkitCompassHeading;
+            if(isIOS){
+                if((event as any).webkitCompassHeading) {
+                    alpha = -(event as any).webkitCompassHeading;
+                }
             }
             // non iOS
             else {
-              alpha = event.alpha;
-              if(!(window as any).chrome) {
-                // Assume Android stock
-                alpha = alpha!-270;
-              }
+                alpha = event.alpha;
+                if(!(window as any).chrome) {
+                    // Assume Android stock
+                    alpha = alpha!-270;
+                }
             }
             //TODO : See if we need IOS special compas case
 
