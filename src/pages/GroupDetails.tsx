@@ -78,7 +78,7 @@ const GroupDetails: FC = () => {
                 title={group.name}
             />
 
-            <div className="p-4 pb-[76px] h-full overflow-y-auto">
+            <div className="p-2 pb-[76px] h-full overflow-y-auto">
                 <LocationStatus 
                     error={error}
                     isConnectingSocket={isConnectingSocket}
