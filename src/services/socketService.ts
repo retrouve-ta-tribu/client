@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import { Event } from 'sprunk-engine'
 
 export enum RoomEvents {
   Join = "Join",
@@ -10,6 +11,11 @@ export enum RoomEvents {
  * SocketService is a singleton class that manages the socket connection and provides methods to join and leave rooms, broadcast messages, and listen for events.
  */
 export class SocketService {
+  public onConnected: Event<void> = new Event<void>();
+  /*
+    * Event triggered when the socket is disconnected.
+   */
+  public onDisconnected: Event<boolean> = new Event<boolean>();
   private socket: Socket | null = null;
   private listeners: Map<string, Set<(data: unknown) => void>> = new Map();
   private connected: boolean = false;
@@ -30,22 +36,28 @@ export class SocketService {
         return;
       }
 
-      this.socket = io(this.serverUrl);
+      this.socket = io(this.serverUrl, {
+        reconnectionDelayMax: 10000,
+      });
 
       this.socket.on('connect', () => {
         console.log('Connected to socket server with ID:', this.socket?.id);
         this.connected = true;
+        this.onConnected.emit();
         resolve();
       });
 
       this.socket.on('connect_error', (error) => {
         console.error('Socket connection error:', error);
         reject(error);
+        //Only need to reconnect if socket.io will not do it automatically
+        this.onDisconnected.emit(!this.socket!.active);
       });
 
       this.socket.on('disconnect', (reason) => {
         console.log('Disconnected from socket server:', reason);
         this.connected = false;
+        this.onDisconnected.emit(!this.socket!.active);
       });
 
       // Set up listener for broadcast events
@@ -63,6 +75,8 @@ export class SocketService {
       this.socket.disconnect();
       this.socket = null;
       this.connected = false;
+      //This is intentional, as the socket is disconnected. We do not need to reconnect.
+      this.onDisconnected.emit(false);
     }
   }
 

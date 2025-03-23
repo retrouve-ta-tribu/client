@@ -1,19 +1,21 @@
 import { FC } from 'react';
-import { PointOfInterest } from '../../services/types';
+import {PointOfInterest, Position} from '../../services/types';
 import PointOfInterestCard from './PointOfInterestCard';
 
 interface PointOfInterestListProps {
     points: PointOfInterest[];
+    myPosition: Position;
     onRemovePoint: (pointId: string) => void;
 }
 
-const PointOfInterestList: FC<PointOfInterestListProps> = ({ points, onRemovePoint }) => {
+const PointOfInterestList: FC<PointOfInterestListProps> = ({ points, myPosition, onRemovePoint }) => {
     return (
         <div className="space-y-2 max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-2">
             {points.map((point) => (
                 <PointOfInterestCard 
                     key={point._id}
                     point={point}
+                    myPosition={myPosition}
                     onRemove={onRemovePoint}
                 />
             ))}

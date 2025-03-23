@@ -33,22 +33,6 @@ class LocationSharingService {
     }
 
     /**
-     * Check if the socket is connected
-     * @returns True if the socket is connected, false otherwise
-     */
-    isSocketConnected(): boolean {
-        return socketService.isConnected();
-    }
-
-    /**
-     * Connect to the socket
-     * @returns A promise that resolves when the socket is connected
-     */
-    async connectSocket(): Promise<void> {
-        return socketService.connect();
-    }
-
-    /**
      * Start sharing location updates
      * @param groupId - The ID of the group to share location updates with
      * @param userId - The ID of the user to share location updates from
@@ -62,9 +46,7 @@ class LocationSharingService {
         this.userId = userId;
         
         // Connect to socket if not already connected
-        if (!socketService.isConnected()) {
-            await socketService.connect();
-        }
+        await socketService.connect();
         
         // Join the room for this group
         socketService.joinRoom(groupId);
@@ -73,16 +55,22 @@ class LocationSharingService {
         socketService.addListener<IncomingPositionBroadcastData>(RoomEvents.Broadcast, this.handleLocationUpdate);
         
         // Start tracking location and broadcasting updates
-        await geolocationService.startTracking(userId, (position) => {
-            this.broadcastLocation(position);
+        await geolocationService.startTracking();
+        geolocationService.onPositionUpdated.addObserver((position) => {
+            this.broadcastLocation({ 
+                longitude: position.coords.longitude,
+                latitude: position.coords.latitude,
+                userId,
+                timestamp: Date.now()
+            });
         });
         
         // Set up interval to broadcast location periodically
         this.intervalId = window.setInterval(() => {
-            const position = geolocationService.getLastPosition();
+            /*const position = geolocationService.getLastPosition();
             if (position) {
                 this.broadcastLocation(position);
-            }
+            }*/
         }, 1000);
     }
 

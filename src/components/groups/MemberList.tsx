@@ -1,10 +1,9 @@
 import { FC, useEffect, useState } from 'react';
 import Spinner from '../common/Spinner';
 import MemberCard from './MemberCard';
-import BigMemberCard from './BigMemberCard';
-import {Member, UserPosition} from '../../services/types.ts';
+import { Member, UserPosition } from '../../services/types';
 import authService from '../../services/authService';
-
+import 'leaflet/dist/leaflet.css';
 
 export interface MemberListProps {
   members: Member[];
@@ -40,7 +39,7 @@ const MemberList: FC<MemberListProps> = ({
         {isLoading && (
           <div className="flex items-center">
             <Spinner size="sm" color="blue" className="mr-2" />
-            <span className="text-sm text-gray-500">Waiting for locations...</span>
+            <span className="text-sm text-gray-500">En attente de localisations...</span>
           </div>
         )}
       </div>
@@ -53,16 +52,20 @@ const MemberList: FC<MemberListProps> = ({
         />
       )}
 
-      <div className="mt-4 flex flex-col gap-2">
+
+      <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-2 flex flex-col gap-2 mt-4">
         {members.map((member) => {
           const position = positionMap[member.id];
+          if (!authService.state.profile?.id) return;
           if (member.id === authService.state.profile?.id) return;
+          const startPosition = positionMap[authService.state.profile?.id];
           
           return (
-            <BigMemberCard
+            <MemberCard
               key={member.id}
               member={member}
               position={position}
+              startPosition={startPosition}
             />
           );
         })}

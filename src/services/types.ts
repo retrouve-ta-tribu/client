@@ -7,7 +7,7 @@
 export interface Member {
   id: string;
   googleId: string;
-  displayName: string;
+  name: string;
   email: string;
   picture: string;
 }
@@ -28,16 +28,22 @@ export interface Group {
 
 /**
  * Represents a user's geographical position at a specific time
- * @property latitude - Geographical latitude coordinate
- * @property longitude - Geographical longitude coordinate
  * @property userId - Unique identifier of the user
  * @property timestamp - Unix timestamp of when the position was recorded
  */
-export interface UserPosition {
-  latitude: number;
-  longitude: number;
+export interface UserPosition extends Position{
   userId: string;
   timestamp: number;
+}
+
+/**
+ * Represents a geographical position
+ * @property latitude - Geographical latitude coordinate
+ * @property longitude - Geographical longitude coordinate
+ */
+export interface Position {
+    latitude: number;
+    longitude: number;
 }
 
 /**
@@ -83,4 +89,14 @@ export interface PointOfInterest {
         type: 'Point';
         coordinates: [number, number]; // [longitude, latitude]
     };
+}
+
+/**
+ * Represents the device orientation data
+ */
+export interface DeviceOrientationData {
+  alpha: number | null; // Z-axis rotation (0-360)
+  beta: number | null;  // X-axis rotation (-180 to 180)
+  gamma: number | null; // Y-axis rotation (-90 to 90)
+  timestamp: number;    // Timestamp of the data
 }

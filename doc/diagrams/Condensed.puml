@@ -1,0 +1,82 @@
+@startuml
+package components {
+}
+package hooks {
+
+enum RoomEvents {
+    Join
+    Leave
+    Broadcast
+}
+enum GroupEvents {
+    MembersChanged
+}
+enum LocationEvents {
+    LocationUpdate
+}
+enum PointEvents {
+    PointsChanged
+}
+
+}
+package pages {
+}
+package services {
+
+class UserService {
+}
+class AuthService {
+}
+class DeviceOrientationService {
+}
+class GeolocationService {
+}
+enum RoomEvents {
+    Join
+    Leave
+    Broadcast
+}
+class SocketService {
+}
+enum GroupEvents {
+    MembersChanged
+}
+class GroupService {
+}
+enum LocationEvents {
+    LocationUpdate
+}
+class LocationSharingService {
+}
+enum ChatEvents {
+    Message
+    Typing
+    StoppedTyping
+}
+class MessageChatService {
+}
+enum PointEvents {
+    PointsChanged
+}
+class PointsOfInterestService {
+}
+class WorldCalculationService {
+}
+
+}
+package shaders {
+}
+package styles {
+}
+package utils {
+
+
+}
+UserService --> "*" User
+Group --> "*" Member
+GroupService --> "*" Group
+GroupService --> "*" Member
+LocationSharingService --> "*" UserPosition
+PointsOfInterestService --> "*" PointOfInterest
+MessageChatService --> "*" ChatMessage
+@enduml

@@ -34,7 +34,7 @@ const CreateGroup: FC = () => {
         setFriends(friendsList);
       } catch (err) {
         console.error('Failed to load friends:', err);
-        setError('Failed to load friends. Please try again later.');
+        setError('Impossible de charger les amis. Veuillez réessayer plus tard.');
       }
     };
 
@@ -94,7 +94,7 @@ const CreateGroup: FC = () => {
       navigate('/');
     } catch (err) {
       console.error('Failed to create group:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create group. Please try again later.');
+      setError(err instanceof Error ? err.message : 'Impossible de créer le groupe. Veuillez réessayer plus tard.');
     } finally {
       setIsSubmitting(false);
     }

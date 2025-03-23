@@ -7,7 +7,7 @@ export interface AuthUser {
 }
 
 export interface AuthProfile {
-    googleId: string;
+    id: string;
     name: string;
     email: string;
     picture: string;
@@ -31,12 +31,13 @@ interface GoogleProfile extends AuthProfile {
 class AuthService {
     private static instance: AuthService;
     private listeners: Set<Listener> = new Set();
+    public onLoginSuccess?: () => void;
     
     private _state: AuthState = {
         user: null,
         profile: null,
         error: null,
-        isLoading: true
+        isLoading: false
     };
 
     private constructor() {
@@ -150,7 +151,7 @@ class AuthService {
             },
             onError: (error) => {
                 console.error('Login Failed:', error);
-                this.setState({ error });
+                this.setState({ error: new Error(error.error || 'Login failed') });
             }
         });
     }

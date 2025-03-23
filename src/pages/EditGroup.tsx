@@ -2,7 +2,6 @@ import { FC, useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import NavBar from '../components/layout/NavBar';
-import Button from '../components/common/Button';
 import PersonCard from '../components/users/PersonCard';
 import userService, { User } from '../services/userService';
 import groupService from '../services/groupService';
@@ -11,13 +10,12 @@ import ChevronIcon from '../components/icons/ChevronIcon';
 
 const EditGroup: FC = () => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const [activeTab, setActiveTab] = useState('groups');
   const [groupName, setGroupName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [friends, setFriends] = useState<User[]>([]);
   const [selectedFriends, setSelectedFriends] = useState<User[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -49,7 +47,7 @@ const EditGroup: FC = () => {
         setSelectedFriends(selectedMembers);
       } catch (err) {
         console.error('Failed to load group data:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load group data');
+        setError(err instanceof Error ? err.message : 'Impossible de charger les données du groupe');
       } finally {
         setIsLoading(false);
       }
@@ -103,7 +101,7 @@ const EditGroup: FC = () => {
       setSelectedFriends(selectedFriends.filter(friend => friend.googleId !== friendGoogleId));
     } catch (err) {
       console.error('Failed to remove member:', err);
-      setError(err instanceof Error ? err.message : 'Failed to remove member');
+      setError(err instanceof Error ? err.message : 'Impossible de retirer le membre');
     }
   };
 
@@ -111,7 +109,7 @@ const EditGroup: FC = () => {
     return (
       <PageContainer>
         <NavBar activeTab={activeTab} onTabChange={handleTabChange} />
-        <div className="p-4">Loading...</div>
+        <div className="p-4">Chargement...</div>
       </PageContainer>
     );
   }

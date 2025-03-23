@@ -15,23 +15,23 @@ const Login: FC = () => {
 
     return (
         <PageContainer>
-            <PageHeader title="Login" />
+            <PageHeader title="Connexion" />
             <div className="flex flex-col items-center justify-center p-8">
-                {authService.error && (
+                {authService.state.error && (
                     <div className="text-red-500 mb-4">
-                        {authService.error.message}
+                        {authService.state.error.message}
                     </div>
                 )}
                 
                 <button 
                     onClick={() => login()}
-                    disabled={authService.isLoading}
+                    disabled={authService.state.isLoading}
                     className={`bg-blue-500 text-white px-6 py-3 rounded-lg cursor-pointer flex items-center gap-2 ${
-                        authService.isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
+                        authService.state.isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
                     }`}
                 >
-                    <span>{authService.isLoading ? 'Loading...' : 'Sign in with Google'}</span> 
-                    {!authService.isLoading}
+                    <span>{authService.state.isLoading ? 'Chargement...' : 'Se connecter avec Google'}</span> 
+                    {!authService.state.isLoading}
                 </button>
             </div>
         </PageContainer>
