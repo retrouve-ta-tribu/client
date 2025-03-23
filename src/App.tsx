@@ -11,7 +11,7 @@ function App() {
     const { profile, isLoading } = useAuthState();
 
     if (isLoading) {
-        return <div>Changement...</div>;
+        return <div>Chargement...</div>;
     }
 
     return (

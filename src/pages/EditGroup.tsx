@@ -101,7 +101,7 @@ const EditGroup: FC = () => {
       setSelectedFriends(selectedFriends.filter(friend => friend.googleId !== friendGoogleId));
     } catch (err) {
       console.error('Failed to remove member:', err);
-      setError(err instanceof Error ? err.message : 'Impossible de supprimer le membre');
+      setError(err instanceof Error ? err.message : 'Impossible de retirer le membre');
     }
   };
 
