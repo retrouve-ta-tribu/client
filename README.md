@@ -16,29 +16,13 @@ This is a [Vite](https://vitejs.dev/) project that provides a real-time location
 ### Run the project
 #### Client
 ```shell
-cd client
 npm install
 npm run dev
-```
-
-#### Server
-```shell
-cd server
-npm install
-npm run dev
-```
-
-#### WebSocket Relay
-```shell
-cd websocket-relay
-npm install
-npm run start
 ```
 
 ## Deployment
 ### Build the client
 ```shell
-cd client
 npm run build
 ```
 This will generate static files in the `dist` folder.
@@ -50,40 +34,24 @@ The server and websocket relay components can be deployed to any Node.js hosting
 ## Collaborate
 ### Directory structure
 ```shell
-├───client                  # Frontend React application
-│   ├───src                 # Source code
-│   │   ├───components      # Reusable UI components
-│   │   ├───hooks           # Custom React hooks
-│   │   ├───pages           # Page components
-│   │   ├───services        # Services for external communication and business logic
-│   │   ├───shaders         # WebGL shaders
-│   │   ├───styles          # CSS and styling files
-│   │   └───utils           # Utility functions and helpers
-│   ├───doc                 # Documentation
-│   └───public              # Static assets
-├───server                  # Backend API server
-│   └───src                 # Server source code
-└───websocket-relay         # Real-time communication server
+├───src                 # Source code
+│   ├───components      # Reusable UI components
+│   ├───hooks           # Custom React hooks
+│   ├───pages           # Page components
+│   ├───services        # Services for external communication and business logic
+│   ├───shaders         # WebGL shaders
+│   ├───styles          # CSS and styling files
+│   └───utils           # Utility functions and helpers
+├───doc                 # Documentation
+└───public              # Static assets
 ```
 
 ### Environment Variables
 The application uses environment variables for configuration. Create `.env` files in each directory:
 
-#### Client (.env)
 ```
 VITE_SOCKET_SERVER_URL=http://localhost:3001
 VITE_GOOGLE_CLIENT_ID=your-google-client-id
-```
-
-#### Server (.env)
-```
-PORT=3000
-MONGODB_URI=your-mongodb-connection-string
-```
-
-#### WebSocket Relay (.env)
-```
-PORT=3001
 ```
 
 ### Workflow
