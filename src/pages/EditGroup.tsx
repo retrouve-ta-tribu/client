@@ -6,18 +6,16 @@ import PersonCard from '../components/users/PersonCard';
 import userService, { User } from '../services/userService';
 import groupService from '../services/groupService';
 import { Member } from '../services/types';
-import authService from '../services/authService';
 import ChevronIcon from '../components/icons/ChevronIcon';
 
 const EditGroup: FC = () => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const [activeTab, setActiveTab] = useState('groups');
   const [groupName, setGroupName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [friends, setFriends] = useState<User[]>([]);
   const [groupMembers, setGroupMembers] = useState<Member[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 

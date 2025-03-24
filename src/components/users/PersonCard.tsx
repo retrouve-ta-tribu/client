@@ -1,5 +1,4 @@
 import { FC, useState } from 'react';
-import { Member } from '../../services/types';
 
 /**
  * Props for the PersonCard component that displays person information with actions
@@ -10,7 +9,7 @@ import { Member } from '../../services/types';
  * @property compact - Whether to show the compact version of the card
  */
 interface PersonCardProps {
-  person;
+  person: any;
   onRemove?: () => void;
   onClick?: () => void;
   showRemoveButton?: boolean;
