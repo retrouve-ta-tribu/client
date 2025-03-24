@@ -81,7 +81,7 @@ class GroupService {
     const googleId = authService.state.profile?.id;
     
     if (!googleId) {
-      console.warn('User not authenticated, returning empty groups array');
+      console.warn('Utilisateur non authentifié, retour d\'un tableau vide');
       return [];
     }
 
@@ -89,12 +89,12 @@ class GroupService {
       const response = await fetch(`${this.baseUrl}/users/${googleId}/groups`);
       
       if (!response.ok) {
-        throw new Error(`Failed to fetch groups: ${response.statusText}`);
+        throw new Error(`Impossible de récupérer les groupes: ${response.statusText}`);
       }
 
       return response.json();
     } catch (error) {
-      console.error('Error fetching groups:', error);
+      console.error('Erreur lors de la récupération des groupes:', error);
       return [];
     }
   }
@@ -113,12 +113,12 @@ class GroupService {
       }
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch group: ${response.statusText}`);
+        throw new Error(`Impossible de récupérer le groupe: ${response.statusText}`);
       }
 
       return response.json();
     } catch (error) {
-      console.error(`Error fetching group ${groupId}:`, error);
+      console.error(`Erreur lors de la récupération du groupe ${groupId}:`, error);
       return null;
     }
   }
@@ -131,7 +131,7 @@ class GroupService {
   public async createGroup(groupData: CreateGroupRequest): Promise<any> {
     const googleId = authService.state.profile?.id;
     if (!googleId) {
-      throw new Error('User not authenticated');
+      throw new Error('Utilisateur non authentifié');
     }
     
     try {
@@ -149,12 +149,12 @@ class GroupService {
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-        throw new Error(errorData.message || `Failed to create group: ${response.statusText}`);
+        throw new Error(errorData.message || `Impossible de créer le groupe: ${response.statusText}`);
       }
       
       return response.json();
     } catch (error) {
-      console.error('Error creating group:', error);
+      console.error('Erreur lors de la création du groupe:', error);
       throw error;
     }
   }
@@ -169,7 +169,7 @@ class GroupService {
         body: JSON.stringify({ name }),
       });
     } catch (error) {
-      console.error(`Error renaming group ${groupId}:`, error);
+      console.error(`Erreur lors du renommage du groupe ${groupId}:`, error);
       throw error;
     }
   }
@@ -191,10 +191,10 @@ class GroupService {
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-        throw new Error(errorData.message || `Failed to leave group: ${response.statusText}`);
+        throw new Error(errorData.message || `Impossible de quitter le groupe: ${response.statusText}`);
       }
     } catch (error) {
-      console.error(`Error leaving group ${groupId}:`, error);
+      console.error(`Erreur lors de la sortie du groupe ${groupId}:`, error);
       throw error;
     }
   }
@@ -208,7 +208,7 @@ class GroupService {
     const response = await fetch(`${this.baseUrl}/groups/${groupId}/members`);
     
     if (!response.ok) {
-        throw new Error('Failed to fetch group members');
+        throw new Error('Impossible de récupérer les membres du groupe');
     }
     
     const members = await response.json();
@@ -237,13 +237,13 @@ class GroupService {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-        throw new Error(errorData.message || `Failed to add member: ${response.statusText}`);
+        throw new Error(errorData.message || `Impossible d'ajouter le membre: ${response.statusText}`);
       }
 
       // Broadcast the change to all clients
       this.broadcastMembersChanged(groupId);
     } catch (error) {
-      console.error('Error adding member:', error);
+      console.error('Erreur lors de l\'ajout du membre:', error);
       throw error;
     }
   }
@@ -265,13 +265,13 @@ class GroupService {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-        throw new Error(errorData.message || `Failed to remove member: ${response.statusText}`);
+        throw new Error(errorData.message || `Impossible de supprimer le membre: ${response.statusText}`);
       }
 
       // Broadcast the change to all clients
       this.broadcastMembersChanged(groupId);
     } catch (error) {
-      console.error('Error removing member:', error);
+      console.error('Erreur lors de la suppression du membre:', error);
       throw error;
     }
   }
@@ -323,4 +323,4 @@ class GroupService {
   }
 }
 
-export default GroupService.getInstance(); 
+export default GroupService.getInstance();

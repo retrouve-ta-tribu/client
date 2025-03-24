@@ -15,7 +15,7 @@ class GeolocationService {
   startTracking(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
-        reject(new Error('Geolocation is not supported by this browser'));
+        reject(new Error('La géolocalisation n\'est pas supportée par ce navigateur'));
         alert("La géolocalisation n'est pas prise en charge par ce navigateur. Certaines fonctionnalités peuvent ne pas fonctionner correctement.");
         return;
       }
@@ -30,7 +30,7 @@ class GeolocationService {
           resolve();
         },
         (error) => {
-          console.error('Error getting location:', error);
+          console.error('Erreur lors de l\'obtention de la position:', error);
           this.watchId = null;
           reject(error);
         },
@@ -56,4 +56,4 @@ class GeolocationService {
 
 // Create a singleton instance
 const geolocationService = new GeolocationService();
-export default geolocationService; 
+export default geolocationService;

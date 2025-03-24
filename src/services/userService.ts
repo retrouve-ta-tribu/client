@@ -63,12 +63,12 @@ class UserService {
             }
 
             if (!response.ok) {
-                throw new Error(`Failed to fetch user: ${response.statusText}`);
+                throw new Error(`Impossible de récupérer l'utilisateur: ${response.statusText}`);
             }
 
             return response.json();
         } catch (error) {
-            console.error('Error fetching user:', error);
+            console.error('Erreur lors de la récupération de l\'utilisateur:', error);
             throw error;
         }
     }
@@ -89,12 +89,12 @@ class UserService {
             });
 
             if (!response.ok) {
-                throw new Error(`Failed to create user: ${response.statusText}`);
+                throw new Error(`Impossible de créer l'utilisateur: ${response.statusText}`);
             }
 
             return response.json();
         } catch (error) {
-            console.error('Error creating user:', error);
+            console.error('Erreur lors de la création de l\'utilisateur:', error);
             throw error;
         }
     }
@@ -146,7 +146,7 @@ class UserService {
         const googleId = authService.state.profile?.id;
         
         if (!googleId) {
-            throw new Error('User not authenticated');
+            throw new Error('Utilisateur non authentifié');
         }
 
         try {
@@ -163,7 +163,7 @@ class UserService {
                 throw new Error(errorData.message || 'Failed to add friend');
             }
         } catch (error) {
-            console.error('Error adding friend:', error);
+            console.error('Erreur lors de l\'ajout d\'un ami:', error);
             throw error;
         }
     }
@@ -177,7 +177,7 @@ class UserService {
         const googleId = authService.state.profile?.id;
         
         if (!googleId) {
-            throw new Error('User not authenticated');
+            throw new Error('Utilisateur non authentifié');
         }
 
         try {      
@@ -194,7 +194,7 @@ class UserService {
                 throw new Error(errorData.message || `Failed to remove friend: ${response.statusText}`);
             }
         } catch (error) {
-            console.error('Error removing friend:', error);
+            console.error('Erreur lors de la suppression d\'un ami:', error);
             throw error;
         }
     }
@@ -213,7 +213,7 @@ class UserService {
             const response = await fetch(`${this.baseUrl}/users`);
             
             if (!response.ok) {
-                throw new Error(`Failed to fetch users: ${response.statusText}`);
+                throw new Error(`Impossible de récupérer les utilisateurs: ${response.statusText}`);
             }
 
             const users = await response.json();
@@ -229,7 +229,7 @@ class UserService {
             
             return this.allUsers;
         } catch (error) {
-            console.error('Error fetching users:', error);
+            console.error('Erreur lors de la récupération des utilisateurs:', error);
             throw error;
         }
     }
@@ -255,4 +255,4 @@ class UserService {
     }
 }
 
-export default UserService.getInstance(); 
+export default UserService.getInstance();

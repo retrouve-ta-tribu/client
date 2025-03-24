@@ -98,7 +98,7 @@ class AuthService {
         try {
             await this.checkStoredUser();
         } catch (error) {
-            console.error('Auth initialization error:', error);
+            console.error('Erreur d\'initialisation de l\'authentification:', error);
             this.setState({ error: error as Error });
         } finally {
             this.setState({ isLoading: false });
@@ -124,11 +124,11 @@ class AuthService {
             
             if (!this._state.profile) {
                 // If profile fetch failed, clear invalid data
-                throw new Error('Failed to validate stored session');
+                throw new Error('Impossible de valider la session stockée');
             }
         } catch (error) {
             // Clear invalid session data
-            console.error('Invalid stored session:', error);
+            console.error('Session stockée invalide:', error);
             localStorage.removeItem('google_user');
             this.setState({
                 user: null,
@@ -149,8 +149,8 @@ class AuthService {
                 await this.login(response);
             },
             onError: (error) => {
-                console.error('Login Failed:', error);
-                this.setState({ error: new Error(error.error_description || 'Login Failed') });
+                console.error('Échec de la connexion:', error);
+                this.setState({ error: new Error(error.error_description || 'Échec de la connexion') });
             }
         });
     }
@@ -168,7 +168,7 @@ class AuthService {
             
             await this.fetchProfile();
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('Erreur de connexion:', error);
             this.setState({
                 error: error as Error,
                 user: null,
@@ -211,7 +211,7 @@ class AuthService {
             );
 
             if (!response.ok) {
-                throw new Error('Failed to fetch user profile');
+                throw new Error('Impossible de récupérer le profil utilisateur');
             }
 
             const googleProfile = await response.json() as GoogleProfile;
@@ -231,13 +231,13 @@ class AuthService {
                     });
                 }
             } catch (error) {
-                console.error('Failed to check/create user in backend:', error);
+                console.error('Impossible de vérifier/créer l\'utilisateur:', error);
                 // Continue anyway as the Google auth was successful
             }
 
             this.setState({ profile: googleProfile });
         } catch (err) {
-            console.error('Profile fetch error:', err);
+            console.error('Erreur lors de la récupération du profil:', err);
             localStorage.removeItem('google_user');
             this.setState({
                 user: null,
@@ -259,4 +259,4 @@ class AuthService {
     }
 }
 
-export default AuthService.getInstance(); 
+export default AuthService.getInstance();

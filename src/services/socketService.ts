@@ -41,21 +41,21 @@ export class SocketService {
       });
 
       this.socket.on('connect', () => {
-        console.log('Connected to socket server with ID:', this.socket?.id);
+        console.log('Connecté au serveur socket avec l\'ID:', this.socket?.id);
         this.connected = true;
         this.onConnected.emit();
         resolve();
       });
 
       this.socket.on('connect_error', (error) => {
-        console.error('Socket connection error:', error);
+        console.error('Erreur de connexion socket:', error);
         reject(error);
         //Only need to reconnect if socket.io will not do it automatically
         this.onDisconnected.emit(!this.socket!.active);
       });
 
       this.socket.on('disconnect', (reason) => {
-        console.log('Disconnected from socket server:', reason);
+        console.log('Déconnecté du serveur socket:', reason);
         this.connected = false;
         this.onDisconnected.emit(!this.socket!.active);
       });
@@ -86,7 +86,7 @@ export class SocketService {
    */
   joinRoom(roomName: string): void {
     if (!this.socket || !this.connected) {
-      console.log("Socket not connected");
+      console.log("Socket non connectée");
     }
     this.socket!.emit(RoomEvents.Join, roomName);
   }
@@ -97,7 +97,7 @@ export class SocketService {
    */
   leaveRoom(roomName: string): void {
     if (!this.socket || !this.connected) {
-      console.log("Socket not connected");
+      console.log("Socket non connectée");
     }
     this.socket!.emit(RoomEvents.Leave, roomName);
   }
@@ -109,7 +109,7 @@ export class SocketService {
    */
   broadcast<T>(roomName: string, content: T): void {
     if (!this.socket || !this.connected) {
-      console.log("Socket not connected");
+      console.log("Socket non connectée");
     }
     this.socket!.emit(RoomEvents.Broadcast, {
       room: roomName,
@@ -172,4 +172,4 @@ export class SocketService {
 
 // Create a singleton instance
 const socketService = new SocketService(import.meta.env.VITE_SOCKET_SERVER_URL || 'http://localhost:3001');
-export default socketService; 
+export default socketService;
