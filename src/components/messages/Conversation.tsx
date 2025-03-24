@@ -94,7 +94,7 @@ const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => 
     return (
         <>
             <div className="flex flex-col h-full">
-                <div className="flex-1 flex overflow-auto no-scrollbar justify-end items-end">
+                <div className="block h-full overflow-auto no-scrollbar justify-end items-end">
                     <div className="flex px-4 flex-col gap-4 w-full">
                         {messages.map((message, index) => (
                             <Message 
