@@ -74,25 +74,9 @@ const Home: FC = () => {
             throw new Error('You must be logged in to leave a group');
         }
         
-        const apiUrl = import.meta.env.VITE_API_URL;
-        if (!apiUrl) {
-            throw new Error('API URL is not defined');
-        }
+       await groupService.leaveGroup(groupId, currentUserId);
         
-        const response = await fetch(`${apiUrl}/api/groups/${groupId}/members/${currentUserId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-            throw new Error(errorData.message || `Failed to leave group: ${response.statusText}`);
-        }
-        
-        // Refresh the groups list
-        await loadGroups();
+       await loadGroups();
     };
 
     return (
