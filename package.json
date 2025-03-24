@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-uml": "node ./doc/generator.js",
-    "generate-doc": "npx typedoc --excludeInternal false --entryPointStrategy expand --out ./doc/site/build ./src/"
+    "generate-doc": "npx typedoc"
   },
   "dependencies": {
     "@react-oauth/google": "^0.12.1",
