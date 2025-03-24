@@ -159,6 +159,21 @@ class GroupService {
     }
   }
 
+  public async renameGroup(groupId: string, name: string): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseUrl}/groups/${groupId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name }),
+      });
+    } catch (error) {
+      console.error(`Error renaming group ${groupId}:`, error);
+      throw error;
+    }
+  }
+
   /**
    * Leave a group
    * @param groupId - The ID of the group to leave

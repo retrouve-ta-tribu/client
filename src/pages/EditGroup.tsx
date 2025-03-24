@@ -105,6 +105,19 @@ const EditGroup: FC = () => {
     }
   };
 
+  const handleUpdateGroupName = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id || !groupName.trim()) return;
+
+    try {
+      await groupService.renameGroup(id, groupName);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to update group name:', err);
+      setError(err instanceof Error ? err.message : 'Impossible de mettre à jour le nom du groupe');
+    }
+  };
+
   if (isLoading) {
     return (
       <PageContainer>
@@ -130,21 +143,28 @@ const EditGroup: FC = () => {
         </div>
 
         <div className="p-4">
-          <form className="max-w-2xl mx-auto space-y-6">
+          <form className="max-w-2xl mx-auto space-y-6" onSubmit={handleUpdateGroupName}>
             <div>
               <label htmlFor="groupName" className="block text-sm font-medium text-gray-700 mb-1">
                 Nom du groupe
               </label>
-              <input
-                type="text"
-                id="groupName"
-                value={groupName}
-                onChange={(e) => setGroupName(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Entrez le nom du groupe"
-                required
-                disabled
-              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  id="groupName"
+                  value={groupName}
+                  onChange={(e) => setGroupName(e.target.value)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Entrez le nom du groupe"
+                  required
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Valider
+                </button>
+              </div>
             </div>
 
             <div className="mb-4">
@@ -212,4 +232,4 @@ const EditGroup: FC = () => {
   );
 };
 
-export default EditGroup; 
+export default EditGroup;
