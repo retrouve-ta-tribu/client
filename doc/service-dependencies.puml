@@ -1,0 +1,60 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+
+' Package colors
+skinparam packageBackgroundColor<<Services>> #F5F5F5
+skinparam packageBackgroundColor<<External>> #FFF4E0
+skinparam packageBorderColor<<Services>> #666666
+skinparam packageBorderColor<<External>> #FFA726
+
+' Class colors
+skinparam classArrowColor #222
+
+package "Services" <<Services>> {
+    [AuthService] as AuthService #FFAAAA
+    [UserService] as UserService #FFAAAA
+    [GroupService] as GroupService #CC77FF
+    [MessageChatService] as MessageChatService #CC77FF
+    [LocationSharingService] as LocationSharingService #AAFFFF
+    [PointsOfInterestService] as PointsOfInterestService #CC77FF
+    [DeviceOrientationService] as DeviceOrientationService #AAFFAA
+    [GeolocationService] as GeolocationService #AAFFAA
+    [WorldCalculationService] as WorldCalculationService #CCFFCC
+    [SocketService] as SocketService #66CCff
+}
+
+package "External" <<External>> {
+    [GoogleAuth] as GoogleAuth #FFE0B2
+    [DeviceAPI] as DeviceAPI #FFE0B2
+    [GeolocationAPI] as GeolocationAPI #FFE0B2
+}
+
+' Relationships
+AuthService --> GoogleAuth
+AuthService -left-> UserService
+
+UserService -left-> AuthService
+
+GroupService -up-> AuthService
+GroupService -up-> SocketService
+GroupService -right-> UserService
+
+MessageChatService -up-> SocketService
+MessageChatService -up-> AuthService
+
+LocationSharingService -up-> SocketService
+LocationSharingService -up-> GeolocationService
+LocationSharingService -up-> AuthService
+
+PointsOfInterestService -up-> SocketService
+PointsOfInterestService -up-> AuthService
+
+DeviceOrientationService -up-> DeviceAPI
+
+GeolocationService -up-> GeolocationAPI
+
+WorldCalculationService -up-> DeviceOrientationService
+WorldCalculationService -up-> GeolocationService
+
+@enduml

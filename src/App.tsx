@@ -1,35 +1,55 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom'
+import Home from './pages/Home'
+import GroupDetails from './pages/GroupDetails'
+import Login from './pages/Login'
+import Friends from './pages/Friends'
+import { useAuthState } from './hooks/useAuthState'
+import CreateGroup from './pages/CreateGroup'
+import EditGroup from './pages/EditGroup'
 
 function App() {
-  const [count, setCount] = useState(0)
+    const { profile, isLoading } = useAuthState();
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    if (isLoading) {
+        return <div>Chargement...</div>;
+    }
+
+    return (
+        <>
+            <Routes>
+                <Route
+                    path="/login"
+                    element={profile ? <Navigate to="/" /> : <Login />}
+                />
+                <Route
+                    path="/group/:id"
+                    element={profile ? <GroupDetails /> : <Navigate to="/login" replace />}
+                />
+                <Route
+                    path="/group/:id/edit"
+                    element={profile ? <EditGroup /> : <Navigate to="/login" replace />}
+                />
+                <Route
+                    path="/friends"
+                    element={profile ? <Friends /> : <Navigate to="/login" replace />}
+                />
+                <Route
+                    path="/"
+                    element={profile ? <Home /> : <Navigate to="/login" />}
+                />
+                <Route path="/create-group" element={<CreateGroup />} />
+            </Routes>
+        </>
+    )
 }
 
-export default App
+// Wrapper component to provide router context
+function AppWrapper() {
+    return (
+        <Router>
+            <App/>
+        </Router>
+    )
+}
+
+export default AppWrapper
