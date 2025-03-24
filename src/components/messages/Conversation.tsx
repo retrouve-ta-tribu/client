@@ -30,11 +30,9 @@ const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => 
             setTypingUsers(users.filter(name => name !== currentUser?.name));
         };
 
-        if (currentUser) {
-            messageChatService.joinChat(group._id.$oid, currentUser.id);
-            messageChatService.addMessageListener(handleMessages);
-            messageChatService.addTypingListener(handleTypingUsers);
-        }
+        messageChatService.joinChat(group._id, currentUser.id);
+        messageChatService.addMessageListener(handleMessages);
+        messageChatService.addTypingListener(handleTypingUsers);
 
         return () => {
             messageChatService.removeMessageListener(handleMessages);

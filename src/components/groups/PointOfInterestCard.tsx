@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import React, { FC } from 'react';
 import {PointOfInterest, Position} from '../../services/types';
 import XIcon from '../icons/XIcon';
 import DirectionVisualizer from "../sprunk/DirectionVisualizer.tsx";

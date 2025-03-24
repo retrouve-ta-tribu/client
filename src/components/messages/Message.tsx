@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 
 /**
  * Props for the Message component that displays a single chat message
