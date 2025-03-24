@@ -161,7 +161,7 @@ class GroupService {
 
   public async renameGroup(groupId: string, name: string): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}/groups/${groupId}`, {
+      await fetch(`${this.baseUrl}/groups/${groupId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
