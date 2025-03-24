@@ -44,7 +44,7 @@ const GroupCard: FC<GroupCardProps> = ({ group, onLeave }) => {
         setError(null);
         
         try {
-            await onLeave(group._id);
+            await onLeave(group._id.$oid);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to leave group');
         } finally {

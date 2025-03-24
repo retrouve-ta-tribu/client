@@ -1,15 +1,9 @@
 import { FC } from 'react';
-import { useNavigate } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import PageHeader from '../components/layout/PageHeader';
 import authService from '../services/authService';
 
 const Login: FC = () => {
-    const navigate = useNavigate();
-    
-    // Set up callback for successful login
-    authService.onLoginSuccess = () => navigate('/');
-    
     // Get the login function from the service
     const login = authService.getGoogleLogin();
 
@@ -25,13 +19,9 @@ const Login: FC = () => {
                 
                 <button 
                     onClick={() => login()}
-                    disabled={authService.isLoading}
-                    className={`bg-blue-500 text-white px-6 py-3 rounded-lg cursor-pointer flex items-center gap-2 ${
-                        authService.isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
-                    }`}
+                    className="bg-blue-500 text-white px-6 py-3 rounded-lg cursor-pointer flex items-center gap-2"
                 >
-                    <span>{authService.isLoading ? 'Chargement...' : 'Se connecter avec Google'}</span> 
-                    {!authService.isLoading}
+                    <span>Se connecter avec Google</span> 
                 </button>
             </div>
         </PageContainer>

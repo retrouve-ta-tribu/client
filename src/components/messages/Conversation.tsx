@@ -15,7 +15,7 @@ const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => 
     const [newMessage, setNewMessage] = useState('');
     const [typingUsers, setTypingUsers] = useState<string[]>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const currentUser = authService.state.profile;
+    const currentUser = authService.state.profile!;
 
     useEffect(() => {
         const handleMessages = (updatedMessages: ChatMessage[]) => {
@@ -30,7 +30,7 @@ const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => 
             setTypingUsers(users.filter(name => name !== currentUser?.name));
         };
 
-        messageChatService.joinChat(group._id, currentUser.id);
+        messageChatService.joinChat(group._id.$oid, currentUser.id);
         messageChatService.addMessageListener(handleMessages);
         messageChatService.addTypingListener(handleTypingUsers);
 

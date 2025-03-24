@@ -104,7 +104,7 @@ class UserService {
      * @returns A promise that resolves to an array of User objects
      */
     public async getFriends(): Promise<User[]> {
-        const googleId = authService.state.profile?.id;
+        const googleId = authService.state.profile?.id!;
 
         try {
             const currentUser = await this.getUserByGoogleId(googleId);
