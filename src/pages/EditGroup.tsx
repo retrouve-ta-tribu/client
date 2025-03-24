@@ -12,6 +12,7 @@ const EditGroup: FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState('groups');
+  const [groupNameInput, setGroupNameInput] = useState('');
   const [groupName, setGroupName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [friends, setFriends] = useState<User[]>([]);
@@ -30,6 +31,7 @@ const EditGroup: FC = () => {
         if (!group) {
           throw new Error('Group not found');
         }
+        setGroupNameInput(group.name);
         setGroupName(group.name);
 
         // Load all group members
@@ -105,12 +107,13 @@ const EditGroup: FC = () => {
     }
   };
 
-  const handleUpdateGroupName = async (e: React.FormEvent) => {
+  const handleUpdateGroupNameInput = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!id || !groupName.trim()) return;
+    if (!id || !groupNameInput.trim()) return;
 
     try {
-      await groupService.renameGroup(id, groupName);
+      await groupService.renameGroup(id, groupNameInput);
+      setGroupName(groupNameInput);
       setError(null);
     } catch (err) {
       console.error('Failed to update group name:', err);
@@ -143,24 +146,25 @@ const EditGroup: FC = () => {
         </div>
 
         <div className="p-4">
-          <form className="max-w-2xl mx-auto space-y-6" onSubmit={handleUpdateGroupName}>
+          <form className="max-w-2xl mx-auto space-y-6" onSubmit={handleUpdateGroupNameInput}>
             <div>
-              <label htmlFor="groupName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="groupNameInput" className="block text-sm font-medium text-gray-700 mb-1">
                 Nom du groupe
               </label>
               <div className="flex gap-2">
                 <input
                   type="text"
-                  id="groupName"
-                  value={groupName}
-                  onChange={(e) => setGroupName(e.target.value)}
+                  id="groupNameInput"
+                  value={groupNameInput}
+                  onChange={(e) => setGroupNameInput(e.target.value)}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Entrez le nom du groupe"
                   required
                 />
                 <button
+                  disabled={groupNameInput.trim() == groupName}
                   type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-4 py-2 cursor-pointer disabled:cursor-default disabled:bg-gray-400 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   Valider
                 </button>
