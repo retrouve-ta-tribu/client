@@ -95,7 +95,7 @@ export interface PointOfInterest {
  * Represents the device orientation data
  */
 export interface DeviceOrientationData {
-  alpha: number | null; // Z-axis rotation (0-360)
+  alpha: number | null | undefined; // Z-axis rotation (0-360)
   beta: number | null;  // X-axis rotation (-180 to 180)
   gamma: number | null; // Y-axis rotation (-90 to 90)
   timestamp: number;    // Timestamp of the data
