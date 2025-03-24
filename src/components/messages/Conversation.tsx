@@ -30,7 +30,7 @@ const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => 
             setTypingUsers(users.filter(name => name !== currentUser?.name));
         };
 
-        messageChatService.joinChat(group._id.$oid, currentUser.id);
+        messageChatService.joinChat(group._id.toString(), currentUser.id);
         messageChatService.addMessageListener(handleMessages);
         messageChatService.addTypingListener(handleTypingUsers);
 
@@ -94,8 +94,8 @@ const Conversation: FC<ConversationProps> = ({ group, setHasUnreadMessage }) => 
     return (
         <>
             <div className="flex flex-col h-full">
-                <div className="block h-full no-scrollbar overflow-auto justify-end items-end">
-                    <div className="flex px-4 flex-col gap-4 w-full h-fit-content">
+                <div className="flex-1 flex overflow-auto no-scrollbar justify-end items-end">
+                    <div className="flex px-4 flex-col gap-4 w-full">
                         {messages.map((message, index) => (
                             <Message 
                                 key={`${message.userId}-${message.timestamp}-${index}`}
