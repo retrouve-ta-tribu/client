@@ -54,7 +54,7 @@ class PointsOfInterestService {
      */
     async getGroupPoints(groupId: string): Promise<PointOfInterest[]> {
         const response = await fetch(`${this.baseUrl}/groups/${groupId}/points`);
-        if (!response.ok) throw new Error('Failed to fetch points of interest');
+        if (!response.ok) throw new Error('Impossible de récupérer les points d\'intérêt');
         return response.json();
     }
 
@@ -79,7 +79,7 @@ class PointsOfInterestService {
                 }
             })
         });
-        if (!response.ok) throw new Error('Failed to add point of interest');
+        if (!response.ok) throw new Error('Impossible d\'ajouter le point d\'intérêt');
         const result = await response.json();
         
         // Broadcast the change
@@ -97,7 +97,7 @@ class PointsOfInterestService {
         const response = await fetch(`${this.baseUrl}/groups/${groupId}/points/${pointId}`, {
             method: 'DELETE'
         });
-        if (!response.ok) throw new Error('Failed to remove point of interest');
+        if (!response.ok) throw new Error('Impossible de supprimer le point d\'intérêt');
         
         // Broadcast the change
         this.broadcastPointsChanged(groupId);
@@ -150,4 +150,4 @@ class PointsOfInterestService {
     }
 }
 
-export default PointsOfInterestService.getInstance(); 
+export default PointsOfInterestService.getInstance();

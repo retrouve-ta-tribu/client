@@ -167,4 +167,4 @@ class LocationSharingService {
     }
 }
 
-export default LocationSharingService.getInstance(); 
+export default LocationSharingService.getInstance();

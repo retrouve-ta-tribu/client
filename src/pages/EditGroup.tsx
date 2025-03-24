@@ -29,7 +29,7 @@ const EditGroup: FC = () => {
         // Load group data
         const group = await groupService.getGroupById(id);
         if (!group) {
-          throw new Error('Group not found');
+          throw new Error('Groupe introuvable');
         }
         setGroupNameInput(group.name);
         setGroupName(group.name);
@@ -42,7 +42,7 @@ const EditGroup: FC = () => {
         const friendsList = await userService.getFriends();
         setFriends(friendsList);
       } catch (err) {
-        console.error('Failed to load group data:', err);
+        console.error('Impossible de charger les données du groupe:', err);
         setError(err instanceof Error ? err.message : 'Impossible de charger les données du groupe');
       } finally {
         setIsLoading(false);
@@ -89,8 +89,8 @@ const EditGroup: FC = () => {
       setGroupMembers(updatedMembers);
       setSearchTerm('');
     } catch (err) {
-      console.error('Failed to add member:', err);
-      setError(err instanceof Error ? err.message : 'Failed to add member');
+      console.error('Impossible d\'ajouter le membre:', err);
+      setError(err instanceof Error ? err.message : 'Impossible d\'ajouter le membre');
     }
   };
 
@@ -102,7 +102,7 @@ const EditGroup: FC = () => {
       const updatedMembers = await groupService.getGroupMembers(id);
       setGroupMembers(updatedMembers);
     } catch (err) {
-      console.error('Failed to remove member:', err);
+      console.error('Impossible de retirer le membre:', err);
       setError(err instanceof Error ? err.message : 'Impossible de retirer le membre');
     }
   };
@@ -116,7 +116,7 @@ const EditGroup: FC = () => {
       setGroupName(groupNameInput);
       setError(null);
     } catch (err) {
-      console.error('Failed to update group name:', err);
+      console.error('Impossible de mettre à jour le nom du groupe:', err);
       setError(err instanceof Error ? err.message : 'Impossible de mettre à jour le nom du groupe');
     }
   };

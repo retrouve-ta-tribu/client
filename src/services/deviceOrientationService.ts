@@ -15,8 +15,8 @@ class DeviceOrientationService {
     startTracking(onOrientationUpdate: (orientation: DeviceOrientationData) => void): Promise<void> {
         return new Promise((resolve, reject) => {
             if (!window.DeviceOrientationEvent) {
-                reject(new Error('Device orientation is not supported by this browser'));
-                alert("L'orientation du périphérique n'est pas prise en charge par ce navigateurl. Certaines fonctionnalités peuvent ne pas fonctionner correctement.");
+                reject(new Error('L\'orientation du périphérique n\'est pas supportée par ce navigateur'));
+                alert("L'orientation du périphérique n'est pas prise en charge par ce navigateur. Certaines fonctionnalités peuvent ne pas fonctionner correctement.");
                 return;
             }
 
@@ -28,7 +28,7 @@ class DeviceOrientationService {
                             this.setupOrientationListener(onOrientationUpdate);
                             resolve();
                         } else {
-                            reject(new Error('Permission to access device orientation was denied'));
+                            reject(new Error('La permission d\'accéder à l\'orientation du périphérique a été refusée'));
                             alert("La permission d'accéder à l'orientation du périphérique a été refusée");
                         }
                     })
