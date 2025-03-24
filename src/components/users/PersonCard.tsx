@@ -1,5 +1,4 @@
 import { FC, useState } from 'react';
-import { Friend } from '../../services/friendService';
 
 /**
  * Props for the PersonCard component that displays person information with actions
@@ -10,7 +9,7 @@ import { Friend } from '../../services/friendService';
  * @property compact - Whether to show the compact version of the card
  */
 interface PersonCardProps {
-  person: Friend;
+  person: any;
   onRemove?: () => void;
   onClick?: () => void;
   showRemoveButton?: boolean;

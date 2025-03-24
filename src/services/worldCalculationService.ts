@@ -36,7 +36,7 @@ class WorldCalculationService {
     calculateArrowDirection(targetBearing: number, deviceOrientation: DeviceOrientationData): Quaternion {
         const { alpha } = deviceOrientation;
 
-        if (alpha === null) {
+        if (!alpha) {
             // If orientation data is missing, return a quaternion based on the target bearing only
             return Quaternion.fromEulerAngles(0, this.toRadians(-targetBearing), 0);
         }

@@ -5,17 +5,17 @@ import NavBar from '../components/layout/NavBar';
 import PersonCard from '../components/users/PersonCard';
 import userService, { User } from '../services/userService';
 import groupService from '../services/groupService';
-import authService from '../services/authService';
+import { Member } from '../services/types';
 import ChevronIcon from '../components/icons/ChevronIcon';
 
 const EditGroup: FC = () => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const [activeTab, setActiveTab] = useState('groups');
   const [groupName, setGroupName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [friends, setFriends] = useState<User[]>([]);
-  const [selectedFriends, setSelectedFriends] = useState<User[]>([]);
+  const [groupMembers, setGroupMembers] = useState<Member[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -32,19 +32,13 @@ const EditGroup: FC = () => {
         }
         setGroupName(group.name);
 
-        // Load group members
+        // Load all group members
         const members = await groupService.getGroupMembers(id);
-        const memberIds = members.map(member => member.id);
+        setGroupMembers(members);
 
-        // Load all friends
+        // Load friends for search
         const friendsList = await userService.getFriends();
         setFriends(friendsList);
-
-        // Set selected friends based on group members
-        const selectedMembers = friendsList.filter(friend => 
-          memberIds.includes(friend.googleId) && friend.googleId !== authService.state.profile?.id
-        );
-        setSelectedFriends(selectedMembers);
       } catch (err) {
         console.error('Failed to load group data:', err);
         setError(err instanceof Error ? err.message : 'Impossible de charger les données du groupe');
@@ -70,7 +64,7 @@ const EditGroup: FC = () => {
 
     const lowerSearchTerm = searchTerm.toLowerCase();
     return friends.filter(friend => {
-      if (selectedFriends.some(selected => selected.googleId === friend.googleId)) {
+      if (groupMembers.some(member => member.id === friend.googleId)) {
         return false;
       }
 
@@ -84,21 +78,27 @@ const EditGroup: FC = () => {
         lastName.includes(lowerSearchTerm) ||
         email.includes(lowerSearchTerm);
     });
-  }, [searchTerm, friends, selectedFriends]);
+  }, [searchTerm, friends, groupMembers]);
 
   const handleAddFriend = async (friend: User) => {
-    await groupService.addMember(id, friend.googleId);
-
-    setSelectedFriends([...selectedFriends, friend]);
-    setSearchTerm('');
+    try {
+      await groupService.addMember(id, friend.googleId);
+      const updatedMembers = await groupService.getGroupMembers(id);
+      setGroupMembers(updatedMembers);
+      setSearchTerm('');
+    } catch (err) {
+      console.error('Failed to add member:', err);
+      setError(err instanceof Error ? err.message : 'Failed to add member');
+    }
   };
 
-  const handleRemoveFriend = async (friendGoogleId: string | undefined) => {
-    if (!friendGoogleId || !id) return;
+  const handleRemoveFriend = async (memberId: string | undefined) => {
+    if (!memberId || !id) return;
     
     try {
-      await groupService.removeMember(id, friendGoogleId);
-      setSelectedFriends(selectedFriends.filter(friend => friend.googleId !== friendGoogleId));
+      await groupService.removeMember(id, memberId);
+      const updatedMembers = await groupService.getGroupMembers(id);
+      setGroupMembers(updatedMembers);
     } catch (err) {
       console.error('Failed to remove member:', err);
       setError(err instanceof Error ? err.message : 'Impossible de retirer le membre');
@@ -180,18 +180,18 @@ const EditGroup: FC = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Membres du groupe ({selectedFriends.length})
+                Membres du groupe ({groupMembers.length})
               </label>
               <div className="border border-gray-200 rounded-md p-2 min-h-[100px] max-h-[200px] overflow-y-auto">
-                {selectedFriends.length === 0 ? (
-                  <div className="text-sm text-gray-500">Aucun membre sélectionné</div>
+                {groupMembers.length === 0 ? (
+                  <div className="text-sm text-gray-500">Aucun membre dans le groupe</div>
                 ) : (
                   <div className="space-y-2">
-                    {selectedFriends.map(friend => (
+                    {groupMembers.map(member => (
                       <PersonCard
-                        key={friend.email}
-                        person={friend}
-                        onRemove={() => handleRemoveFriend(friend.googleId)}
+                        key={member.email}
+                        person={member}
+                        onRemove={() => handleRemoveFriend(member.id)}
                         compact={true}
                       />
                     ))}

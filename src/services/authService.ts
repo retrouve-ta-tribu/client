@@ -150,7 +150,7 @@ class AuthService {
             },
             onError: (error) => {
                 console.error('Login Failed:', error);
-                this.setState({ error });
+                this.setState({ error: new Error(error.error_description || 'Login Failed') });
             }
         });
     }

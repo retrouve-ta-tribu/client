@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents, ZoomControl, Tooltip, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, Tooltip, Popup } from 'react-leaflet';
 import L from "leaflet";
 import { Member, PointOfInterest, UserPosition } from "../../services/types";
 import worldCalculationService from '../../services/worldCalculationService';
