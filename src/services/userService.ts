@@ -6,14 +6,12 @@ import authService from './authService';
  * @property email - User's email address
  * @property displayName - User's display name
  * @property picture - URL to user's profile picture
- * @property friends - Array of friend IDs
  */
 interface CreateUserDto {
     googleId: string;
     email: string;
     displayName: string;
     picture: string;
-    friends: string[];
 }
 
 /**
@@ -57,7 +55,7 @@ class UserService {
     public async getUserByGoogleId(googleId: string): Promise<User | null> {
         try {
             const response = await fetch(`${this.baseUrl}/users/${googleId}`);
-            
+
             if (response.status === 404) {
                 return null;
             }
@@ -99,105 +97,6 @@ class UserService {
         }
     }
 
-    /**
-     * Fetches the friends of the current user
-     * @returns A promise that resolves to an array of User objects
-     */
-    public async getFriends(): Promise<User[]> {
-        const googleId = authService.state.profile?.id!;
-
-        try {
-            const currentUser = await this.getUserByGoogleId(googleId);
-            
-            if (!currentUser || !currentUser.friends || currentUser.friends.length === 0) {
-                return [];
-            }
-
-            const friendsPromises = currentUser.friends.map(async (friendId) => {
-                try {
-                    const friendData = await this.getUserByGoogleId(friendId);
-                    if (!friendData) return null;
-                    
-                    return {
-                        ...friendData,
-                        picture: friendData.picture || 'https://via.placeholder.com/150',
-                    };
-                } catch (error) {
-                    console.error(`Error fetching friend ${friendId}:`, error);
-                    return null;
-                }
-            });
-
-            const friendsResults = await Promise.all(friendsPromises);
-            return friendsResults.filter((friend): friend is User => friend !== null);
-            
-        } catch (error) {
-            console.error('Error fetching friends:', error);
-            return [];
-        }
-    }
-
-    /**
-     * Adds a friend to the current user's friends list
-     * @param email - The email address of the friend to add
-     * @returns A promise that resolves when the friend is added
-     */
-    public async addFriend(email: string): Promise<void> {
-        const googleId = authService.state.profile?.id;
-        
-        if (!googleId) {
-            throw new Error('User not authenticated');
-        }
-
-        try {
-            const response = await fetch(`${this.baseUrl}/users/${googleId}/friends`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to add friend');
-            }
-        } catch (error) {
-            console.error('Error adding friend:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Removes a friend from the current user's friends list
-     * @param friendId - The ID of the friend to remove
-     * @returns A promise that resolves when the friend is removed
-     */
-    public async removeFriend(friendId: string): Promise<void> {
-        const googleId = authService.state.profile?.id;
-        
-        if (!googleId) {
-            throw new Error('User not authenticated');
-        }
-
-        try {      
-            const response = await fetch(`${this.baseUrl}/users/${googleId}/friends`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ friendId }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-                throw new Error(errorData.message || `Failed to remove friend: ${response.statusText}`);
-            }
-        } catch (error) {
-            console.error('Error removing friend:', error);
-            throw error;
-        }
-    }
 
     /**
      * Fetches all users from the system
@@ -211,14 +110,14 @@ class UserService {
 
         try {
             const response = await fetch(`${this.baseUrl}/users`);
-            
+
             if (!response.ok) {
                 throw new Error(`Failed to fetch users: ${response.statusText}`);
             }
 
             const users = await response.json();
             const currentUserId = authService.state.profile?.id;
-            
+
             this.allUsers = users
                 .filter((user: User) => user.googleId !== currentUserId)
                 .map((user: User) => ({
@@ -226,7 +125,7 @@ class UserService {
                     picture: user.picture || 'https://via.placeholder.com/150',
                 }));
             this.lastFetchTime = now;
-            
+
             return this.allUsers;
         } catch (error) {
             console.error('Error fetching users:', error);
@@ -242,12 +141,12 @@ class UserService {
     public searchUsers(query: string): User[] {
         const lowerQuery = query.toLowerCase();
         const currentUserId = authService.state.profile?.id;
-        
+
         return this.allUsers.filter(user => {
             if (user.googleId === currentUserId) {
                 return false;
             }
-            
+
             const displayName = user.displayName?.toLowerCase() || '';
             const email = user.email.toLowerCase();
             return displayName.includes(lowerQuery) || email.includes(lowerQuery);

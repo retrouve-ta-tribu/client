@@ -31,7 +31,7 @@ interface GoogleProfile extends AuthProfile {
 class AuthService {
     private static instance: AuthService;
     private listeners: Set<Listener> = new Set();
-    
+
     private _state: AuthState = {
         user: null,
         profile: null,
@@ -118,10 +118,10 @@ class AuthService {
         try {
             const parsedUser = JSON.parse(storedUser);
             this.setState({ user: parsedUser });
-            
+
             // Validate token by fetching profile
             await this.fetchProfile();
-            
+
             if (!this._state.profile) {
                 // If profile fetch failed, clear invalid data
                 throw new Error('Failed to validate stored session');
@@ -162,10 +162,10 @@ class AuthService {
     public async login(googleResponse: any): Promise<void> {
         try {
             this.setState({ isLoading: true });
-            
+
             localStorage.setItem('google_user', JSON.stringify(googleResponse));
             this.setState({ user: googleResponse });
-            
+
             await this.fetchProfile();
         } catch (error) {
             console.error('Login error:', error);
@@ -215,19 +215,18 @@ class AuthService {
             }
 
             const googleProfile = await response.json() as GoogleProfile;
-            
+
             // Check if user exists in our backend
             try {
                 const existingUser = await userService.getUserByGoogleId(googleProfile.id);
-                
+
                 if (!existingUser) {
                     // Only create if user doesn't exist
                     await userService.createUser({
                         googleId: googleProfile.id,
                         email: googleProfile.email,
                         displayName: googleProfile.name,
-                        picture: googleProfile.picture,
-                        friends: []
+                        picture: googleProfile.picture
                     });
                 }
             } catch (error) {
