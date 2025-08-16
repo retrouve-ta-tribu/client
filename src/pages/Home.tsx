@@ -39,7 +39,7 @@ const Home: FC = () => {
                     }
                     return 0;
                 };
-                
+
                 const dateA = getTimestamp(a.createdAt);
                 const dateB = getTimestamp(b.createdAt);
                 return dateB - dateA;
@@ -59,9 +59,6 @@ const Home: FC = () => {
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab)
-        if (tab === 'friends') {
-            navigate('/friends')
-        }
     }
 
     const handleCreateGroup = () => {
@@ -73,24 +70,24 @@ const Home: FC = () => {
         if (!currentUserId) {
             throw new Error('You must be logged in to leave a group');
         }
-        
+
         const apiUrl = import.meta.env.VITE_API_URL;
         if (!apiUrl) {
             throw new Error('API URL is not defined');
         }
-        
+
         const response = await fetch(`${apiUrl}/api/groups/${groupId}/members/${currentUserId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             },
         });
-        
+
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
             throw new Error(errorData.message || `Failed to leave group: ${response.statusText}`);
         }
-        
+
         // Refresh the groups list
         await loadGroups();
     };
@@ -99,11 +96,11 @@ const Home: FC = () => {
         <PageContainer>
             <div className="flex flex-col h-full max-h-screen">
                 <NavBar activeTab={activeTab} onTabChange={handleTabChange} />
-                
+
                 <div className="p-4">
                     <PermissionsRequest />
                 </div>
-                
+
                 <div className="p-4 flex-shrink-0">
                     <Button 
                         variant="bordered"
@@ -113,7 +110,7 @@ const Home: FC = () => {
                         Créer un groupe
                     </Button>
                 </div>
-                
+
                 <div className="flex-grow overflow-y-auto">
                     {isLoading ? (
                         <div className="p-4 text-center text-gray-500">Chargement...</div>

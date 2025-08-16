@@ -2,7 +2,6 @@ import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom
 import Home from './pages/Home'
 import GroupDetails from './pages/GroupDetails'
 import Login from './pages/Login'
-import Friends from './pages/Friends'
 import { useAuthState } from './hooks/useAuthState'
 import CreateGroup from './pages/CreateGroup'
 import EditGroup from './pages/EditGroup'
@@ -28,10 +27,6 @@ function App() {
                 <Route
                     path="/group/:id/edit"
                     element={profile ? <EditGroup /> : <Navigate to="/login" replace />}
-                />
-                <Route
-                    path="/friends"
-                    element={profile ? <Friends /> : <Navigate to="/login" replace />}
                 />
                 <Route
                     path="/"

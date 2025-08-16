@@ -9,13 +9,13 @@ interface NavBarProps {
 
 const NavBar: FC<NavBarProps> = ({ activeTab, onTabChange }) => {
   const { profile } = useAuthState();
-  
+
   return (
     <div className="flex justify-between items-center border-b border-gray-200 p-2 flex-shrink-0">
       <div className="inline-flex rounded-md shadow-sm" role="group">
         <button
           type="button"
-          className={`px-6 py-2 text-sm font-medium cursor-pointer rounded-l-lg ${
+          className={`px-6 py-2 text-sm font-medium cursor-pointer rounded-lg ${
             activeTab === 'groups'
               ? 'bg-blue-500 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100'
@@ -24,19 +24,8 @@ const NavBar: FC<NavBarProps> = ({ activeTab, onTabChange }) => {
         >
           Mes groupes
         </button>
-        <button
-          type="button"
-          className={`px-6 py-2 text-sm font-medium cursor-pointer rounded-r-lg ${
-            activeTab === 'friends'
-              ? 'bg-blue-500 text-white'
-              : 'bg-white text-gray-700 hover:bg-gray-100'
-          }`}
-          onClick={() => onTabChange('friends')}
-        >
-          Mes amis
-        </button>
       </div>
-      
+
       {profile && (
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
