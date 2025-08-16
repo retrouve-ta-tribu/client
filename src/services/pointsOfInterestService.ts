@@ -1,5 +1,6 @@
 import { PointOfInterest } from './types';
 import socketService, { RoomEvents } from './socketService';
+import {ROOM_NAME_PREFIX} from "./groupService.ts";
 
 export enum PointEvents {
     PointsChanged = 'PointsChanged'
@@ -7,7 +8,7 @@ export enum PointEvents {
 
 interface PointsBroadcastData {
     type: PointEvents;
-    groupId: string;
+    groupId: number;
 }
 
 /**
@@ -16,7 +17,7 @@ interface PointsBroadcastData {
 class PointsOfInterestService {
     private static instance: PointsOfInterestService;
     private baseUrl: string;
-    private pointsListeners: Map<string, Set<() => void>> = new Map(); // groupId -> Set of listeners
+    private pointsListeners: Map<number, Set<() => void>> = new Map(); // groupId -> Set of listeners
 
     private constructor() {
         const apiUrl = import.meta.env.VITE_API_URL;
@@ -52,7 +53,7 @@ class PointsOfInterestService {
      * @param groupId - The ID of the group
      * @returns A promise that resolves to an array of PointOfInterest objects
      */
-    async getGroupPoints(groupId: string): Promise<PointOfInterest[]> {
+    async getGroupPoints(groupId: number): Promise<PointOfInterest[]> {
         const response = await fetch(`${this.baseUrl}/groups/${groupId}/points`);
         if (!response.ok) throw new Error('Failed to fetch points of interest');
         return response.json();
@@ -65,7 +66,7 @@ class PointsOfInterestService {
      * @param latitude - The latitude of the point of interest
      * @param longitude - The longitude of the point of interest
      */
-    async addPoint(groupId: string, name: string, latitude: number, longitude: number): Promise<PointOfInterest> {
+    async addPoint(groupId: number, name: string, latitude: number, longitude: number): Promise<PointOfInterest> {
         const response = await fetch(`${this.baseUrl}/groups/${groupId}/points`, {
             method: 'POST',
             headers: {
@@ -93,7 +94,7 @@ class PointsOfInterestService {
      * @param groupId - The ID of the group
      * @param pointId - The ID of the point of interest
      */
-    async removePoint(groupId: string, pointId: string): Promise<void> {
+    async removePoint(groupId: number, pointId: string): Promise<void> {
         const response = await fetch(`${this.baseUrl}/groups/${groupId}/points/${pointId}`, {
             method: 'DELETE'
         });
@@ -108,7 +109,7 @@ class PointsOfInterestService {
      * @param groupId - The ID of the group
      * @param callback - The callback to add
      */
-    addPointsListener(groupId: string, callback: () => void): void {
+    addPointsListener(groupId: number, callback: () => void): void {
         if (!this.pointsListeners.has(groupId)) {
             this.pointsListeners.set(groupId, new Set());
         }
@@ -120,7 +121,7 @@ class PointsOfInterestService {
      * @param groupId - The ID of the group
      * @param callback - The callback to remove
      */
-    removePointsListener(groupId: string, callback: () => void): void {
+    removePointsListener(groupId: number, callback: () => void): void {
         this.pointsListeners.get(groupId)?.delete(callback);
         if (this.pointsListeners.get(groupId)?.size === 0) {
             this.pointsListeners.delete(groupId);
@@ -131,7 +132,7 @@ class PointsOfInterestService {
      * Notify listeners of a group
      * @param groupId - The ID of the group
      */
-    private notifyListeners(groupId: string): void {
+    private notifyListeners(groupId: number): void {
         this.pointsListeners.get(groupId)?.forEach(callback => {
             callback();
         });
@@ -141,12 +142,12 @@ class PointsOfInterestService {
      * Broadcast the points changed event to all listeners
      * @param groupId - The ID of the group
      */
-    private broadcastPointsChanged(groupId: string): void {
+    private broadcastPointsChanged(groupId: number): void {
         const broadcastData: PointsBroadcastData = {
             type: PointEvents.PointsChanged,
             groupId
         };
-        socketService.broadcast(groupId, broadcastData);
+        socketService.broadcast(ROOM_NAME_PREFIX+groupId, broadcastData);
     }
 }
 

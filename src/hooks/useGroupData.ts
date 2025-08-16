@@ -4,7 +4,7 @@ import groupService, { Group as ServerGroup } from '../services/groupService'
 import authService from '../services/authService'
 import { Member } from '../services/types'
 
-export function useGroupData(groupId: string) {
+export function useGroupData(groupId: number) {
     const [group, setGroup] = useState<ServerGroup | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)

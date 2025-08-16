@@ -65,7 +65,7 @@ const Home: FC = () => {
         navigate('/create-group')
     }
 
-    const handleLeaveGroup = async (groupId: string) => {
+    const handleLeaveGroup = async (groupId: number) => {
         const currentUserId = authService.state.profile?.id;
         if (!currentUserId) {
             throw new Error('You must be logged in to leave a group');
@@ -122,7 +122,7 @@ const Home: FC = () => {
                         <div className="divide-y divide-gray-100">
                             {groups.map((group, index) => (
                                 <GroupCard 
-                                    key={`${group._id}-${index}`} 
+                                    key={`${group.id}-${index}`}
                                     group={group} 
                                     onLeave={handleLeaveGroup}
                                 />

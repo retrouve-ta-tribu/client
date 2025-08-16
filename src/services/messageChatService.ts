@@ -1,5 +1,6 @@
 import socketService, { RoomEvents } from './socketService';
 import { ChatMessage } from "./types";
+import {ROOM_NAME_PREFIX} from "./groupService.ts";
 
 export enum ChatEvents {
     Message = 'ChatMessage',
@@ -21,7 +22,7 @@ interface IncomingChatBroadcastData {
  */
 class MessageChatService {
     private static instance: MessageChatService;
-    private groupId: string | null = null;
+    private groupId: number | null = null;
     private userId: string | null = null;
     private messages: ChatMessage[] = [];
     private messageListeners: Set<(messages: ChatMessage[]) => void> = new Set();
@@ -49,27 +50,11 @@ class MessageChatService {
     }
 
     /**
-     * Check if the socket is connected
-     * @returns True if the socket is connected, false otherwise
-     */
-    isSocketConnected(): boolean {
-        return socketService.isConnected();
-    }
-
-    /**
-     * Connect to the socket
-     * @returns A promise that resolves when the socket is connected
-     */
-    async connectSocket(): Promise<void> {
-        return socketService.connect();
-    }
-
-    /**
      * Join a chat room
      * @param groupId - The ID of the group to join
      * @param userId - The ID of the user to join the chat
      */
-    async joinChat(groupId: string, userId: string): Promise<void> {
+    async joinChat(groupId: number, userId: string): Promise<void> {
         // Leave any existing chat
         this.leaveChat();
         
@@ -82,7 +67,7 @@ class MessageChatService {
         }
         
         // Join the room for this group
-        socketService.joinRoom(groupId);
+        socketService.joinRoom(ROOM_NAME_PREFIX+groupId);
         
         // Set up listener for chat messages
         socketService.addListener<IncomingChatBroadcastData>(RoomEvents.Broadcast, this.handleMessage);
@@ -99,7 +84,7 @@ class MessageChatService {
                 this.typingInterval = null;
             }
             socketService.removeListener(RoomEvents.Broadcast, this.handleMessage);
-            socketService.leaveRoom(this.groupId);
+            socketService.leaveRoom(ROOM_NAME_PREFIX+this.groupId);
             this.groupId = null;
         }
         
@@ -151,7 +136,7 @@ class MessageChatService {
             message
         };
 
-        socketService.broadcast(this.groupId, broadcastData);
+        socketService.broadcast(ROOM_NAME_PREFIX+this.groupId, broadcastData);
         
             this.notifyListeners();
     }
@@ -281,7 +266,7 @@ class MessageChatService {
             }
         };
 
-        socketService.broadcast(this.groupId, broadcastData);
+        socketService.broadcast(ROOM_NAME_PREFIX+this.groupId, broadcastData);
     }
 }
 

@@ -2,26 +2,23 @@ import authService from './authService';
 import { Member } from './types';
 import socketService, { RoomEvents } from './socketService';
 
+export const ROOM_NAME_PREFIX = "RTT-";
+
 /**
  * Represents a group's information in the system
  * @property _id - The unique identifier of the group
  * @property name - The name of the group
  * @property description - The description of the group
  * @property members - The members of the group
- * @property createdBy - The user who created the group
  * @property createdAt - The date and time when the group was created
  */
 export interface Group {
-  _id: {
-    $oid: string;
-  };
+  id: number,
   name: string;
   description?: string;
-  members: string[];
-  createdBy: string;
-  createdAt: {
-    $date: string;
-  };
+  members?: string[];
+  member_count?: number;
+  createdAt: string;
 }
 
 /**
@@ -40,13 +37,13 @@ export enum GroupEvents {
 
 interface GroupBroadcastData {
     type: GroupEvents;
-    groupId: string;
+    groupId: number;
 }
 
 class GroupService {
   private static instance: GroupService;
   private baseUrl: string;
-  private memberListeners: Map<string, Set<() => void>> = new Map(); // groupId -> Set of listeners
+  private memberListeners: Map<number, Set<() => void>> = new Map(); // groupId -> Set of listeners
 
   private constructor() {
     const apiUrl = import.meta.env.VITE_API_URL;
@@ -104,7 +101,7 @@ class GroupService {
    * @param groupId - The ID of the group to fetch
    * @returns A promise that resolves to the group or null if the group is not found
    */
-  public async getGroupById(groupId: string): Promise<Group | null> {
+  public async getGroupById(groupId: number): Promise<Group | null> {
     try {
       const response = await fetch(`${this.baseUrl}/groups/${groupId}`);
       
@@ -165,7 +162,7 @@ class GroupService {
    * @param userId - The ID of the user to leave the group
    * @returns A promise that resolves when the user leaves the group
    */
-  public async leaveGroup(groupId: string, userId: string): Promise<void> {
+  public async leaveGroup(groupId: number, userId: string): Promise<void> {
     try {
       const response = await fetch(`${this.baseUrl}/groups/${groupId}/members/${userId}`, {
         method: 'DELETE',
@@ -189,7 +186,7 @@ class GroupService {
    * @param groupId - The ID of the group to get the members of
    * @returns A promise that resolves to the members of the group
    */
-  public async getGroupMembers(groupId: string): Promise<Member[]> {
+  public async getGroupMembers(groupId: number): Promise<Member[]> {
     const response = await fetch(`${this.baseUrl}/groups/${groupId}/members`);
     
     if (!response.ok) {
@@ -211,7 +208,7 @@ class GroupService {
    * @param userId - The ID of the user to add to the group
    * @returns A promise that resolves when the member is added
    */
-  public async addMember(groupId: string, userId: string): Promise<void> {
+  public async addMember(groupId: number, userId: number): Promise<void> {
     try {
       const response = await fetch(`${this.baseUrl}/groups/${groupId}/members/${userId}`, {
         method: 'POST',
@@ -239,7 +236,7 @@ class GroupService {
    * @param userId - The ID of the user to remove from the group
    * @returns A promise that resolves when the member is removed
    */
-  public async removeMember(groupId: string, userId: string): Promise<void> {
+  public async removeMember(groupId: number, userId: string): Promise<void> {
     try {
       const response = await fetch(`${this.baseUrl}/groups/${groupId}/members/${userId}`, {
         method: 'DELETE',
@@ -266,7 +263,7 @@ class GroupService {
    * @param groupId - The ID of the group
    * @param callback - The callback to add
    */
-  addMemberListener(groupId: string, callback: () => void): void {
+  addMemberListener(groupId: number, callback: () => void): void {
     if (!this.memberListeners.has(groupId)) {
       this.memberListeners.set(groupId, new Set());
     }
@@ -278,7 +275,7 @@ class GroupService {
    * @param groupId - The ID of the group
    * @param callback - The callback to remove
    */
-  removeMemberListener(groupId: string, callback: () => void): void {
+  removeMemberListener(groupId: number, callback: () => void): void {
     this.memberListeners.get(groupId)?.delete(callback);
     if (this.memberListeners.get(groupId)?.size === 0) {
       this.memberListeners.delete(groupId);
@@ -289,7 +286,7 @@ class GroupService {
    * Notify listeners of a group
    * @param groupId - The ID of the group
    */
-  private notifyListeners(groupId: string): void {
+  private notifyListeners(groupId: number): void {
     this.memberListeners.get(groupId)?.forEach(callback => {
       callback();
     });
@@ -299,12 +296,12 @@ class GroupService {
    * Broadcast a members changed event to all clients
    * @param groupId - The ID of the group
    */
-  private broadcastMembersChanged(groupId: string): void {
+  private broadcastMembersChanged(groupId: number): void {
     const broadcastData: GroupBroadcastData = {
       type: GroupEvents.MembersChanged,
       groupId
     };
-    socketService.broadcast(groupId, broadcastData);
+    socketService.broadcast(ROOM_NAME_PREFIX+groupId, broadcastData);
   }
 }
 

@@ -11,7 +11,7 @@ import ExitIcon from '../icons/ExitIcon'
  */
 interface GroupCardProps {
     group: Group;
-    onLeave?: (groupId: string) => Promise<void>;
+    onLeave?: (groupId: number) => Promise<void>;
 }
 
 const GroupCard: FC<GroupCardProps> = ({ group, onLeave }) => {
@@ -32,7 +32,7 @@ const GroupCard: FC<GroupCardProps> = ({ group, onLeave }) => {
     };
 
     const formattedDate = formatDate(group.createdAt);
-    const memberCount = group.members?.length || 0;
+    const memberCount = group.member_count || group.members?.length || 0;
 
     const handleLeave = async (e: React.MouseEvent) => {
         e.preventDefault();
@@ -44,7 +44,7 @@ const GroupCard: FC<GroupCardProps> = ({ group, onLeave }) => {
         setError(null);
         
         try {
-            await onLeave(group._id.$oid);
+            await onLeave(group.id);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to leave group');
         } finally {
@@ -54,7 +54,7 @@ const GroupCard: FC<GroupCardProps> = ({ group, onLeave }) => {
 
     return (
         <div className="relative">
-            <Link to={`/group/${group._id}`} className="block hover:bg-gray-50">
+            <Link to={`/group/${group.id}`} className="block hover:bg-gray-50">
                 <div className="p-4">
                     <h3 className="font-semibold text-gray-800">{group.name}</h3>
                     

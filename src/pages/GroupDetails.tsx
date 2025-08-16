@@ -130,7 +130,7 @@ const GroupDetails: FC = () => {
                 <div className="relative max-w-3xl mx-auto bg-white shadow-md h-full flex flex-col justify-between overflow-hidden">
                     <Conversation 
                         group={{
-                            _id: group._id,
+                            id: group.id,
                             name: group.name,
                             members: memberObjects
                         }} 

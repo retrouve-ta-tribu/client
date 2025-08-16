@@ -1,6 +1,7 @@
 import socketService, { RoomEvents } from './socketService';
 import geolocationService from './geolocationService';
 import { UserPosition } from "./types.ts";
+import {ROOM_NAME_PREFIX} from "./groupService.ts";
 
 export enum LocationEvents {
     LocationUpdate = 'LocationUpdate'
@@ -13,7 +14,7 @@ interface IncomingPositionBroadcastData {
 
 class LocationSharingService {
     private static instance: LocationSharingService;
-    private groupId: string | null = null;
+    private groupId: number | null = null;
     private userId: string | null = null;
     private intervalId: number | null = null;
     private positions: Map<string, UserPosition> = new Map();
@@ -38,7 +39,7 @@ class LocationSharingService {
      * @param userId - The ID of the user to share location updates from
      * @returns A promise that resolves when the location sharing starts
      */
-    async startSharing(groupId: string, userId: string): Promise<void> {
+    async startSharing(groupId: number, userId: string): Promise<void> {
         // Stop any existing sharing
         this.stopSharing();
         
@@ -49,7 +50,7 @@ class LocationSharingService {
         await socketService.connect();
         
         // Join the room for this group
-        socketService.joinRoom(groupId);
+        socketService.joinRoom(ROOM_NAME_PREFIX+groupId);
         
         // Set up listener for location updates
         socketService.addListener<IncomingPositionBroadcastData>(RoomEvents.Broadcast, this.handleLocationUpdate);
@@ -87,7 +88,7 @@ class LocationSharingService {
         
         if (this.groupId) {
             socketService.removeListener(RoomEvents.Broadcast, this.handleLocationUpdate);
-            socketService.leaveRoom(this.groupId);
+            socketService.leaveRoom(ROOM_NAME_PREFIX+this.groupId);
             this.groupId = null;
         }
         
@@ -129,7 +130,7 @@ class LocationSharingService {
             position,
         };
         
-        socketService.broadcast(this.groupId, message);
+        socketService.broadcast(ROOM_NAME_PREFIX+this.groupId, message);
     }
 
     /**

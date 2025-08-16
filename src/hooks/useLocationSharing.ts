@@ -4,7 +4,7 @@ import authService from '../services/authService'
 import { UserPosition } from '../services/types'
 import socketService from "../services/socketService.ts";
 
-export function useLocationSharing(groupId: string, setError: (error: string | null) => void) {
+export function useLocationSharing(groupId: number, setError: (error: string | null) => void) {
     const [userPositions, setUserPositions] = useState<UserPosition[]>([])
     const [isConnectingSocket, setIsConnectingSocket] = useState<boolean>(false)
     const [isGettingLocation, setIsGettingLocation] = useState<boolean>(false)

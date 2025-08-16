@@ -4,7 +4,7 @@ import authService from '../services/authService'
 import { PointOfInterest, UserPosition } from '../services/types'
 import { getCurrentUserPosition } from '../utils/positionUtils'
 
-export function usePointsOfInterest(groupId: string, setError: (error: string | null) => void) {
+export function usePointsOfInterest(groupId: number, setError: (error: string | null) => void) {
     const [points, setPoints] = useState<PointOfInterest[]>([])
     const [isAddingPoint, setIsAddingPoint] = useState(false)
 

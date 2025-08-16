@@ -19,9 +19,7 @@ export interface Member {
  * @property members - Array of members in the group
  */
 export interface Group {
-  _id: {
-    $oid: string;
-  };
+  id: number;
   name: string;
   members: Member[];
 }
